@@ -92,16 +92,19 @@ export interface Database {
         Row: Profile;
         Insert: Omit<Profile, "created_at" | "updated_at">;
         Update: Partial<Omit<Profile, "id">>;
+        Relationships: [];
       };
       competitions: {
         Row: Competition;
         Insert: Omit<Competition, "id" | "created_at" | "updated_at">;
         Update: Partial<Omit<Competition, "id">>;
+        Relationships: [];
       };
       rounds: {
         Row: Round;
         Insert: Omit<Round, "id" | "created_at">;
         Update: Partial<Omit<Round, "id">>;
+        Relationships: [];
       };
       registrations: {
         Row: Registration;
@@ -110,22 +113,27 @@ export interface Database {
           "id" | "created_at" | "reviewed_at" | "reviewed_by"
         >;
         Update: Partial<Omit<Registration, "id">>;
+        Relationships: [];
       };
       competition_judges: {
         Row: CompetitionJudge;
         Insert: Omit<CompetitionJudge, "id" | "assigned_at">;
         Update: Partial<Omit<CompetitionJudge, "id">>;
+        Relationships: [];
       };
       scores: {
         Row: Score;
         Insert: Omit<Score, "id" | "created_at" | "updated_at">;
         Update: Partial<Omit<Score, "id">>;
+        Relationships: [];
       };
     };
     Views: {
       round_results: {
         Row: RoundResult;
+        Relationships: [];
       };
     };
+    Functions: Record<string, never>;
   };
 }

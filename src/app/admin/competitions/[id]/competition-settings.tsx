@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import type { Competition } from "@/types/database";
+import type { Competition, CompetitionStatus } from "@/types/database";
 
 export function CompetitionSettings({
   competition,
@@ -14,7 +14,7 @@ export function CompetitionSettings({
   competition: Competition;
 }) {
   const router = useRouter();
-  const [status, setStatus] = useState(competition.status);
+  const [status, setStatus] = useState<CompetitionStatus>(competition.status);
   const [registrationOpen, setRegistrationOpen] = useState(
     competition.registration_open
   );
@@ -38,9 +38,7 @@ export function CompetitionSettings({
           label="Status"
           value={status}
           onChange={(e) =>
-            setStatus(
-              e.target.value as Competition["status"]
-            )
+            setStatus(e.target.value as CompetitionStatus)
           }
           options={[
             { value: "draft", label: "Draft" },
