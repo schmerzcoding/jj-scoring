@@ -4,9 +4,9 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { Registration, Profile } from "@/types/database";
+import type { RegistrationWithProfile } from "@/types/database";
 
-type Participant = Registration & { profile: Profile | null };
+type Participant = RegistrationWithProfile;
 
 export function ScoringPanel({
   roundId,

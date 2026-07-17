@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import type { Profile, CompetitionJudge } from "@/types/database";
-
-type JudgeWithProfile = CompetitionJudge & { profile: Profile | null };
+import type { Profile, CompetitionJudgeWithProfile } from "@/types/database";
 
 export function JudgesPanel({
   competitionId,
@@ -15,7 +13,7 @@ export function JudgesPanel({
   availableJudges,
 }: {
   competitionId: string;
-  assignedJudges: JudgeWithProfile[];
+  assignedJudges: CompetitionJudgeWithProfile[];
   availableJudges: Profile[];
 }) {
   const router = useRouter();

@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
-import type { Registration, Profile } from "@/types/database";
-
-type RegistrationWithProfile = Registration & { profile: Profile | null };
+import type { RegistrationWithProfile } from "@/types/database";
 
 export function RegistrationsPanel({
   registrations,
