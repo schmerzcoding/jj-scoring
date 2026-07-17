@@ -10,10 +10,8 @@ import type { Registration, Profile } from "@/types/database";
 type RegistrationWithProfile = Registration & { profile: Profile | null };
 
 export function RegistrationsPanel({
-  competitionId,
   registrations,
 }: {
-  competitionId: string;
   registrations: RegistrationWithProfile[];
 }) {
   const router = useRouter();

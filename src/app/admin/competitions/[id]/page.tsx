@@ -77,10 +77,7 @@ export default async function AdminCompetitionPage({
 
       <CompetitionSettings competition={competition} />
 
-      <RegistrationsPanel
-        competitionId={id}
-        registrations={registrations ?? []}
-      />
+      <RegistrationsPanel registrations={registrations ?? []} />
 
       <RoundsPanel competitionId={id} rounds={rounds ?? []} />
 
