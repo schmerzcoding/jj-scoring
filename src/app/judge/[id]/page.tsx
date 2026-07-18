@@ -3,6 +3,13 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { ScoringPanel } from "./scoring-panel";
+import { Leaderboard } from "@/components/leaderboard";
+import {
+  getAdvancedIdsForRound,
+  getLeaderboardForRoundServer,
+} from "@/lib/leaderboard-server";
+import { getEligibleParticipants } from "@/lib/leaderboard";
+import type { ParticipantRow } from "@/lib/leaderboard";
 
 export default async function JudgeCompetitionPage({
   params,
@@ -47,18 +54,28 @@ export default async function JudgeCompetitionPage({
   const participantProfileById = new Map(
     participantProfiles?.map((p) => [p.id, p]) ?? []
   );
-  const registrationsWithProfiles =
+  const participants: ParticipantRow[] =
     registrations?.map((registration) => ({
-      ...registration,
+      id: registration.id,
+      role: registration.role,
+      display_name: registration.display_name,
       profile: participantProfileById.get(registration.user_id) ?? null,
     })) ?? [];
 
-  const filteredRegistrations = activeRound
-    ? registrationsWithProfiles.filter((r) => {
-        if (activeRound.role_type === "both") return true;
-        return r.role === activeRound.role_type;
-      })
-    : [];
+  let filteredRegistrations = participants;
+  if (activeRound) {
+    const advancedIds = await getAdvancedIdsForRound(
+      supabase,
+      rounds ?? [],
+      activeRound
+    );
+    filteredRegistrations = getEligibleParticipants(
+      activeRound,
+      rounds ?? [],
+      participants,
+      advancedIds
+    );
+  }
 
   let existingScores: Record<string, number> = {};
   if (activeRound) {
@@ -74,6 +91,23 @@ export default async function JudgeCompetitionPage({
       );
     }
   }
+
+  const leaderboardRounds =
+    rounds?.filter(
+      (round) => round.status === "completed" || round.id === activeRound?.id
+    ) ?? [];
+
+  const roundLeaderboards = await Promise.all(
+    leaderboardRounds.map(async (round) => ({
+      round,
+      entries: await getLeaderboardForRoundServer(
+        supabase,
+        round,
+        rounds ?? [],
+        participants
+      ),
+    }))
+  );
 
   return (
     <div className="space-y-8">
@@ -106,7 +140,7 @@ export default async function JudgeCompetitionPage({
           roundId={activeRound.id}
           roundName={activeRound.name}
           judgeId={user.id}
-          participants={filteredRegistrations ?? []}
+          participants={filteredRegistrations}
           existingScores={existingScores}
         />
       ) : (
@@ -114,6 +148,20 @@ export default async function JudgeCompetitionPage({
           <p className="text-gray-500">
             No active round. Wait for the admin to activate a round.
           </p>
+        </div>
+      )}
+
+      {roundLeaderboards.length > 0 && (
+        <div className="space-y-6">
+          <h2 className="text-lg font-semibold text-gray-900">Leaderboards</h2>
+          {roundLeaderboards.map(({ round, entries }) => (
+            <Leaderboard
+              key={round.id}
+              title={round.name}
+              entries={entries}
+              showAdvanced={round.status === "completed"}
+            />
+          ))}
         </div>
       )}
     </div>

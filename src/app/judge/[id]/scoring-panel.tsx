@@ -4,9 +4,9 @@ import { useState } from "react";
 import { createClient, fromTable } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { RegistrationWithProfile } from "@/types/database";
+import type { ParticipantRow } from "@/lib/leaderboard";
 
-type Participant = RegistrationWithProfile;
+type Participant = ParticipantRow;
 
 export function ScoringPanel({
   roundId,

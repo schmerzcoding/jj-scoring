@@ -81,6 +81,9 @@ export type Database = {
           role_type: Database["public"]["Enums"]["round_role_type"];
           status: Database["public"]["Enums"]["round_status"];
           max_advance: number | null;
+          max_advance_leaders: number | null;
+          max_advance_followers: number | null;
+          leaderboard_published: boolean;
           created_at: string;
         };
         Insert: {
@@ -91,6 +94,9 @@ export type Database = {
           role_type?: Database["public"]["Enums"]["round_role_type"];
           status?: Database["public"]["Enums"]["round_status"];
           max_advance?: number | null;
+          max_advance_leaders?: number | null;
+          max_advance_followers?: number | null;
+          leaderboard_published?: boolean;
           created_at?: string;
         };
         Update: {
@@ -101,6 +107,48 @@ export type Database = {
           role_type?: Database["public"]["Enums"]["round_role_type"];
           status?: Database["public"]["Enums"]["round_status"];
           max_advance?: number | null;
+          max_advance_leaders?: number | null;
+          max_advance_followers?: number | null;
+          leaderboard_published?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      round_standings: {
+        Row: {
+          id: string;
+          round_id: string;
+          registration_id: string;
+          role: Database["public"]["Enums"]["registration_role"];
+          total_score: number;
+          average_score: number;
+          judge_count: number;
+          rank_in_role: number;
+          advanced: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          round_id: string;
+          registration_id: string;
+          role: Database["public"]["Enums"]["registration_role"];
+          total_score?: number;
+          average_score?: number;
+          judge_count?: number;
+          rank_in_role: number;
+          advanced?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          round_id?: string;
+          registration_id?: string;
+          role?: Database["public"]["Enums"]["registration_role"];
+          total_score?: number;
+          average_score?: number;
+          judge_count?: number;
+          rank_in_role?: number;
+          advanced?: boolean;
           created_at?: string;
         };
         Relationships: [];
@@ -247,6 +295,7 @@ export type RoundStatus = Database["public"]["Enums"]["round_status"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Competition = Database["public"]["Tables"]["competitions"]["Row"];
 export type Round = Database["public"]["Tables"]["rounds"]["Row"];
+export type RoundStanding = Database["public"]["Tables"]["round_standings"]["Row"];
 export type Registration = Database["public"]["Tables"]["registrations"]["Row"];
 export type CompetitionJudge =
   Database["public"]["Tables"]["competition_judges"]["Row"];

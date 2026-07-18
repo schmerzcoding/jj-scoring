@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/utils";
 import { RegistrationForm } from "./registration-form";
+import { Leaderboard } from "@/components/leaderboard";
+import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";
+import type { ParticipantRow } from "@/lib/leaderboard";
 
 export default async function CompetitionDetailPage({
   params,
@@ -40,6 +43,33 @@ export default async function CompetitionDetailPage({
     .select("*")
     .eq("competition_id", id)
     .order("order_index");
+
+  const { data: approvedRegistrations } = await supabase
+    .from("registrations")
+    .select("*")
+    .eq("competition_id", id)
+    .eq("status", "approved");
+
+  const userIds = [...new Set(approvedRegistrations?.map((r) => r.user_id) ?? [])];
+  const { data: profiles } =
+    userIds.length > 0
+      ? await supabase.from("profiles").select("id, full_name").in("id", userIds)
+      : { data: [] as { id: string; full_name: string }[] };
+
+  const profileById = new Map(profiles?.map((p) => [p.id, p]) ?? []);
+  const participants: ParticipantRow[] =
+    approvedRegistrations?.map((registration) => ({
+      id: registration.id,
+      role: registration.role,
+      display_name: registration.display_name,
+      profile: profileById.get(registration.user_id) ?? null,
+    })) ?? [];
+
+  const publishedLeaderboards = await getPublishedRoundLeaderboards(
+    supabase,
+    id,
+    participants
+  );
 
   return (
     <div className="space-y-8">
@@ -101,6 +131,20 @@ export default async function CompetitionDetailPage({
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {publishedLeaderboards.length > 0 && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold text-gray-900">Results</h2>
+          {publishedLeaderboards.map(({ round, entries }) => (
+            <Leaderboard
+              key={round.id}
+              title={round.name}
+              entries={entries}
+              showAdvanced={false}
+            />
+          ))}
         </div>
       )}
     </div>

@@ -80,6 +80,16 @@ export default async function AdminCompetitionPage({
       profile: judgeProfileById.get(assignment.judge_id) ?? null,
     })) ?? [];
 
+  const approvedParticipants =
+    registrationsWithProfiles
+      .filter((registration) => registration.status === "approved")
+      .map(({ id, role, display_name, profile }) => ({
+        id,
+        role,
+        display_name,
+        profile,
+      })) ?? [];
+
   const { data: allJudges } = await supabase
     .from("profiles")
     .select("*")
@@ -117,7 +127,11 @@ export default async function AdminCompetitionPage({
 
       <RegistrationsPanel registrations={registrationsWithProfiles} />
 
-      <RoundsPanel competitionId={id} rounds={rounds ?? []} />
+      <RoundsPanel
+        competitionId={id}
+        rounds={rounds ?? []}
+        participants={approvedParticipants}
+      />
 
       <JudgesPanel
         competitionId={id}
