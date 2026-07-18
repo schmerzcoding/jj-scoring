@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, fromTable } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { RegistrationWithProfile } from "@/types/database";
@@ -41,14 +41,13 @@ export function ScoringPanel({
     const existing = existingScores[registrationId] !== undefined;
 
     if (existing) {
-      await supabase
-        .from("scores")
+      await fromTable(supabase, "scores")
         .update({ score: scoreValue })
         .eq("round_id", roundId)
         .eq("judge_id", judgeId)
         .eq("registration_id", registrationId);
     } else {
-      await supabase.from("scores").insert({
+      await fromTable(supabase, "scores").insert({
         round_id: roundId,
         judge_id: judgeId,
         registration_id: registrationId,

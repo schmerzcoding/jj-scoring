@@ -1,6 +1,6 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import { createClient, fromTable } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
@@ -22,7 +22,7 @@ export function JudgesPanel({
 
   async function assignJudge(judgeId: string) {
     const supabase = createClient();
-    await supabase.from("competition_judges").insert({
+    await fromTable(supabase, "competition_judges").insert({
       competition_id: competitionId,
       judge_id: judgeId,
     });
@@ -31,7 +31,7 @@ export function JudgesPanel({
 
   async function removeJudge(assignmentId: string) {
     const supabase = createClient();
-    await supabase.from("competition_judges").delete().eq("id", assignmentId);
+    await fromTable(supabase, "competition_judges").delete().eq("id", assignmentId);
     router.refresh();
   }
 

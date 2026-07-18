@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, fromTable } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
@@ -23,8 +23,7 @@ export function CompetitionSettings({
   async function handleSave() {
     setLoading(true);
     const supabase = createClient();
-    await supabase
-      .from("competitions")
+    await fromTable(supabase, "competitions")
       .update({ status, registration_open: registrationOpen })
       .eq("id", competition.id);
     setLoading(false);

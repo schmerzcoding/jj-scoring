@@ -1,6 +1,6 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import { createClient, fromTable } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/status-badge";
@@ -25,8 +25,7 @@ export function RegistrationsPanel({
       data: { user },
     } = await supabase.auth.getUser();
 
-    await supabase
-      .from("registrations")
+    await fromTable(supabase, "registrations")
       .update({
         status,
         reviewed_at: new Date().toISOString(),

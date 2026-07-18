@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, fromTable } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ export function RoundsPanel({
     setLoading(true);
 
     const supabase = createClient();
-    await supabase.from("rounds").insert({
+    await fromTable(supabase, "rounds").insert({
       competition_id: competitionId,
       name: name.trim(),
       order_index: rounds.length,
@@ -45,14 +45,13 @@ export function RoundsPanel({
     const supabase = createClient();
 
     if (status === "active") {
-      await supabase
-        .from("rounds")
+      await fromTable(supabase, "rounds")
         .update({ status: "pending" })
         .eq("competition_id", competitionId)
         .eq("status", "active");
     }
 
-    await supabase.from("rounds").update({ status }).eq("id", roundId);
+    await fromTable(supabase, "rounds").update({ status }).eq("id", roundId);
     router.refresh();
   }
 

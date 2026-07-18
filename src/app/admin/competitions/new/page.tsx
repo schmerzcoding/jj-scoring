@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, fromTable } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -35,8 +35,7 @@ export default function NewCompetitionPage() {
       return;
     }
 
-    const { data, error: insertError } = await supabase
-      .from("competitions")
+    const { data, error: insertError } = await fromTable(supabase, "competitions")
       .insert({
         name,
         description: description || null,
