@@ -14,7 +14,7 @@ export default function NewCompetitionPage() {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [eventDate, setEventDate] = useState("");
-  const [status, setStatus] = useState("draft");
+  const [status, setStatus] = useState("open");
   const [registrationOpen, setRegistrationOpen] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

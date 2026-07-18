@@ -75,6 +75,16 @@ export default async function AdminCompetitionPage({
         </div>
       </div>
 
+      {competition.status === "draft" && (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <p className="text-sm text-yellow-800">
+            This competition is in <strong>draft</strong> and is hidden from
+            the public list. Change status to <strong>Open</strong> below and
+            enable registration when you are ready.
+          </p>
+        </div>
+      )}
+
       <CompetitionSettings competition={competition} />
 
       <RegistrationsPanel registrations={registrations ?? []} />

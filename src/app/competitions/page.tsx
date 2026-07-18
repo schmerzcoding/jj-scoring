@@ -9,7 +9,7 @@ export default async function CompetitionsPage() {
   const { data: competitions } = await supabase
     .from("competitions")
     .select("*")
-    .neq("status", "draft")
+    .in("status", ["open", "closed", "in_progress", "completed"])
     .order("event_date", { ascending: true });
 
   return (
