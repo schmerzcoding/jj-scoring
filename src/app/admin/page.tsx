@@ -31,6 +31,27 @@ export default async function AdminDashboard() {
     .select("*", { count: "exact", head: true })
     .eq("status", "pending");
 
+  const { data: pendingRegistrations } = await supabase
+    .from("registrations")
+    .select("id, role, status, competition_id, display_name, user_id")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+
+  const pendingCompetitionIds = [
+    ...new Set(pendingRegistrations?.map((r) => r.competition_id) ?? []),
+  ];
+  const { data: pendingCompetitions } =
+    pendingCompetitionIds.length > 0
+      ? await supabase
+          .from("competitions")
+          .select("id, name")
+          .in("id", pendingCompetitionIds)
+      : { data: [] as { id: string; name: string }[] };
+
+  const competitionNameById = new Map(
+    pendingCompetitions?.map((c) => [c.id, c.name]) ?? []
+  );
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -44,10 +65,27 @@ export default async function AdminDashboard() {
       </div>
 
       {pendingCount !== null && pendingCount > 0 && (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 space-y-3">
           <p className="text-sm text-yellow-800">
-            {pendingCount} registration{pendingCount > 1 ? "s" : ""} pending approval.
+            {pendingCount} registration{pendingCount > 1 ? "s" : ""} pending
+            approval. Open the competition below and use{" "}
+            <strong>Approve</strong> in the Registrations section.
           </p>
+          <ul className="space-y-2">
+            {pendingRegistrations?.map((registration) => (
+                <li key={registration.id}>
+                  <Link
+                    href={`/admin/competitions/${registration.competition_id}`}
+                    className="text-sm font-medium text-brand-700 hover:underline"
+                  >
+                    Review: {registration.display_name ?? "Participant"} (
+                    {registration.role}) —{" "}
+                    {competitionNameById.get(registration.competition_id) ??
+                      "Competition"}
+                  </Link>
+                </li>
+              ))}
+          </ul>
         </div>
       )}
 

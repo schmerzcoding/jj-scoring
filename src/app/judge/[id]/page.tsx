@@ -34,12 +34,27 @@ export default async function JudgeCompetitionPage({
 
   const { data: registrations } = await supabase
     .from("registrations")
-    .select("*, profile:profiles(*)")
+    .select("*")
     .eq("competition_id", id)
     .eq("status", "approved");
 
+  const participantIds = [...new Set(registrations?.map((r) => r.user_id) ?? [])];
+  const { data: participantProfiles } =
+    participantIds.length > 0
+      ? await supabase.from("profiles").select("id, full_name").in("id", participantIds)
+      : { data: [] as { id: string; full_name: string }[] };
+
+  const participantProfileById = new Map(
+    participantProfiles?.map((p) => [p.id, p]) ?? []
+  );
+  const registrationsWithProfiles =
+    registrations?.map((registration) => ({
+      ...registration,
+      profile: participantProfileById.get(registration.user_id) ?? null,
+    })) ?? [];
+
   const filteredRegistrations = activeRound
-    ? registrations?.filter((r) => {
+    ? registrationsWithProfiles.filter((r) => {
         if (activeRound.role_type === "both") return true;
         return r.role === activeRound.role_type;
       })

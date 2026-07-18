@@ -37,9 +37,24 @@ export default async function AdminCompetitionPage({
 
   const { data: registrations } = await supabase
     .from("registrations")
-    .select("*, profile:profiles(*)")
+    .select("*")
     .eq("competition_id", id)
     .order("created_at", { ascending: false });
+
+  const userIds = [...new Set(registrations?.map((r) => r.user_id) ?? [])];
+  const { data: registrationProfiles } =
+    userIds.length > 0
+      ? await supabase.from("profiles").select("id, full_name").in("id", userIds)
+      : { data: [] as { id: string; full_name: string }[] };
+
+  const profileById = new Map(
+    registrationProfiles?.map((p) => [p.id, p]) ?? []
+  );
+  const registrationsWithProfiles =
+    registrations?.map((registration) => ({
+      ...registration,
+      profile: profileById.get(registration.user_id) ?? null,
+    })) ?? [];
 
   const { data: rounds } = await supabase
     .from("rounds")
@@ -49,8 +64,21 @@ export default async function AdminCompetitionPage({
 
   const { data: judges } = await supabase
     .from("competition_judges")
-    .select("*, profile:profiles(*)")
+    .select("*")
     .eq("competition_id", id);
+
+  const judgeIds = [...new Set(judges?.map((j) => j.judge_id) ?? [])];
+  const { data: judgeProfiles } =
+    judgeIds.length > 0
+      ? await supabase.from("profiles").select("id, full_name").in("id", judgeIds)
+      : { data: [] as { id: string; full_name: string }[] };
+
+  const judgeProfileById = new Map(judgeProfiles?.map((p) => [p.id, p]) ?? []);
+  const judgesWithProfiles =
+    judges?.map((assignment) => ({
+      ...assignment,
+      profile: judgeProfileById.get(assignment.judge_id) ?? null,
+    })) ?? [];
 
   const { data: allJudges } = await supabase
     .from("profiles")
@@ -87,13 +115,13 @@ export default async function AdminCompetitionPage({
 
       <CompetitionSettings competition={competition} />
 
-      <RegistrationsPanel registrations={registrations ?? []} />
+      <RegistrationsPanel registrations={registrationsWithProfiles} />
 
       <RoundsPanel competitionId={id} rounds={rounds ?? []} />
 
       <JudgesPanel
         competitionId={id}
-        assignedJudges={judges ?? []}
+        assignedJudges={judgesWithProfiles}
         availableJudges={allJudges ?? []}
       />
     </div>
