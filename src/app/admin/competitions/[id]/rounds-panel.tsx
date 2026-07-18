@@ -80,9 +80,15 @@ export function RoundsPanel({
 
   async function togglePublish(round: Round, published: boolean) {
     const supabase = createClient();
-    await fromTable(supabase, "rounds")
+    const { error } = await fromTable(supabase, "rounds")
       .update({ leaderboard_published: published })
       .eq("id", round.id);
+
+    if (error) {
+      alert(`Could not update publish setting: ${error.message}`);
+      return;
+    }
+
     router.refresh();
   }
 

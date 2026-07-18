@@ -120,6 +120,7 @@ export type Database = {
           round_id: string;
           registration_id: string;
           role: Database["public"]["Enums"]["registration_role"];
+          display_name: string | null;
           total_score: number;
           average_score: number;
           judge_count: number;
@@ -132,6 +133,7 @@ export type Database = {
           round_id: string;
           registration_id: string;
           role: Database["public"]["Enums"]["registration_role"];
+          display_name?: string | null;
           total_score?: number;
           average_score?: number;
           judge_count?: number;
@@ -144,6 +146,7 @@ export type Database = {
           round_id?: string;
           registration_id?: string;
           role?: Database["public"]["Enums"]["registration_role"];
+          display_name?: string | null;
           total_score?: number;
           average_score?: number;
           judge_count?: number;

@@ -68,7 +68,15 @@ export default async function CompetitionDetailPage({
   const publishedLeaderboards = await getPublishedRoundLeaderboards(
     supabase,
     id,
+    rounds ?? [],
     participants
+  );
+
+  const hasPublishedRounds = (rounds ?? []).some(
+    (round) => round.leaderboard_published
+  );
+  const hasCompletedRounds = (rounds ?? []).some(
+    (round) => round.status === "completed"
   );
 
   return (
@@ -128,23 +136,36 @@ export default async function CompetitionDetailPage({
                 <p className="mt-1 text-xs capitalize text-gray-500">
                   {round.role_type}
                 </p>
+                {round.leaderboard_published && (
+                  <p className="mt-2 text-xs font-medium text-green-600">
+                    Results published
+                  </p>
+                )}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {publishedLeaderboards.length > 0 && (
+      {(hasPublishedRounds || hasCompletedRounds || publishedLeaderboards.length > 0) && (
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-900">Results</h2>
-          {publishedLeaderboards.map(({ round, entries }) => (
-            <Leaderboard
-              key={round.id}
-              title={round.name}
-              entries={entries}
-              showAdvanced={false}
-            />
-          ))}
+          {publishedLeaderboards.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              {hasCompletedRounds
+                ? "Results are being finalized. Check back soon."
+                : "Results will appear here once rounds are completed."}
+            </p>
+          ) : (
+            publishedLeaderboards.map(({ round, entries }) => (
+              <Leaderboard
+                key={round.id}
+                title={round.name}
+                entries={entries}
+                showAdvanced={false}
+              />
+            ))
+          )}
         </div>
       )}
     </div>

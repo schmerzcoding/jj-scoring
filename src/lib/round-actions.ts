@@ -10,12 +10,15 @@ import type { Round, RoundStanding } from "@/types/database";
 
 export function standingsToLeaderboard(
   standings: RoundStanding[],
-  nameByRegistrationId: Map<string, string>
+  nameByRegistrationId?: Map<string, string>
 ): LeaderboardEntry[] {
   return standings
     .map((standing) => ({
       registrationId: standing.registration_id,
-      displayName: nameByRegistrationId.get(standing.registration_id) ?? "Unknown",
+      displayName:
+        standing.display_name ??
+        nameByRegistrationId?.get(standing.registration_id) ??
+        "Unknown",
       role: standing.role,
       totalScore: Number(standing.total_score),
       averageScore: Number(standing.average_score),
@@ -126,6 +129,7 @@ export async function completeRound(
       leaderboard.map((entry) => ({
         round_id: round.id,
         registration_id: entry.registrationId,
+        display_name: entry.displayName,
         role: entry.role,
         total_score: entry.totalScore,
         average_score: entry.averageScore,
@@ -141,7 +145,7 @@ export async function completeRound(
   }
 
   await fromTable(supabase, "rounds")
-    .update({ status: "completed" })
+    .update({ status: "completed", leaderboard_published: true })
     .eq("id", round.id);
 
   return {
