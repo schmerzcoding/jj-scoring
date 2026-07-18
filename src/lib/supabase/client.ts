@@ -1,7 +1,9 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type AppSupabaseClient = SupabaseClient<any, "public", any>;
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export function createClient(): AppSupabaseClient {
   return createBrowserClient(
@@ -16,5 +18,6 @@ export function createClient(): AppSupabaseClient {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function fromTable(supabase: AppSupabaseClient, table: string): any {
-  return supabase.from(table);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return supabase.from(table) as any;
 }
