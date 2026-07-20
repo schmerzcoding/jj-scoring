@@ -111,3 +111,17 @@ Brevo free plan includes ~300 emails/day (check current limits on their site). S
 - Never commit SMTP keys to git
 - SMTP is configured only in Supabase dashboard, not in `.env.local`
 - The app only needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+## Re-enabling verification later
+
+When your domain and Brevo are ready:
+
+1. Configure Brevo + Supabase as above
+2. Enable **Confirm email** in Supabase
+3. Set in `.env.local` and Vercel:
+
+```env
+NEXT_PUBLIC_REQUIRE_EMAIL_VERIFICATION=true
+```
+
+4. Redeploy. Signup will require email verification again.

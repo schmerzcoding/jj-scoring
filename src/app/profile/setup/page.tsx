@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { isEmailVerified, needsProfileSetup } from "@/lib/auth";
+import { needsProfileSetup } from "@/lib/auth";
 import { profileToFormValues, EMPTY_PROFILE_FORM_VALUES } from "@/lib/profile";
 import { ProfileSetupForm } from "./profile-setup-form";
 
@@ -11,7 +11,6 @@ export default async function ProfileSetupPage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
-  if (!isEmailVerified(user)) redirect("/verify-email");
 
   const { data: profile } = await supabase
     .from("profiles")

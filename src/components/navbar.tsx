@@ -42,7 +42,7 @@ export async function Navbar() {
             </Link>
           )}
 
-          {user && profile?.profile_completed && profile.role === "participant" && (
+          {user && profile?.role === "participant" && profile.profile_completed && (
             <Link href="/profile" className="text-sm text-gray-600 hover:text-gray-900">
               Profile
             </Link>

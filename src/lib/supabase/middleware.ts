@@ -4,6 +4,7 @@ import {
   isAuthPublicPath,
   isEmailVerified,
   needsProfileSetup,
+  requireEmailVerification,
 } from "@/lib/auth";
 
 export async function updateSession(request: NextRequest) {
@@ -40,7 +41,7 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  if (!isEmailVerified(user)) {
+  if (requireEmailVerification() && !isEmailVerified(user)) {
     if (
       !isAuthPublicPath(pathname) &&
       pathname !== "/verify-email"
@@ -76,7 +77,7 @@ export async function updateSession(request: NextRequest) {
   if (
     pathname === "/login" ||
     pathname === "/signup" ||
-    pathname === "/verify-email"
+    (requireEmailVerification() && pathname === "/verify-email")
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/";

@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { isEmailVerified } from "@/lib/auth";
+import { fetchProfileCompetitionData } from "@/lib/profile-stats";
+import {
+  AchievementsSection,
+  EnrollmentsSection,
+  HistorySection,
+  ProfileSummary,
+} from "@/components/profile-dashboard";
 import { ProfileEditForm } from "./profile-edit-form";
 
 export default async function ProfilePage() {
@@ -10,7 +16,6 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
-  if (!isEmailVerified(user)) redirect("/verify-email");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -20,8 +25,22 @@ export default async function ProfilePage() {
 
   if (!profile) redirect("/profile/setup");
 
+  const competitionData = await fetchProfileCompetitionData(supabase, user.id);
+
   return (
-    <div className="mx-auto max-w-lg">
+    <div className="mx-auto max-w-4xl space-y-8">
+      <ProfileSummary
+        fullName={profile.full_name}
+        bio={profile.bio}
+        danceRole={profile.dance_role}
+        age={profile.age}
+        gender={profile.gender}
+      />
+
+      <EnrollmentsSection enrollments={competitionData.enrollments} />
+      <AchievementsSection achievements={competitionData.achievements} />
+      <HistorySection history={competitionData.history} />
+
       <ProfileEditForm
         userId={user.id}
         email={user.email ?? ""}

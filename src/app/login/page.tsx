@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getPostLoginPath, isEmailVerified } from "@/lib/auth";
+import { getPostLoginPath, requireEmailVerification } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,8 +29,9 @@ export default function LoginPage() {
 
     if (authError) {
       const needsVerification =
-        authError.message.toLowerCase().includes("email not confirmed") ||
-        authError.message.toLowerCase().includes("not confirmed");
+        requireEmailVerification() &&
+        (authError.message.toLowerCase().includes("email not confirmed") ||
+          authError.message.toLowerCase().includes("not confirmed"));
 
       if (needsVerification) {
         router.push(`/verify-email?email=${encodeURIComponent(email)}`);
@@ -43,7 +44,11 @@ export default function LoginPage() {
     }
 
     const user = data.user;
-    if (user && !isEmailVerified(user)) {
+    if (
+      user &&
+      requireEmailVerification() &&
+      !user.email_confirmed_at
+    ) {
       router.push(`/verify-email?email=${encodeURIComponent(email)}`);
       return;
     }

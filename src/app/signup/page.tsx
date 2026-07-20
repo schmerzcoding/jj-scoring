@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { isEmailVerified } from "@/lib/auth";
+import { Card } from "@/components/ui/card";
+import { getPostLoginPath } from "@/lib/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -51,11 +52,18 @@ export default function SignupPage() {
       return;
     }
 
-    if (!isEmailVerified(data.user)) {
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+    if (data.session) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, profile_completed")
+        .eq("id", data.user.id)
+        .single();
+
+      router.push(getPostLoginPath(profile));
     } else {
-      router.push("/profile/setup");
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
     }
+
     router.refresh();
   }
 
@@ -63,7 +71,7 @@ export default function SignupPage() {
     <div className="mx-auto max-w-md">
       <Card
         title="Sign up"
-        description="Create your account — you'll verify your email, then complete your profile"
+        description="Create your account and complete your dancer profile"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input

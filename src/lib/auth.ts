@@ -1,7 +1,13 @@
 import type { Profile } from "@/types/database";
 import type { User } from "@supabase/supabase-js";
 
+/** Set to "true" when Brevo + domain + Supabase Confirm email are configured. */
+export function requireEmailVerification(): boolean {
+  return process.env.NEXT_PUBLIC_REQUIRE_EMAIL_VERIFICATION === "true";
+}
+
 export function isEmailVerified(user: User): boolean {
+  if (!requireEmailVerification()) return true;
   return Boolean(user.email_confirmed_at);
 }
 
