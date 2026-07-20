@@ -184,7 +184,7 @@ export default function NewCompetitionPage() {
           </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="flex gap-3">
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" loading={loading}>
               {loading ? "Creating..." : "Create Competition"}
             </Button>
             <Button

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/status-badge";
 import { UserAvatar } from "@/components/avatar-upload";
 import { formatDate, formatScore } from "@/lib/utils";
@@ -63,15 +65,17 @@ export function EnrollmentsSection({
       description="Competitions you are signed up for"
     >
       {enrollments.length === 0 ? (
-        <p className="text-sm text-muted">
-          You are not registered for any active competition.{" "}
-          <Link
-            href="/competitions"
-            className="text-brand-400 hover:text-brand-300 hover:underline"
-          >
-            Browse competitions
-          </Link>
-        </p>
+        <EmptyState
+          icon="calendar"
+          title="No active registrations"
+          description="Browse open competitions and sign up as leader or follower."
+          compact
+          action={
+            <Link href="/competitions">
+              <Button size="sm">Browse competitions</Button>
+            </Link>
+          }
+        />
       ) : (
         <div className="divide-y divide-border">
           {enrollments.map((registration) => (
@@ -94,9 +98,12 @@ export function HistorySection({
       description="Events you have completed"
     >
       {history.length === 0 ? (
-        <p className="text-sm text-muted">
-          No completed competitions yet. Your past events will appear here.
-        </p>
+        <EmptyState
+          icon="clipboard"
+          title="No history yet"
+          description="Completed competitions you took part in will show up here."
+          compact
+        />
       ) : (
         <div className="divide-y divide-border">
           {history.map((registration) => (
@@ -119,9 +126,12 @@ export function AchievementsSection({
       description="Results and milestones from your rounds"
     >
       {achievements.length === 0 ? (
-        <p className="text-sm text-muted">
-          Compete in a round to unlock achievements here.
-        </p>
+        <EmptyState
+          icon="trophy"
+          title="No achievements yet"
+          description="Compete in a round to unlock your first milestone."
+          compact
+        />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {achievements.map((achievement) => (
@@ -180,7 +190,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
   };
 
   return (
-    <div className="rounded-xl border border-border bg-surface-raised p-4">
+    <div className="rounded-xl border border-border bg-surface-raised p-4 transition-colors hover:border-brand-800/30">
       <span
         className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeStyles[achievement.kind]}`}
       >

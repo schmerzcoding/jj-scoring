@@ -56,7 +56,7 @@ export function CompetitionSettings({
           />
           <span className="text-sm text-foreground">Registration open</span>
         </label>
-        <Button onClick={handleSave} disabled={loading} size="sm">
+        <Button onClick={handleSave} loading={loading} size="sm">
           {loading ? "Saving..." : "Save"}
         </Button>
       </div>

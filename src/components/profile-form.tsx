@@ -147,7 +147,7 @@ export function ProfileForm({
         <p className="text-sm text-emerald-400">Profile saved successfully.</p>
       )}
 
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" className="w-full" loading={loading}>
         {loading ? "Saving..." : submitLabel}
       </Button>
     </form>

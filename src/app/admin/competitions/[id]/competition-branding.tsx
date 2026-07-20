@@ -51,7 +51,7 @@ export function CompetitionBranding({
           onChange={setCountryCode}
           required
         />
-        <Button size="sm" onClick={saveCountry} disabled={loading}>
+        <Button size="sm" onClick={saveCountry} loading={loading}>
           {loading ? "Saving..." : "Save country"}
         </Button>
         <CompetitionBannerUpload

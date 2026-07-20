@@ -4,6 +4,7 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { ScoringPanel } from "./scoring-panel";
 import { Leaderboard } from "@/components/leaderboard";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   getAdvancedIdsForRound,
   getLeaderboardForRoundServer,
@@ -129,7 +130,7 @@ export default async function JudgeCompetitionPage({
 
       <div>
         <h2 className="text-lg font-semibold text-foreground">Rounds</h2>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2 stagger-children">
           {rounds?.map((round) => (
             <div
               key={round.id}
@@ -152,11 +153,12 @@ export default async function JudgeCompetitionPage({
           existingScores={existingScores}
         />
       ) : (
-        <div className="rounded-2xl border border-border bg-surface-overlay p-8 text-center shadow-lg shadow-black/20">
-          <p className="text-muted">
-            No active round. Wait for the admin to activate a round.
-          </p>
-        </div>
+        <EmptyState
+          icon="rounds"
+          title="No active round"
+          description="Wait for the organizer to activate a round before you can start scoring."
+          compact
+        />
       )}
 
       {roundLeaderboards.length > 0 && (

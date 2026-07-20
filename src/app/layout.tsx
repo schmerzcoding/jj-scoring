@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} app-glow`}>
         <Navbar />
-        <main className="mx-auto min-h-[calc(100vh-4rem)] max-w-7xl px-4 py-8">
+        <main className="animate-fade-in mx-auto min-h-[calc(100vh-4rem)] max-w-7xl px-4 py-8">
           {children}
         </main>
       </body>

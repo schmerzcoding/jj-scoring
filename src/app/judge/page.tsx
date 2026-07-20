@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/utils";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default async function JudgeDashboard() {
   const supabase = await createClient();
@@ -36,32 +37,36 @@ export default async function JudgeDashboard() {
 
       <div className="grid gap-4">
         {assignments?.length === 0 && (
-          <p className="text-muted">
-            You are not assigned to any competitions yet.
-          </p>
+          <EmptyState
+            icon="gavel"
+            title="No assignments yet"
+            description="When an organizer assigns you to a competition, it will appear here."
+          />
         )}
-        {assignments?.map((assignment) => {
-          const comp = assignment.competition;
-          if (!comp) return null;
-          return (
-            <Link
-              key={assignment.id}
-              href={`/judge/${comp.id}`}
-              className="flex items-center justify-between rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20 transition-all hover:border-brand-800/40"
-            >
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">
-                  {comp.name}
-                </h2>
-                <div className="mt-1 flex gap-4 text-sm text-muted">
-                  {comp.location && <span>{comp.location}</span>}
-                  <span>{formatDate(comp.event_date)}</span>
+        <div className="stagger-children grid gap-4">
+          {assignments?.map((assignment) => {
+            const comp = assignment.competition;
+            if (!comp) return null;
+            return (
+              <Link
+                key={assignment.id}
+                href={`/judge/${comp.id}`}
+                className="flex items-center justify-between rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20 transition-all hover:border-brand-800/40 hover:shadow-brand-950/10"
+              >
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {comp.name}
+                  </h2>
+                  <div className="mt-1 flex gap-4 text-sm text-muted">
+                    {comp.location && <span>{comp.location}</span>}
+                    <span>{formatDate(comp.event_date)}</span>
+                  </div>
                 </div>
-              </div>
-              <StatusBadge status={comp.status} />
-            </Link>
-          );
-        })}
+                <StatusBadge status={comp.status} />
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

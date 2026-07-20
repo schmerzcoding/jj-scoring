@@ -270,7 +270,7 @@ function RoundRow({
         >
           Save advancement
         </Button>
-        <Button size="sm" variant="ghost" onClick={onLoadLeaderboard} disabled={loadingBoard}>
+        <Button size="sm" variant="ghost" onClick={onLoadLeaderboard} loading={loadingBoard}>
           {loadingBoard ? "Loading..." : "Show leaderboard"}
         </Button>
         {round.status === "completed" && (

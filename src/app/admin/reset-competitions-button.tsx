@@ -108,7 +108,8 @@ export function ResetCompetitionsButton({
               type="button"
               variant="danger"
               onClick={handleDelete}
-              disabled={loading || confirmValue !== CONFIRM_TEXT}
+              loading={loading}
+              disabled={confirmValue !== CONFIRM_TEXT}
             >
               {loading ? "Deleting..." : "Delete everything"}
             </Button>

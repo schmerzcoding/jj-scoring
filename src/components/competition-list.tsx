@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
@@ -25,12 +26,18 @@ export function CompetitionList({
   }, []);
 
   if (competitions.length === 0) {
-    return <p className="text-muted">No competitions available yet.</p>;
+    return (
+      <EmptyState
+        icon="calendar"
+        title="No competitions yet"
+        description="Check back soon — new events will appear here when organizers publish them."
+      />
+    );
   }
 
   return (
     <>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="stagger-children grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {competitions.map((competition) => (
           <article
             key={competition.id}

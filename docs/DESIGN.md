@@ -40,6 +40,10 @@ Step-by-step visual identity for the app. Dark elegant theme with wine/burgundy 
 - **Judge:** dashboard, scoring panel with Yes/No toggle, round chips, leaderboards
 - **Danger zone:** dark red warning styling
 
-## Next steps
+## Step 4 — done
 
-- **Step 4:** Polish — loading states, empty states, micro-interactions
+- **EmptyState** component with icons for lists, panels, and cards
+- **Spinner** + `loading` prop on Button (forms, scoring, admin actions)
+- **Success variant** on save buttons in scoring panel
+- **Page fade-in** on main content; **stagger** on card grids
+- **Reduced motion** respected via `prefers-reduced-motion`

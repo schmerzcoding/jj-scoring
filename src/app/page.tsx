@@ -69,7 +69,7 @@ export default async function HomePage() {
           <h2 className="mb-6 text-2xl font-semibold text-foreground">
             Upcoming Competitions
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {competitions.map((comp) => (
               <Link
                 key={comp.id}
@@ -92,7 +92,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="grid gap-8 sm:grid-cols-3">
+      <section className="stagger-children grid gap-8 sm:grid-cols-3">
         <FeatureCard
           title="For Organizers"
           description="Create events, manage rounds, approve registrations, and assign judges."

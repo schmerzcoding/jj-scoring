@@ -4,6 +4,7 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ResetCompetitionsButton } from "./reset-competitions-button";
 
 export default async function AdminDashboard() {
@@ -95,8 +96,18 @@ export default async function AdminDashboard() {
         <h2 className="text-xl font-semibold text-foreground">Competitions</h2>
         <div className="mt-4 grid gap-4">
           {competitions?.length === 0 && (
-            <p className="text-muted">No competitions yet. Create your first one!</p>
+            <EmptyState
+              icon="calendar"
+              title="No competitions yet"
+              description="Create your first Jack & Jill event to get started."
+              action={
+                <Link href="/admin/competitions/new">
+                  <Button>New Competition</Button>
+                </Link>
+              }
+            />
           )}
+          <div className="stagger-children grid gap-4">
           {competitions?.map((comp) => (
             <Link
               key={comp.id}
@@ -120,6 +131,7 @@ export default async function AdminDashboard() {
               </div>
             </Link>
           ))}
+          </div>
         </div>
       </div>
 

@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
+import { Spinner } from "./spinner";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "ghost";
+  variant?: "primary" | "secondary" | "danger" | "ghost" | "success";
   size?: "sm" | "md" | "lg";
+  loading?: boolean;
 }
 
 export function Button({
@@ -10,6 +12,8 @@ export function Button({
   size = "md",
   className,
   children,
+  loading = false,
+  disabled,
   ...props
 }: ButtonProps) {
   return (
@@ -21,10 +25,12 @@ export function Button({
         {
           "bg-brand-600 text-white shadow-md shadow-brand-950/40 hover:bg-brand-500 hover:shadow-lg hover:shadow-brand-900/35 active:scale-[0.98]":
             variant === "primary",
-          "border border-border bg-surface-overlay text-foreground hover:border-brand-700/50 hover:bg-surface-hover":
+          "border border-border bg-surface-overlay text-foreground hover:border-brand-700/50 hover:bg-surface-hover active:scale-[0.98]":
             variant === "secondary",
           "bg-red-900/80 text-red-100 shadow-md shadow-red-950/30 hover:bg-red-800 active:scale-[0.98]":
             variant === "danger",
+          "bg-emerald-900/80 text-emerald-100 shadow-md shadow-emerald-950/30":
+            variant === "success",
           "text-muted-foreground hover:bg-surface-hover hover:text-foreground":
             variant === "ghost",
           "px-3 py-1.5 text-sm": size === "sm",
@@ -33,8 +39,12 @@ export function Button({
         },
         className
       )}
+      disabled={disabled || loading}
       {...props}
     >
+      {loading && (
+        <Spinner size={size === "sm" ? "sm" : "md"} className="mr-2 shrink-0" />
+      )}
       {children}
     </button>
   );

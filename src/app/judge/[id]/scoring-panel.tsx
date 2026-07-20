@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient, fromTable } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
 import type { ParticipantRow } from "@/lib/leaderboard";
 import type { RoundScoringFormat } from "@/types/database";
@@ -117,9 +118,12 @@ export function ScoringPanel({
   return (
     <Card title={`Scoring: ${roundName}`} description={description}>
       {participants.length === 0 ? (
-        <p className="text-sm text-muted">
-          No approved participants for this round.
-        </p>
+        <EmptyState
+          icon="users"
+          title="No participants"
+          description="There are no approved participants eligible for this round."
+          compact
+        />
       ) : (
         <>
           <div className="divide-y divide-border">
@@ -186,14 +190,12 @@ export function ScoringPanel({
                   />
                   <Button
                     size="sm"
+                    variant={saved[p.id] ? "success" : "primary"}
                     onClick={() => saveScore(p.id)}
-                    disabled={saving === p.id || !canSave(p.id)}
+                    loading={saving === p.id}
+                    disabled={!canSave(p.id) && saving !== p.id}
                   >
-                    {saved[p.id]
-                      ? "Saved!"
-                      : saving === p.id
-                        ? "..."
-                        : "Save"}
+                    {saved[p.id] ? "Saved!" : "Save"}
                   </Button>
                 </div>
               </div>

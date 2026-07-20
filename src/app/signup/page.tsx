@@ -90,7 +90,7 @@ export default function SignupPage() {
             required
           />
           {error && <p className="text-sm text-red-400">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" loading={loading}>
             {loading ? "Creating account..." : "Sign up"}
           </Button>
         </form>

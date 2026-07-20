@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { Profile, CompetitionJudgeWithProfile } from "@/types/database";
 
 export function JudgesPanel({
@@ -77,11 +78,20 @@ export function JudgesPanel({
           />
         </div>
       ) : (
-        <p className="text-sm text-muted">
-          {availableJudges.length === 0
-            ? "No judge accounts exist. Create judge users in Supabase and set their role to 'judge'."
-            : "All available judges are assigned."}
-        </p>
+        <EmptyState
+          icon="gavel"
+          title={
+            availableJudges.length === 0
+              ? "No judge accounts"
+              : "All judges assigned"
+          }
+          description={
+            availableJudges.length === 0
+              ? "Create judge users in Supabase and set their role to 'judge'."
+              : "Every available judge is already on this competition."
+          }
+          compact
+        />
       )}
     </Card>
   );

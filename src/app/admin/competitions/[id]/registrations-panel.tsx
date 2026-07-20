@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { RegistrationWithProfile } from "@/types/database";
 
 export function RegistrationsPanel({
@@ -42,7 +43,12 @@ export function RegistrationsPanel({
       description={`${approved.length} approved, ${pending.length} pending`}
     >
       {registrations.length === 0 ? (
-        <p className="text-sm text-muted">No registrations yet.</p>
+        <EmptyState
+          icon="users"
+          title="No registrations yet"
+          description="Participants will appear here once they sign up for this event."
+          compact
+        />
       ) : (
         <div className="divide-y divide-border">
           {registrations.map((reg) => (

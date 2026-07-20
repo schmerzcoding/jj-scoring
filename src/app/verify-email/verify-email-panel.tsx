@@ -87,7 +87,7 @@ export function VerifyEmailPanel({
           type="button"
           className="w-full"
           onClick={resendEmail}
-          disabled={loading}
+          loading={loading}
         >
           {loading ? "Sending..." : "Resend verification email"}
         </Button>

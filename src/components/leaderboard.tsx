@@ -1,4 +1,5 @@
 import { formatScore } from "@/lib/utils";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { LeaderboardEntry } from "@/lib/leaderboard";
 import type { RoundScoringFormat } from "@/types/database";
 
@@ -25,7 +26,7 @@ export function Leaderboard({
     return (
       <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
         <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-        <p className="mt-2 text-sm text-muted">{emptyMessage}</p>
+        <EmptyState title={emptyMessage} compact className="mt-2" />
       </div>
     );
   }
@@ -68,7 +69,7 @@ function LeaderboardColumn({
         {label}
       </h4>
       {entries.length === 0 ? (
-        <p className="text-sm text-muted">No participants</p>
+        <EmptyState title="No participants" compact className="py-2" />
       ) : (
         <div className="divide-y divide-border">
           {entries.map((entry) => (
