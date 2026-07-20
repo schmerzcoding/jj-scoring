@@ -42,7 +42,7 @@ export function CompetitionBranding({
   return (
     <Card title="Branding" description="Banner and country shown on the competitions page">
       <div className="space-y-4">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted">
           Current country: {getCountryName(competition.country_code) || "Not set"}
         </p>
         <CountrySelect
@@ -62,7 +62,7 @@ export function CompetitionBranding({
             router.refresh();
           }}
         />
-        {message && <p className="text-sm text-green-600">{message}</p>}
+        {message && <p className="text-sm text-emerald-400">{message}</p>}
       </div>
     </Card>
   );

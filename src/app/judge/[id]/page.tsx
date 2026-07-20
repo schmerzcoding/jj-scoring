@@ -119,23 +119,23 @@ export default async function JudgeCompetitionPage({
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/judge" className="text-sm text-brand-600 hover:underline">
+        <Link href="/judge" className="text-sm text-brand-400 hover:text-brand-300 hover:underline">
           &larr; Back to judge panel
         </Link>
-        <h1 className="mt-2 text-3xl font-bold text-gray-900">
+        <h1 className="mt-2 text-3xl font-bold text-foreground">
           {competition.name}
         </h1>
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">Rounds</h2>
+        <h2 className="text-lg font-semibold text-foreground">Rounds</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {rounds?.map((round) => (
             <div
               key={round.id}
-              className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2"
+              className="flex items-center gap-2 rounded-xl border border-border bg-surface-overlay px-4 py-2"
             >
-              <span className="text-sm font-medium">{round.name}</span>
+              <span className="text-sm font-medium text-foreground">{round.name}</span>
               <StatusBadge status={round.status} />
             </div>
           ))}
@@ -152,8 +152,8 @@ export default async function JudgeCompetitionPage({
           existingScores={existingScores}
         />
       ) : (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <p className="text-gray-500">
+        <div className="rounded-2xl border border-border bg-surface-overlay p-8 text-center shadow-lg shadow-black/20">
+          <p className="text-muted">
             No active round. Wait for the admin to activate a round.
           </p>
         </div>
@@ -161,7 +161,7 @@ export default async function JudgeCompetitionPage({
 
       {roundLeaderboards.length > 0 && (
         <div className="space-y-6">
-          <h2 className="text-lg font-semibold text-gray-900">Leaderboards</h2>
+          <h2 className="text-lg font-semibold text-foreground">Leaderboards</h2>
           {roundLeaderboards.map(({ round, entries }) => (
             <Leaderboard
               key={round.id}

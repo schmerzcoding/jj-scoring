@@ -38,13 +38,13 @@ export function JudgesPanel({
   return (
     <Card title="Judges" description="Assign judges to this competition">
       {assignedJudges.length > 0 && (
-        <div className="mb-4 divide-y divide-gray-100">
+        <div className="mb-4 divide-y divide-border">
           {assignedJudges.map((j) => (
             <div
               key={j.id}
               className="flex items-center justify-between py-2"
             >
-              <span className="text-sm font-medium text-gray-900">
+              <span className="text-sm font-medium text-foreground">
                 {j.profile?.full_name ?? "Unknown"}
               </span>
               <Button
@@ -77,7 +77,7 @@ export function JudgesPanel({
           />
         </div>
       ) : (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           {availableJudges.length === 0
             ? "No judge accounts exist. Create judge users in Supabase and set their role to 'judge'."
             : "All available judges are assigned."}

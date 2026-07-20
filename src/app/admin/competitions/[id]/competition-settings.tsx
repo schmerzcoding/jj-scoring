@@ -52,9 +52,9 @@ export function CompetitionSettings({
             type="checkbox"
             checked={registrationOpen}
             onChange={(e) => setRegistrationOpen(e.target.checked)}
-            className="rounded border-gray-300"
+            className="rounded border-border bg-surface-raised text-brand-500 focus:ring-brand-600/30"
           />
-          <span className="text-sm text-gray-700">Registration open</span>
+          <span className="text-sm text-foreground">Registration open</span>
         </label>
         <Button onClick={handleSave} disabled={loading} size="sm">
           {loading ? "Saving..." : "Save"}

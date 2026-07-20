@@ -143,7 +143,7 @@ export function RoundsPanel({
         </div>
       )}
 
-      <form onSubmit={addRound} className="flex flex-wrap items-end gap-3 border-t border-gray-100 pt-4">
+      <form onSubmit={addRound} className="flex flex-wrap items-end gap-3 border-t border-border pt-4">
         <Input
           label="Round name"
           placeholder="e.g. Play-in, Phase 1, Semifinal, Final"
@@ -213,18 +213,18 @@ function RoundRow({
   );
 
   return (
-    <div className="rounded-lg border border-gray-200 p-4">
+    <div className="rounded-xl border border-border bg-surface-raised p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <span className="font-medium text-gray-900">{round.name}</span>
-          <span className="ml-2 text-sm capitalize text-gray-500">
+          <span className="font-medium text-foreground">{round.name}</span>
+          <span className="ml-2 text-sm capitalize text-muted">
             ({round.role_type})
           </span>
-          <span className="ml-2 text-xs text-gray-400">
+          <span className="ml-2 text-xs text-muted-foreground">
             {scoringFormatLabel(round.scoring_format ?? "numeric")}
           </span>
           {round.leaderboard_published && (
-            <span className="ml-2 text-xs font-medium text-green-600">
+            <span className="ml-2 text-xs font-medium text-emerald-400">
               Leaderboard published
             </span>
           )}
@@ -274,12 +274,12 @@ function RoundRow({
           {loadingBoard ? "Loading..." : "Show leaderboard"}
         </Button>
         {round.status === "completed" && (
-          <label className="flex items-center gap-2 pb-2 text-sm text-gray-700">
+          <label className="flex items-center gap-2 pb-2 text-sm text-foreground">
             <input
               type="checkbox"
               checked={round.leaderboard_published}
               onChange={(e) => onTogglePublish(round, e.target.checked)}
-              className="rounded border-gray-300"
+              className="rounded border-border bg-surface-raised text-brand-500 focus:ring-brand-600/30"
             />
             Publish leaderboard publicly
           </label>

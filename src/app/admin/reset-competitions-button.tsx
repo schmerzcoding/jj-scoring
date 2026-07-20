@@ -75,7 +75,7 @@ export function ResetCompetitionsButton({
         <Button
           type="button"
           variant="secondary"
-          className="border-red-200 text-red-700 hover:bg-red-50"
+          className="border-red-900/50 text-red-400 hover:border-red-800 hover:bg-red-950/40"
           onClick={() => setOpen(true)}
           disabled={competitionCount === 0}
         >
@@ -84,10 +84,10 @@ export function ResetCompetitionsButton({
             : `Delete all ${competitionCount} competition${competitionCount === 1 ? "" : "s"}`}
         </Button>
       ) : (
-        <div className="space-y-4 rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-800">
+        <div className="space-y-4 rounded-xl border border-red-900/50 bg-red-950/30 p-4">
+          <p className="text-sm text-red-300">
             This permanently deletes{" "}
-            <strong>
+            <strong className="text-red-200">
               {competitionCount} competition{competitionCount === 1 ? "" : "s"}
             </strong>{" "}
             and all rounds, registrations, scores, and standings. This cannot
@@ -102,7 +102,7 @@ export function ResetCompetitionsButton({
             }}
             placeholder={CONFIRM_TEXT}
           />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"

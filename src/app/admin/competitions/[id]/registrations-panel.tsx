@@ -42,19 +42,19 @@ export function RegistrationsPanel({
       description={`${approved.length} approved, ${pending.length} pending`}
     >
       {registrations.length === 0 ? (
-        <p className="text-sm text-gray-500">No registrations yet.</p>
+        <p className="text-sm text-muted">No registrations yet.</p>
       ) : (
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border">
           {registrations.map((reg) => (
             <div
               key={reg.id}
               className="flex items-center justify-between py-3"
             >
               <div>
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-foreground">
                   {reg.display_name ?? reg.profile?.full_name ?? "Unknown"}
                 </span>
-                <span className="ml-2 text-sm capitalize text-gray-500">
+                <span className="ml-2 text-sm capitalize text-muted">
                   ({reg.role})
                 </span>
               </div>

@@ -57,8 +57,8 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="mt-1 text-gray-600">Manage competitions and registrations.</p>
+          <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+          <p className="mt-1 text-muted">Manage competitions and registrations.</p>
         </div>
         <Link href="/admin/competitions/new">
           <Button>New Competition</Button>
@@ -66,52 +66,55 @@ export default async function AdminDashboard() {
       </div>
 
       {pendingCount !== null && pendingCount > 0 && (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 space-y-3">
-          <p className="text-sm text-yellow-800">
+        <div className="space-y-3 rounded-xl border border-amber-800/50 bg-amber-950/40 p-4">
+          <p className="text-sm text-amber-200">
             {pendingCount} registration{pendingCount > 1 ? "s" : ""} pending
             approval. Open the competition below and use{" "}
-            <strong>Approve</strong> in the Registrations section.
+            <strong className="text-amber-100">Approve</strong> in the
+            Registrations section.
           </p>
           <ul className="space-y-2">
             {pendingRegistrations?.map((registration) => (
-                <li key={registration.id}>
-                  <Link
-                    href={`/admin/competitions/${registration.competition_id}`}
-                    className="text-sm font-medium text-brand-700 hover:underline"
-                  >
-                    Review: {registration.display_name ?? "Participant"} (
-                    {registration.role}) —{" "}
-                    {competitionNameById.get(registration.competition_id) ??
-                      "Competition"}
-                  </Link>
-                </li>
-              ))}
+              <li key={registration.id}>
+                <Link
+                  href={`/admin/competitions/${registration.competition_id}`}
+                  className="text-sm font-medium text-brand-400 hover:text-brand-300 hover:underline"
+                >
+                  Review: {registration.display_name ?? "Participant"} (
+                  {registration.role}) —{" "}
+                  {competitionNameById.get(registration.competition_id) ??
+                    "Competition"}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       )}
 
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Competitions</h2>
+        <h2 className="text-xl font-semibold text-foreground">Competitions</h2>
         <div className="mt-4 grid gap-4">
           {competitions?.length === 0 && (
-            <p className="text-gray-500">No competitions yet. Create your first one!</p>
+            <p className="text-muted">No competitions yet. Create your first one!</p>
           )}
           {competitions?.map((comp) => (
             <Link
               key={comp.id}
               href={`/admin/competitions/${comp.id}`}
-              className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="flex items-center justify-between rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20 transition-all hover:border-brand-800/40"
             >
               <div>
-                <h3 className="font-semibold text-gray-900">{comp.name}</h3>
-                <div className="mt-1 flex gap-4 text-sm text-gray-500">
+                <h3 className="font-semibold text-foreground">{comp.name}</h3>
+                <div className="mt-1 flex gap-4 text-sm text-muted">
                   {comp.location && <span>{comp.location}</span>}
                   <span>{formatDate(comp.event_date)}</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 {comp.registration_open && (
-                  <span className="text-xs font-medium text-green-600">Reg. open</span>
+                  <span className="text-xs font-medium text-emerald-400">
+                    Reg. open
+                  </span>
                 )}
                 <StatusBadge status={comp.status} />
               </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient, fromTable } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { ParticipantRow } from "@/lib/leaderboard";
 import type { RoundScoringFormat } from "@/types/database";
 
@@ -116,38 +117,39 @@ export function ScoringPanel({
   return (
     <Card title={`Scoring: ${roundName}`} description={description}>
       {participants.length === 0 ? (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           No approved participants for this round.
         </p>
       ) : (
         <>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-border">
             {participants.map((p) => (
               <div
                 key={p.id}
                 className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-foreground">
                     {p.display_name ?? p.profile?.full_name ?? "Unknown"}
                   </span>
-                  <span className="ml-2 text-sm capitalize text-gray-500">
+                  <span className="ml-2 text-sm capitalize text-muted">
                     ({p.role})
                   </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {isVoteFormat && (
-                    <div className="flex rounded-lg border border-gray-300 p-0.5">
+                    <div className="flex rounded-xl border border-border bg-surface-raised p-0.5">
                       <button
                         type="button"
                         onClick={() =>
                           setVotes((prev) => ({ ...prev, [p.id]: true }))
                         }
-                        className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                        className={cn(
+                          "rounded-lg px-3 py-1.5 text-sm font-medium transition",
                           votes[p.id] === true
-                            ? "bg-green-600 text-white"
-                            : "text-gray-600 hover:bg-gray-50"
-                        }`}
+                            ? "bg-emerald-700 text-white shadow-sm"
+                            : "text-muted hover:bg-surface-hover hover:text-foreground"
+                        )}
                       >
                         Yes
                       </button>
@@ -156,11 +158,12 @@ export function ScoringPanel({
                         onClick={() =>
                           setVotes((prev) => ({ ...prev, [p.id]: false }))
                         }
-                        className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                        className={cn(
+                          "rounded-lg px-3 py-1.5 text-sm font-medium transition",
                           votes[p.id] === false
-                            ? "bg-red-600 text-white"
-                            : "text-gray-600 hover:bg-gray-50"
-                        }`}
+                            ? "bg-red-800 text-white shadow-sm"
+                            : "text-muted hover:bg-surface-hover hover:text-foreground"
+                        )}
                       >
                         No
                       </button>
@@ -178,7 +181,7 @@ export function ScoringPanel({
                         [p.id]: e.target.value,
                       }))
                     }
-                    className="w-24 rounded-lg border border-gray-300 px-3 py-2 text-center text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                    className="w-24 rounded-xl border border-border bg-surface-raised px-3 py-2 text-center text-sm text-foreground shadow-inner shadow-black/10 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/30"
                     placeholder={isVoteFormat ? "Coef 1-10" : "0-10"}
                   />
                   <Button
@@ -196,7 +199,7 @@ export function ScoringPanel({
               </div>
             ))}
           </div>
-          <div className="mt-4 border-t border-gray-100 pt-4">
+          <div className="mt-4 border-t border-border pt-4">
             <Button onClick={saveAll}>Save All Scores</Button>
           </div>
         </>

@@ -28,15 +28,15 @@ export default async function JudgeDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Judge Panel</h1>
-        <p className="mt-1 text-gray-600">
+        <h1 className="text-3xl font-bold text-foreground">Judge Panel</h1>
+        <p className="mt-1 text-muted">
           Score participants in your assigned competitions.
         </p>
       </div>
 
       <div className="grid gap-4">
         {assignments?.length === 0 && (
-          <p className="text-gray-500">
+          <p className="text-muted">
             You are not assigned to any competitions yet.
           </p>
         )}
@@ -47,13 +47,13 @@ export default async function JudgeDashboard() {
             <Link
               key={assignment.id}
               href={`/judge/${comp.id}`}
-              className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+              className="flex items-center justify-between rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20 transition-all hover:border-brand-800/40"
             >
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   {comp.name}
                 </h2>
-                <div className="mt-1 flex gap-4 text-sm text-gray-500">
+                <div className="mt-1 flex gap-4 text-sm text-muted">
                   {comp.location && <span>{comp.location}</span>}
                   <span>{formatDate(comp.event_date)}</span>
                 </div>

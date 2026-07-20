@@ -99,13 +99,13 @@ export default async function AdminCompetitionPage({
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/admin" className="text-sm text-brand-600 hover:underline">
+        <Link href="/admin" className="text-sm text-brand-400 hover:text-brand-300 hover:underline">
           &larr; Back to dashboard
         </Link>
         <div className="mt-2 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{competition.name}</h1>
-            <div className="mt-2 flex gap-4 text-sm text-gray-500">
+            <h1 className="text-3xl font-bold text-foreground">{competition.name}</h1>
+            <div className="mt-2 flex gap-4 text-sm text-muted">
               {competition.location && <span>{competition.location}</span>}
               <span>{formatDate(competition.event_date)}</span>
             </div>
@@ -115,10 +115,10 @@ export default async function AdminCompetitionPage({
       </div>
 
       {competition.status === "draft" && (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-          <p className="text-sm text-yellow-800">
-            This competition is in <strong>draft</strong> and is hidden from
-            the public list. Change status to <strong>Open</strong> below and
+        <div className="rounded-xl border border-amber-800/50 bg-amber-950/40 p-4">
+          <p className="text-sm text-amber-200">
+            This competition is in <strong className="text-amber-100">draft</strong> and is hidden from
+            the public list. Change status to <strong className="text-amber-100">Open</strong> below and
             enable registration when you are ready.
           </p>
         </div>

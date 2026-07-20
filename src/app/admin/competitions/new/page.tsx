@@ -100,14 +100,14 @@ export default function NewCompetitionPage() {
             required
           />
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-muted-foreground">
               Description
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              className="mt-1 block w-full rounded-xl border border-border bg-surface-raised px-3 py-2.5 text-sm text-foreground shadow-inner shadow-black/10 placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/30"
             />
           </div>
           <CountrySelect
@@ -129,10 +129,10 @@ export default function NewCompetitionPage() {
             onChange={(e) => setEventDate(e.target.value)}
           />
           <div>
-            <p className="mb-2 block text-sm font-medium text-gray-700">
+            <p className="mb-2 block text-sm font-medium text-muted-foreground">
               Banner image
             </p>
-            <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+            <div className="overflow-hidden rounded-xl border border-border bg-surface">
               {bannerPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -141,12 +141,12 @@ export default function NewCompetitionPage() {
                   className="aspect-[3/1] w-full object-cover"
                 />
               ) : (
-                <div className="flex aspect-[3/1] items-center justify-center text-sm text-gray-400">
+                <div className="flex aspect-[3/1] items-center justify-center text-sm text-muted-foreground">
                   No banner selected
                 </div>
               )}
             </div>
-            <label className="mt-2 inline-flex cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            <label className="mt-2 inline-flex cursor-pointer rounded-xl border border-border bg-surface-overlay px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand-700/50 hover:bg-surface-hover">
               Choose banner
               <input
                 type="file"
@@ -157,7 +157,7 @@ export default function NewCompetitionPage() {
                 }
               />
             </label>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted">
               Wide festival or event image. JPEG, PNG, WebP. Max 5 MB.
             </p>
           </div>
@@ -178,11 +178,11 @@ export default function NewCompetitionPage() {
               type="checkbox"
               checked={registrationOpen}
               onChange={(e) => setRegistrationOpen(e.target.checked)}
-              className="rounded border-gray-300"
+              className="rounded border-border bg-surface-raised text-brand-500 focus:ring-brand-600/30"
             />
-            <span className="text-sm text-gray-700">Registration open</span>
+            <span className="text-sm text-foreground">Registration open</span>
           </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="flex gap-3">
             <Button type="submit" disabled={loading}>
               {loading ? "Creating..." : "Create Competition"}
