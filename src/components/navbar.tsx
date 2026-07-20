@@ -34,29 +34,32 @@ export async function Navbar() {
     danger: true,
   });
 
+  const navLinkClass =
+    "text-sm text-muted-foreground transition-colors hover:text-brand-400";
+
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="sticky top-0 z-40 border-b border-border-subtle bg-surface-raised/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold text-brand-700">
-          J&J Scoring
+        <Link
+          href="/"
+          className="text-xl font-bold tracking-tight text-foreground transition-colors hover:text-brand-400"
+        >
+          J<span className="text-brand-500">&</span>J Scoring
         </Link>
 
         <nav className="flex items-center gap-6">
-          <Link
-            href="/competitions"
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
+          <Link href="/competitions" className={navLinkClass}>
             Competitions
           </Link>
 
           {user && profile?.role === "admin" && (
-            <Link href="/admin" className="text-sm text-gray-600 hover:text-gray-900">
+            <Link href="/admin" className={navLinkClass}>
               Admin
             </Link>
           )}
 
           {user && profile?.role === "judge" && (
-            <Link href="/judge" className="text-sm text-gray-600 hover:text-gray-900">
+            <Link href="/judge" className={navLinkClass}>
               Judge Panel
             </Link>
           )}
@@ -69,15 +72,12 @@ export async function Navbar() {
             />
           ) : (
             <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="text-sm text-gray-600 hover:text-gray-900"
-              >
+              <Link href="/login" className={navLinkClass}>
                 Log in
               </Link>
               <Link
                 href="/signup"
-                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+                className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-md shadow-brand-950/40 transition-all hover:bg-brand-500"
               >
                 Sign up
               </Link>

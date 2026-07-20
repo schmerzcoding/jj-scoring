@@ -1,18 +1,50 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #fdf4ff;
-  --color-brand-100: #fae8ff;
-  --color-brand-200: #f5d0fe;
-  --color-brand-300: #f0abfc;
-  --color-brand-400: #e879f9;
-  --color-brand-500: #d946ef;
-  --color-brand-600: #c026d3;
-  --color-brand-700: #a21caf;
-  --color-brand-800: #86198f;
-  --color-brand-900: #701a75;
+  /* Brand — elegant wine / burgundy red */
+  --color-brand-50: #fdf2f4;
+  --color-brand-100: #fce8ec;
+  --color-brand-200: #f8ccd6;
+  --color-brand-300: #f0a3b5;
+  --color-brand-400: #e56b87;
+  --color-brand-500: #d43d62;
+  --color-brand-600: #b8304f;
+  --color-brand-700: #9a2842;
+  --color-brand-800: #7f2338;
+  --color-brand-900: #6b2032;
+
+  /* Dark surfaces */
+  --color-surface: #0e0e11;
+  --color-surface-raised: #16161c;
+  --color-surface-overlay: #1e1e26;
+  --color-surface-hover: #26262f;
+
+  /* Borders & text */
+  --color-border: #2a2a35;
+  --color-border-subtle: #212129;
+  --color-foreground: #f4f4f6;
+  --color-muted: #9494a8;
+  --color-muted-foreground: #b4b4c0;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+  @apply bg-surface text-foreground antialiased;
+}
+
+::selection {
+  @apply bg-brand-700/40 text-foreground;
+}
+
+/* Subtle ambient glow on main pages */
+.app-glow {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(184 48 79 / 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgb(154 40 66 / 0.08), transparent);
+}
+
+select option {
+  background-color: #16161c;
+  color: #f4f4f6;
 }

@@ -1,0 +1,35 @@
+# Design system — J&J Scoring
+
+Step-by-step visual identity for the app. Dark elegant theme with wine/burgundy accents.
+
+## Palette
+
+| Token | Hex | Usage |
+|-------|-----|--------|
+| `brand-500` | `#b8304f` | Primary accent, links hover |
+| `brand-600` | `#9a2842` | Buttons, CTAs |
+| `brand-950` | `#3d0f19` | Avatar rings, deep accents |
+| `surface` | `#0c0c0f` | Page background |
+| `surface-overlay` | `#16161c` | Cards, modals, inputs |
+| `surface-raised` | `#121216` | Navbar, elevated bars |
+| `border` | `#2a2a32` | Card and input borders |
+| `foreground` | `#f4f4f6` | Primary text |
+| `muted` | `#9ca3af` | Secondary text |
+
+## Typography
+
+- **Font:** Inter (via `layout.tsx`)
+- **Headings:** bold, tight tracking; accent `&` in brand color on hero/logo
+
+## Components (Step 1 — done)
+
+- **Buttons:** `rounded-xl`, brand shadow, variants in `ui/button.tsx`
+- **Cards:** dark overlay, subtle border, hover border tint
+- **Navbar:** sticky, blurred, burgundy logo accent
+- **Background:** `.app-glow` radial gradients on body
+
+## Next steps
+
+- **Step 2:** Profile dashboard, auth pages (login/signup)
+- **Step 3:** Admin & judge panels, forms, tables
+- **Step 4:** Polish — loading states, empty states, micro-interactions

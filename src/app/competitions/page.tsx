@@ -12,8 +12,8 @@ export default async function CompetitionsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900">Competitions</h1>
-      <p className="mt-2 text-gray-600">
+      <h1 className="text-3xl font-bold text-foreground">Competitions</h1>
+      <p className="mt-2 text-muted">
         Browse open and upcoming Jack & Jill events.
       </p>
 

@@ -58,11 +58,11 @@ export function UserMenu({
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-100"
+        className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-surface-hover"
         aria-expanded={open}
         aria-haspopup="menu"
       >
-        <span className="max-w-[140px] truncate text-sm font-medium text-gray-700">
+        <span className="max-w-[140px] truncate text-sm font-medium text-foreground">
           {name}
         </span>
         <UserAvatar name={name} avatarUrl={avatarUrl} size="sm" />
@@ -71,13 +71,13 @@ export function UserMenu({
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-50 mt-2 min-w-[12rem] overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
+          className="absolute right-0 z-50 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-border bg-surface-overlay py-1 shadow-xl shadow-black/40"
         >
           {items.map((item) => {
-            const className = `block w-full px-4 py-2 text-left text-sm ${
+            const className = `block w-full px-4 py-2.5 text-left text-sm transition-colors ${
               item.danger
-                ? "text-red-600 hover:bg-red-50"
-                : "text-gray-700 hover:bg-gray-50"
+                ? "text-red-400 hover:bg-red-950/40"
+                : "text-foreground hover:bg-surface-hover"
             }`;
 
             if (item.href) {

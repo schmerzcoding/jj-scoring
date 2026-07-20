@@ -15,16 +15,20 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center rounded-lg font-medium transition-colors disabled:opacity-50",
+        "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200",
+        "disabled:pointer-events-none disabled:opacity-45",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
         {
-          "bg-brand-600 text-white hover:bg-brand-700": variant === "primary",
-          "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50":
+          "bg-brand-600 text-white shadow-md shadow-brand-950/40 hover:bg-brand-500 hover:shadow-lg hover:shadow-brand-900/35 active:scale-[0.98]":
+            variant === "primary",
+          "border border-border bg-surface-overlay text-foreground hover:border-brand-700/50 hover:bg-surface-hover":
             variant === "secondary",
-          "bg-red-600 text-white hover:bg-red-700": variant === "danger",
-          "text-gray-600 hover:bg-gray-100 hover:text-gray-900":
+          "bg-red-900/80 text-red-100 shadow-md shadow-red-950/30 hover:bg-red-800 active:scale-[0.98]":
+            variant === "danger",
+          "text-muted-foreground hover:bg-surface-hover hover:text-foreground":
             variant === "ghost",
           "px-3 py-1.5 text-sm": size === "sm",
-          "px-4 py-2 text-sm": size === "md",
+          "px-4 py-2.5 text-sm": size === "md",
           "px-6 py-3 text-base": size === "lg",
         },
         className

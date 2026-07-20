@@ -25,7 +25,7 @@ export function CompetitionList({
   }, []);
 
   if (competitions.length === 0) {
-    return <p className="text-gray-500">No competitions available yet.</p>;
+    return <p className="text-muted">No competitions available yet.</p>;
   }
 
   return (
@@ -34,9 +34,9 @@ export function CompetitionList({
         {competitions.map((competition) => (
           <article
             key={competition.id}
-            className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+            className="overflow-hidden rounded-2xl border border-border bg-surface-overlay shadow-lg shadow-black/20 transition-all hover:border-brand-800/40"
           >
-            <div className="relative aspect-[3/2] bg-gray-100">
+            <div className="relative aspect-[3/2] bg-surface">
               {competition.banner_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -45,7 +45,7 @@ export function CompetitionList({
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center text-sm text-gray-400">
+                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                   No banner
                 </div>
               )}
@@ -53,14 +53,14 @@ export function CompetitionList({
 
             <div className="space-y-3 p-4">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-foreground">
                   {competition.name}
                 </h2>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-muted">
                   {formatDate(competition.event_date)}
                 </p>
                 {competition.country_code && (
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-muted">
                     {getCountryName(competition.country_code)}
                   </p>
                 )}
@@ -81,11 +81,11 @@ export function CompetitionList({
 
       {selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
           onClick={() => setSelected(null)}
         >
           <div
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white shadow-xl"
+            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-surface-overlay shadow-2xl shadow-black/50"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -105,11 +105,11 @@ export function CompetitionList({
                 <div>
                   <h2
                     id="competition-modal-title"
-                    className="text-xl font-bold text-gray-900"
+                    className="text-xl font-bold text-foreground"
                   >
                     {selected.name}
                   </h2>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-muted">
                     {formatDate(selected.event_date)}
                   </p>
                 </div>
@@ -119,21 +119,21 @@ export function CompetitionList({
               <dl className="grid gap-2 text-sm">
                 {selected.country_code && (
                   <div>
-                    <dt className="font-medium text-gray-700">Country</dt>
-                    <dd className="text-gray-600">
+                    <dt className="font-medium text-foreground">Country</dt>
+                    <dd className="text-muted">
                       {getCountryName(selected.country_code)}
                     </dd>
                   </div>
                 )}
                 {selected.location && (
                   <div>
-                    <dt className="font-medium text-gray-700">Location</dt>
-                    <dd className="text-gray-600">{selected.location}</dd>
+                    <dt className="font-medium text-foreground">Location</dt>
+                    <dd className="text-muted">{selected.location}</dd>
                   </div>
                 )}
                 <div>
-                  <dt className="font-medium text-gray-700">Registration</dt>
-                  <dd className="text-gray-600">
+                  <dt className="font-medium text-foreground">Registration</dt>
+                  <dd className="text-muted">
                     {selected.registration_open ? "Open" : "Closed"}
                   </dd>
                 </div>
@@ -141,10 +141,10 @@ export function CompetitionList({
 
               {selected.description && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700">
+                  <h3 className="text-sm font-medium text-foreground">
                     Description
                   </h3>
-                  <p className="mt-1 whitespace-pre-wrap text-sm text-gray-600">
+                  <p className="mt-1 whitespace-pre-wrap text-sm text-muted">
                     {selected.description}
                   </p>
                 </div>

@@ -20,15 +20,15 @@ export function formatScore(score: number): string {
 
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
-    draft: "bg-gray-100 text-gray-700",
-    open: "bg-green-100 text-green-700",
-    closed: "bg-yellow-100 text-yellow-700",
-    in_progress: "bg-blue-100 text-blue-700",
-    completed: "bg-purple-100 text-purple-700",
-    pending: "bg-yellow-100 text-yellow-700",
-    approved: "bg-green-100 text-green-700",
-    rejected: "bg-red-100 text-red-700",
-    active: "bg-blue-100 text-blue-700",
+    draft: "bg-zinc-800 text-zinc-300 ring-1 ring-zinc-700",
+    open: "bg-emerald-950/80 text-emerald-300 ring-1 ring-emerald-800/50",
+    closed: "bg-amber-950/80 text-amber-300 ring-1 ring-amber-800/50",
+    in_progress: "bg-sky-950/80 text-sky-300 ring-1 ring-sky-800/50",
+    completed: "bg-brand-950/80 text-brand-300 ring-1 ring-brand-800/50",
+    pending: "bg-amber-950/80 text-amber-300 ring-1 ring-amber-800/50",
+    approved: "bg-emerald-950/80 text-emerald-300 ring-1 ring-emerald-800/50",
+    rejected: "bg-red-950/80 text-red-300 ring-1 ring-red-800/50",
+    active: "bg-sky-950/80 text-sky-300 ring-1 ring-sky-800/50",
   };
-  return colors[status] ?? "bg-gray-100 text-gray-700";
+  return colors[status] ?? "bg-zinc-800 text-zinc-300 ring-1 ring-zinc-700";
 }

@@ -27,7 +27,7 @@ export function UserAvatar({
     lg: "h-24 w-24 text-2xl",
   };
 
-  const className = `${sizeClasses[size]} shrink-0 overflow-hidden rounded-full bg-brand-100 font-semibold text-brand-700`;
+  const className = `${sizeClasses[size]} shrink-0 overflow-hidden rounded-full bg-brand-950 font-semibold text-brand-300 ring-2 ring-brand-800/50`;
 
   if (avatarUrl) {
     return (
