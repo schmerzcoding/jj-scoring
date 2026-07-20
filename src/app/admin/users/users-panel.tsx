@@ -5,16 +5,17 @@ import { useRouter } from "next/navigation";
 import { createClient, fromTable } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { EmptyState } from "@/components/ui/empty-state";
 import { cn, getStatusColor } from "@/lib/utils";
 import {
-  ASSIGNABLE_ROLES,
-  COMING_SOON_ROLES,
   canDeleteUser,
+  getRoleSelectOptions,
+  isRoleAssignable,
   roleLabel,
   type AdminUserRow,
-  type AssignableRole,
 } from "@/lib/admin-users";
+import type { UserRole } from "@/types/database";
 
 export function UsersPanel({
   users: initialUsers,
@@ -30,7 +31,9 @@ export function UsersPanel({
   const [confirmDelete, setConfirmDelete] = useState<AdminUserRow | null>(null);
   const [error, setError] = useState("");
 
-  async function assignRole(userId: string, role: AssignableRole) {
+  async function assignRole(userId: string, role: UserRole) {
+    if (!isRoleAssignable(role)) return;
+
     setError("");
     setPendingRole(userId);
 
@@ -97,7 +100,6 @@ export function UsersPanel({
       >
         <div className="divide-y divide-border">
           {users.map((user) => {
-            const isSelf = user.id === currentUserId;
             const isAdmin = user.role === "admin";
             const busy = pendingRole === user.id || deletingId === user.id;
 
@@ -111,7 +113,7 @@ export function UsersPanel({
                     <p className="font-medium text-foreground">
                       {user.full_name || "Unnamed user"}
                     </p>
-                    {isSelf && (
+                    {user.id === currentUserId && (
                       <span className="rounded-full bg-brand-950/60 px-2 py-0.5 text-xs font-medium text-brand-300 ring-1 ring-brand-800/50">
                         You
                       </span>
@@ -128,45 +130,21 @@ export function UsersPanel({
                   <p className="mt-1 truncate text-sm text-muted">{user.email}</p>
                 </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                   {!isAdmin && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {ASSIGNABLE_ROLES.map((role) => (
-                        <button
-                          key={role}
-                          type="button"
-                          disabled={busy || user.role === role}
-                          onClick={() => assignRole(user.id, role)}
-                          className={cn(
-                            "rounded-lg px-3 py-1.5 text-xs font-medium transition-all",
-                            user.role === role
-                              ? "bg-brand-600 text-white shadow-sm"
-                              : "border border-border bg-surface-raised text-muted hover:border-brand-700/50 hover:text-foreground disabled:opacity-40"
-                          )}
-                        >
-                          {roleLabel(role)}
-                        </button>
-                      ))}
-                      {COMING_SOON_ROLES.map((role) => (
-                        <button
-                          key={role}
-                          type="button"
-                          disabled
-                          title="Coming soon"
-                          className={cn(
-                            "cursor-not-allowed rounded-lg px-3 py-1.5 text-xs font-medium opacity-45",
-                            user.role === role
-                              ? "bg-brand-600/60 text-white"
-                              : "border border-border bg-surface-raised text-muted"
-                          )}
-                        >
-                          {roleLabel(role)}
-                          <span className="ml-1 text-[10px] uppercase tracking-wide opacity-80">
-                            · Coming soon
-                          </span>
-                        </button>
-                      ))}
-                    </div>
+                    <Select
+                      label="Role"
+                      value={user.role}
+                      disabled={busy}
+                      onChange={(event) => {
+                        const nextRole = event.target.value as UserRole;
+                        if (nextRole !== user.role) {
+                          assignRole(user.id, nextRole);
+                        }
+                      }}
+                      options={getRoleSelectOptions(user.role)}
+                      className="w-full min-w-[11rem] sm:w-48"
+                    />
                   )}
 
                   {canDeleteUser(user, currentUserId) ? (
@@ -175,11 +153,12 @@ export function UsersPanel({
                       variant="danger"
                       loading={deletingId === user.id}
                       onClick={() => setConfirmDelete(user)}
+                      className="sm:mb-0.5"
                     >
                       Delete
                     </Button>
                   ) : (
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground sm:mb-2">
                       {isAdmin ? "Protected admin" : "Cannot delete"}
                     </span>
                   )}

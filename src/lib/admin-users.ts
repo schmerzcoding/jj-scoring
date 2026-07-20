@@ -8,16 +8,25 @@ export type AdminUserRow = {
   created_at: string;
 };
 
-export const ASSIGNABLE_ROLES = [
-  "participant",
-  "judge",
-] as const satisfies readonly UserRole[];
-
-export const COMING_SOON_ROLES = ["organizer"] as const satisfies readonly UserRole[];
-
-export type AssignableRole = (typeof ASSIGNABLE_ROLES)[number];
+/** Add new assignable roles here — they appear in the admin user role dropdown. */
+export const MANAGEABLE_ROLE_OPTIONS: {
+  value: UserRole;
+  label: string;
+  disabled?: boolean;
+}[] = [
+  { value: "participant", label: "Participant" },
+  { value: "judge", label: "Judge" },
+  { value: "organizer", label: "Organizer (coming soon)", disabled: true },
+];
 
 export function roleLabel(role: UserRole): string {
+  const option = MANAGEABLE_ROLE_OPTIONS.find((entry) => entry.value === role);
+  if (option) {
+    return option.disabled
+      ? option.label.replace(/\s*\(coming soon\)$/i, "")
+      : option.label;
+  }
+
   const labels: Record<UserRole, string> = {
     admin: "Admin",
     judge: "Judge",
@@ -25,6 +34,32 @@ export function roleLabel(role: UserRole): string {
     participant: "Participant",
   };
   return labels[role];
+}
+
+export function isRoleAssignable(role: UserRole): boolean {
+  const option = MANAGEABLE_ROLE_OPTIONS.find((entry) => entry.value === role);
+  return Boolean(option && !option.disabled);
+}
+
+export function getRoleSelectOptions(currentRole: UserRole) {
+  const options = MANAGEABLE_ROLE_OPTIONS.map((entry) => ({
+    value: entry.value,
+    label: entry.label,
+    disabled: entry.disabled,
+  }));
+
+  if (
+    currentRole !== "admin" &&
+    !options.some((option) => option.value === currentRole)
+  ) {
+    options.unshift({
+      value: currentRole,
+      label: roleLabel(currentRole),
+      disabled: false,
+    });
+  }
+
+  return options;
 }
 
 export function canDeleteUser(
