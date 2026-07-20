@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/status-badge";
+import { UserAvatar } from "@/components/avatar-upload";
 import { formatDate, formatScore } from "@/lib/utils";
 import type {
   Achievement,
@@ -14,26 +15,35 @@ export function ProfileSummary({
   danceRole,
   age,
   gender,
+  avatarUrl,
 }: {
   fullName: string;
   bio: string | null;
   danceRole: string | null;
   age: number | null;
   gender: string | null;
+  avatarUrl?: string | null;
 }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6">
-      <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
-      <div className="mt-2 flex flex-wrap gap-3 text-sm text-gray-600">
-        {danceRole && (
-          <span className="capitalize">Usual role: {danceRole}</span>
-        )}
-        {age != null && <span>Age: {age}</span>}
-        {gender && (
-          <span className="capitalize">Gender: {gender.replace(/_/g, " ")}</span>
-        )}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <UserAvatar name={fullName} avatarUrl={avatarUrl} size="lg" />
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
+          <div className="mt-2 flex flex-wrap gap-3 text-sm text-gray-600">
+            {danceRole && (
+              <span className="capitalize">Usual role: {danceRole}</span>
+            )}
+            {age != null && <span>Age: {age}</span>}
+            {gender && (
+              <span className="capitalize">
+                Gender: {gender.replace(/_/g, " ")}
+              </span>
+            )}
+          </div>
+          {bio && <p className="mt-4 text-sm text-gray-600">{bio}</p>}
+        </div>
       </div>
-      {bio && <p className="mt-4 text-sm text-gray-600">{bio}</p>}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { LogOutButton } from "./logout-button";
+import { UserAvatar } from "./avatar-upload";
 
 export async function Navbar() {
   const supabase = await createClient();
@@ -50,6 +51,11 @@ export async function Navbar() {
 
           {user ? (
             <div className="flex items-center gap-4">
+              <UserAvatar
+                name={profile?.full_name ?? user.email ?? "User"}
+                avatarUrl={profile?.avatar_url}
+                size="sm"
+              />
               <span className="text-sm text-gray-500">
                 {profile?.full_name ?? user.email}
               </span>

@@ -30,10 +30,12 @@ export function ProfileForm({
   initialValues,
   submitLabel,
   onSubmit,
+  onFullNameChange,
 }: {
   initialValues: ProfileFormValues;
   submitLabel: string;
   onSubmit: (values: ProfileFormValues) => Promise<{ error?: string }>;
+  onFullNameChange?: (name: string) => void;
 }) {
   const [values, setValues] = useState(initialValues);
   const [error, setError] = useState("");
@@ -78,7 +80,10 @@ export function ProfileForm({
       <Input
         label="Full name"
         value={values.fullName}
-        onChange={(e) => setValues({ ...values, fullName: e.target.value })}
+        onChange={(e) => {
+          setValues({ ...values, fullName: e.target.value });
+          onFullNameChange?.(e.target.value);
+        }}
         required
       />
 
