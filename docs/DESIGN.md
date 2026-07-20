@@ -28,8 +28,13 @@ Step-by-step visual identity for the app. Dark elegant theme with wine/burgundy 
 - **Navbar:** sticky, blurred, burgundy logo accent
 - **Background:** `.app-glow` radial gradients on body
 
+## Step 2 — done
+
+- **Auth:** login, signup, verify-email (Card + dark form feedback)
+- **Profile:** summary header, dashboard sections, achievements, edit/setup forms
+- **Competition detail:** banner hero, rounds, registration, leaderboards
+
 ## Next steps
 
-- **Step 2:** Profile dashboard, auth pages (login/signup)
 - **Step 3:** Admin & judge panels, forms, tables
 - **Step 4:** Polish — loading states, empty states, micro-interactions

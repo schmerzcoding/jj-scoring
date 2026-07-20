@@ -131,7 +131,7 @@ export function AvatarUpload({
     <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
       <UserAvatar name={name} avatarUrl={avatarUrl} size="lg" />
       <div className="space-y-2">
-        <label className="inline-flex cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        <label className="inline-flex cursor-pointer rounded-xl border border-border bg-surface-overlay px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand-700/50 hover:bg-surface-hover">
           Upload photo
           <input
             type="file"
@@ -144,12 +144,12 @@ export function AvatarUpload({
           <button
             type="button"
             onClick={handleRemove}
-            className="block text-sm text-red-600 hover:underline"
+            className="block text-sm text-red-400 hover:text-red-300 hover:underline"
           >
             Remove photo
           </button>
         )}
-        <p className="text-xs text-gray-500">JPEG, PNG, WebP or GIF. Max 2 MB.</p>
+        <p className="text-xs text-muted">JPEG, PNG, WebP or GIF. Max 2 MB.</p>
       </div>
     </div>
   );

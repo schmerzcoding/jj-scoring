@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/utils";
+import { getCountryName } from "@/lib/countries";
 import { RegistrationForm } from "./registration-form";
 import { Leaderboard } from "@/components/leaderboard";
 import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";
@@ -81,19 +82,33 @@ export default async function CompetitionDetailPage({
 
   return (
     <div className="space-y-8">
+      {competition.banner_url && (
+        <div className="overflow-hidden rounded-2xl border border-border shadow-lg shadow-black/30">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={competition.banner_url}
+            alt=""
+            className="aspect-[3/1] w-full object-cover"
+          />
+        </div>
+      )}
+
       <div>
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-foreground">
               {competition.name}
             </h1>
             {competition.description && (
-              <p className="mt-2 text-gray-600">{competition.description}</p>
+              <p className="mt-2 text-muted">{competition.description}</p>
             )}
           </div>
           <StatusBadge status={competition.status} />
         </div>
-        <div className="mt-4 flex gap-6 text-sm text-gray-500">
+        <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted">
+          {competition.country_code && (
+            <span>{getCountryName(competition.country_code)}</span>
+          )}
           {competition.location && <span>{competition.location}</span>}
           <span>{formatDate(competition.event_date)}</span>
         </div>
@@ -104,16 +119,16 @@ export default async function CompetitionDetailPage({
       )}
 
       {existingRegistration && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6">
-          <h2 className="font-semibold text-gray-900">Your Registration</h2>
+        <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+          <h2 className="font-semibold text-foreground">Your Registration</h2>
           <div className="mt-3 flex items-center gap-4">
-            <span className="text-sm capitalize text-gray-600">
+            <span className="text-sm capitalize text-muted">
               Role: {existingRegistration.role}
             </span>
             <StatusBadge status={existingRegistration.status} />
           </div>
           {existingRegistration.status === "pending" && (
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-muted">
               Your registration is pending admin approval.
             </p>
           )}
@@ -122,22 +137,22 @@ export default async function CompetitionDetailPage({
 
       {rounds && rounds.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Rounds</h2>
+          <h2 className="text-xl font-semibold text-foreground">Rounds</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {rounds.map((round) => (
               <div
                 key={round.id}
-                className="rounded-lg border border-gray-200 bg-white p-4"
+                className="rounded-xl border border-border bg-surface-overlay p-4 transition-colors hover:border-brand-800/40"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-900">{round.name}</span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-foreground">{round.name}</span>
                   <StatusBadge status={round.status} />
                 </div>
-                <p className="mt-1 text-xs capitalize text-gray-500">
+                <p className="mt-1 text-xs capitalize text-muted">
                   {round.role_type}
                 </p>
                 {round.leaderboard_published && (
-                  <p className="mt-2 text-xs font-medium text-green-600">
+                  <p className="mt-2 text-xs font-medium text-emerald-400">
                     Results published
                   </p>
                 )}
@@ -149,9 +164,9 @@ export default async function CompetitionDetailPage({
 
       {(hasPublishedRounds || hasCompletedRounds || publishedLeaderboards.length > 0) && (
         <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-900">Results</h2>
+          <h2 className="text-xl font-semibold text-foreground">Results</h2>
           {publishedLeaderboards.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted">
               {hasCompletedRounds
                 ? "Results are being finalized. Check back soon."
                 : "Results will appear here once rounds are completed."}

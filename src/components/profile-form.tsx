@@ -89,7 +89,7 @@ export function ProfileForm({
       />
 
       <div className="space-y-1">
-        <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="bio" className="block text-sm font-medium text-muted-foreground">
           About you
         </label>
         <textarea
@@ -98,7 +98,7 @@ export function ProfileForm({
           onChange={(e) => setValues({ ...values, bio: e.target.value })}
           rows={4}
           placeholder="Tell organizers a bit about your dancing experience..."
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          className="block w-full rounded-xl border border-border bg-surface-raised px-3 py-2.5 text-sm text-foreground shadow-inner shadow-black/10 placeholder:text-muted/70 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/30"
         />
       </div>
 
@@ -142,9 +142,9 @@ export function ProfileForm({
         required
       />
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
       {success && (
-        <p className="text-sm text-green-600">Profile saved successfully.</p>
+        <p className="text-sm text-emerald-400">Profile saved successfully.</p>
       )}
 
       <Button type="submit" className="w-full" disabled={loading}>

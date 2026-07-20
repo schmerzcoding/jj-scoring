@@ -66,11 +66,11 @@ export function RegistrationForm({ competitionId }: { competitionId: string }) {
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
         <Button type="submit" disabled={loading}>
           {loading ? "Submitting..." : "Submit Registration"}
         </Button>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted">
           Your registration will be reviewed by the event organizer before approval.
         </p>
       </form>

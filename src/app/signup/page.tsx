@@ -89,14 +89,14 @@ export default function SignupPage() {
             minLength={6}
             required
           />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Creating account..." : "Sign up"}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-500">
+        <p className="mt-4 text-center text-sm text-muted">
           Already have an account?{" "}
-          <Link href="/login" className="text-brand-600 hover:underline">
+          <Link href="/login" className="text-brand-400 hover:text-brand-300 hover:underline">
             Log in
           </Link>
         </p>

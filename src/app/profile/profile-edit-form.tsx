@@ -26,11 +26,11 @@ export function ProfileEditForm({
 
   return (
     <Card title="Your profile" description="Update your dancer information">
-      <p className="mb-4 text-sm text-gray-500">
-        Email: <span className="font-medium text-gray-700">{email}</span>
+      <p className="mb-4 text-sm text-muted">
+        Email: <span className="font-medium text-foreground">{email}</span>
       </p>
 
-      <div className="mb-6 border-b border-gray-100 pb-6">
+      <div className="mb-6 border-b border-border pb-6">
         <AvatarUpload
           userId={userId}
           name={displayName}

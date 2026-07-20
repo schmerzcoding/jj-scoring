@@ -34,7 +34,7 @@ export function ProfileSetupForm({
       title="Complete your profile"
       description="Tell us a bit about yourself before joining competitions."
     >
-      <div className="mb-6 border-b border-gray-100 pb-6">
+      <div className="mb-6 border-b border-border pb-6">
         <AvatarUpload
           userId={userId}
           name={displayName || "Dancer"}

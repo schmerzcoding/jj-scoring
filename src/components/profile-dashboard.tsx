@@ -28,12 +28,12 @@ export function ProfileSummary({
   avatarUrl?: string | null;
 }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6">
+    <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <UserAvatar name={fullName} avatarUrl={avatarUrl} size="lg" />
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
-          <div className="mt-2 flex flex-wrap gap-3 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-foreground">{fullName}</h1>
+          <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted">
             {danceRole && (
               <span className="capitalize">Usual role: {danceRole}</span>
             )}
@@ -45,7 +45,7 @@ export function ProfileSummary({
             )}
             {countryCode && <span>{getCountryName(countryCode)}</span>}
           </div>
-          {bio && <p className="mt-4 text-sm text-gray-600">{bio}</p>}
+          {bio && <p className="mt-4 text-sm text-muted">{bio}</p>}
         </div>
       </div>
     </div>
@@ -63,14 +63,17 @@ export function EnrollmentsSection({
       description="Competitions you are signed up for"
     >
       {enrollments.length === 0 ? (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           You are not registered for any active competition.{" "}
-          <Link href="/competitions" className="text-brand-600 hover:underline">
+          <Link
+            href="/competitions"
+            className="text-brand-400 hover:text-brand-300 hover:underline"
+          >
             Browse competitions
           </Link>
         </p>
       ) : (
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border">
           {enrollments.map((registration) => (
             <RegistrationRow key={registration.id} registration={registration} />
           ))}
@@ -91,11 +94,11 @@ export function HistorySection({
       description="Events you have completed"
     >
       {history.length === 0 ? (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           No completed competitions yet. Your past events will appear here.
         </p>
       ) : (
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border">
           {history.map((registration) => (
             <RegistrationRow key={registration.id} registration={registration} />
           ))}
@@ -116,7 +119,7 @@ export function AchievementsSection({
       description="Results and milestones from your rounds"
     >
       {achievements.length === 0 ? (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           Compete in a round to unlock achievements here.
         </p>
       ) : (
@@ -142,11 +145,11 @@ function RegistrationRow({
       <div>
         <Link
           href={`/competitions/${competition.id}`}
-          className="font-medium text-gray-900 hover:text-brand-700"
+          className="font-medium text-foreground transition-colors hover:text-brand-400"
         >
           {competition.name}
         </Link>
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-500">
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
           <span className="capitalize">{registration.role}</span>
           <span>·</span>
           <span>{formatDate(competition.event_date)}</span>
@@ -157,7 +160,7 @@ function RegistrationRow({
             </>
           )}
         </div>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-muted-foreground">
           Registration: {registrationStatusLabel(registration.status)}
         </p>
       </div>
@@ -171,13 +174,13 @@ function RegistrationRow({
 
 function AchievementCard({ achievement }: { achievement: Achievement }) {
   const badgeStyles = {
-    podium: "bg-amber-100 text-amber-800",
-    advanced: "bg-green-100 text-green-800",
-    participated: "bg-gray-100 text-gray-700",
+    podium: "bg-amber-950/60 text-amber-300 ring-1 ring-amber-800/50",
+    advanced: "bg-emerald-950/60 text-emerald-300 ring-1 ring-emerald-800/50",
+    participated: "bg-surface-hover text-muted-foreground ring-1 ring-border",
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 p-4">
+    <div className="rounded-xl border border-border bg-surface-raised p-4">
       <span
         className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeStyles[achievement.kind]}`}
       >
@@ -187,9 +190,9 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
             ? "Advanced"
             : "Result"}
       </span>
-      <p className="mt-2 font-medium text-gray-900">{achievement.label}</p>
-      <p className="text-sm text-gray-500">{achievement.competitionName}</p>
-      <p className="mt-2 text-xs text-gray-500">
+      <p className="mt-2 font-medium text-foreground">{achievement.label}</p>
+      <p className="text-sm text-muted">{achievement.competitionName}</p>
+      <p className="mt-2 text-xs text-muted-foreground">
         {achievement.scoringFormat === "vote_coefficient" ? (
           <>
             {achievement.yesVotes} Yes · coef{" "}
