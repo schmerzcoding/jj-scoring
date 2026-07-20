@@ -1,11 +1,13 @@
 import { formatScore } from "@/lib/utils";
 import type { LeaderboardEntry } from "@/lib/leaderboard";
+import type { RoundScoringFormat } from "@/types/database";
 
 interface LeaderboardProps {
   title: string;
   entries: LeaderboardEntry[];
   showAdvanced?: boolean;
   emptyMessage?: string;
+  scoringFormat?: RoundScoringFormat;
 }
 
 export function Leaderboard({
@@ -13,9 +15,11 @@ export function Leaderboard({
   entries,
   showAdvanced = true,
   emptyMessage = "No scores yet for this round.",
+  scoringFormat,
 }: LeaderboardProps) {
   const leaders = entries.filter((e) => e.role === "leader");
   const followers = entries.filter((e) => e.role === "follower");
+  const format = scoringFormat ?? entries[0]?.scoringFormat ?? "numeric";
 
   if (entries.length === 0) {
     return (
@@ -34,11 +38,13 @@ export function Leaderboard({
           label="Leaders"
           entries={leaders}
           showAdvanced={showAdvanced}
+          scoringFormat={format}
         />
         <LeaderboardColumn
           label="Followers"
           entries={followers}
           showAdvanced={showAdvanced}
+          scoringFormat={format}
         />
       </div>
     </div>
@@ -49,10 +55,12 @@ function LeaderboardColumn({
   label,
   entries,
   showAdvanced,
+  scoringFormat,
 }: {
   label: string;
   entries: LeaderboardEntry[];
   showAdvanced: boolean;
+  scoringFormat: RoundScoringFormat;
 }) {
   return (
     <div>
@@ -82,13 +90,27 @@ function LeaderboardColumn({
                 )}
               </div>
               <div className="text-right text-gray-600">
-                <div className="font-semibold text-gray-900">
-                  {formatScore(entry.totalScore)} pts
-                </div>
-                <div className="text-xs">
-                  avg {formatScore(entry.averageScore)} ({entry.judgeCount}{" "}
-                  judges)
-                </div>
+                {scoringFormat === "vote_coefficient" ? (
+                  <>
+                    <div className="font-semibold text-gray-900">
+                      {entry.yesVotes} Yes
+                    </div>
+                    <div className="text-xs">
+                      coef {formatScore(entry.coefficientTotal)} (
+                      {entry.judgeCount} judges)
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="font-semibold text-gray-900">
+                      {formatScore(entry.totalScore)} pts
+                    </div>
+                    <div className="text-xs">
+                      avg {formatScore(entry.averageScore)} ({entry.judgeCount}{" "}
+                      judges)
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ))}

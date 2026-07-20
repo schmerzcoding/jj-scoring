@@ -1,4 +1,4 @@
-import type { RegistrationRole, Round } from "@/types/database";
+import type { RegistrationRole, Round, RoundScoringFormat } from "@/types/database";
 
 export interface LeaderboardEntry {
   registrationId: string;
@@ -9,11 +9,15 @@ export interface LeaderboardEntry {
   judgeCount: number;
   rankInRole: number;
   advanced: boolean;
+  scoringFormat: RoundScoringFormat;
+  yesVotes: number;
+  coefficientTotal: number;
 }
 
 export interface ScoreRow {
   registration_id: string;
   score: number;
+  advance_vote?: boolean | null;
 }
 
 export interface ParticipantRow {
@@ -27,7 +31,30 @@ export function displayName(participant: ParticipantRow): string {
   return participant.display_name ?? participant.profile?.full_name ?? "Unknown";
 }
 
-export function buildLeaderboard(
+function rankEntries(
+  entries: LeaderboardEntry[],
+  maxAdvanceLeaders: number | null,
+  maxAdvanceFollowers: number | null,
+  compare: (a: LeaderboardEntry, b: LeaderboardEntry) => number
+) {
+  const rankGroup = (role: RegistrationRole) => {
+    const group = entries.filter((e) => e.role === role).sort(compare);
+    const maxAdvance =
+      role === "leader" ? maxAdvanceLeaders : maxAdvanceFollowers;
+
+    group.forEach((entry, index) => {
+      entry.rankInRole = index + 1;
+      if (maxAdvance != null && maxAdvance > 0) {
+        entry.advanced = entry.rankInRole <= maxAdvance;
+      }
+    });
+  };
+
+  rankGroup("leader");
+  rankGroup("follower");
+}
+
+function buildNumericLeaderboard(
   participants: ParticipantRow[],
   scores: ScoreRow[],
   maxAdvanceLeaders: number | null,
@@ -53,36 +80,106 @@ export function buildLeaderboard(
       judgeCount: stats.count,
       rankInRole: 0,
       advanced: false,
+      scoringFormat: "numeric",
+      yesVotes: 0,
+      coefficientTotal: 0,
     };
   });
 
-  const rankGroup = (role: RegistrationRole) => {
-    const group = entries
-      .filter((e) => e.role === role)
-      .sort((a, b) => {
-        if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
-        if (b.averageScore !== a.averageScore) return b.averageScore - a.averageScore;
-        return a.displayName.localeCompare(b.displayName);
-      });
-
-    const maxAdvance =
-      role === "leader" ? maxAdvanceLeaders : maxAdvanceFollowers;
-
-    group.forEach((entry, index) => {
-      entry.rankInRole = index + 1;
-      if (maxAdvance != null && maxAdvance > 0) {
-        entry.advanced = entry.rankInRole <= maxAdvance;
-      }
-    });
-  };
-
-  rankGroup("leader");
-  rankGroup("follower");
+  rankEntries(entries, maxAdvanceLeaders, maxAdvanceFollowers, (a, b) => {
+    if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+    if (b.averageScore !== a.averageScore) return b.averageScore - a.averageScore;
+    return a.displayName.localeCompare(b.displayName);
+  });
 
   return entries.sort((a, b) => {
     if (a.role !== b.role) return a.role.localeCompare(b.role);
     return a.rankInRole - b.rankInRole;
   });
+}
+
+function buildVoteLeaderboard(
+  participants: ParticipantRow[],
+  scores: ScoreRow[],
+  maxAdvanceLeaders: number | null,
+  maxAdvanceFollowers: number | null
+): LeaderboardEntry[] {
+  const stats = new Map<
+    string,
+    { yesVotes: number; coefficientTotal: number; count: number }
+  >();
+
+  for (const score of scores) {
+    const current = stats.get(score.registration_id) ?? {
+      yesVotes: 0,
+      coefficientTotal: 0,
+      count: 0,
+    };
+    if (score.advance_vote === true) {
+      current.yesVotes += 1;
+    }
+    current.coefficientTotal += Number(score.score);
+    current.count += 1;
+    stats.set(score.registration_id, current);
+  }
+
+  const entries: LeaderboardEntry[] = participants.map((participant) => {
+    const row = stats.get(participant.id) ?? {
+      yesVotes: 0,
+      coefficientTotal: 0,
+      count: 0,
+    };
+    return {
+      registrationId: participant.id,
+      displayName: displayName(participant),
+      role: participant.role,
+      totalScore: row.yesVotes,
+      averageScore: row.count > 0 ? row.coefficientTotal / row.count : 0,
+      judgeCount: row.count,
+      rankInRole: 0,
+      advanced: false,
+      scoringFormat: "vote_coefficient",
+      yesVotes: row.yesVotes,
+      coefficientTotal: row.coefficientTotal,
+    };
+  });
+
+  rankEntries(entries, maxAdvanceLeaders, maxAdvanceFollowers, (a, b) => {
+    if (b.yesVotes !== a.yesVotes) return b.yesVotes - a.yesVotes;
+    if (b.coefficientTotal !== a.coefficientTotal) {
+      return b.coefficientTotal - a.coefficientTotal;
+    }
+    return a.displayName.localeCompare(b.displayName);
+  });
+
+  return entries.sort((a, b) => {
+    if (a.role !== b.role) return a.role.localeCompare(b.role);
+    return a.rankInRole - b.rankInRole;
+  });
+}
+
+export function buildLeaderboard(
+  participants: ParticipantRow[],
+  scores: ScoreRow[],
+  maxAdvanceLeaders: number | null,
+  maxAdvanceFollowers: number | null,
+  scoringFormat: RoundScoringFormat = "numeric"
+): LeaderboardEntry[] {
+  if (scoringFormat === "vote_coefficient") {
+    return buildVoteLeaderboard(
+      participants,
+      scores,
+      maxAdvanceLeaders,
+      maxAdvanceFollowers
+    );
+  }
+
+  return buildNumericLeaderboard(
+    participants,
+    scores,
+    maxAdvanceLeaders,
+    maxAdvanceFollowers
+  );
 }
 
 export function getEligibleParticipants(
@@ -108,4 +205,11 @@ export function getPreviousRound(allRounds: Round[], round: Round): Round | null
       .filter((r) => r.order_index < round.order_index)
       .sort((a, b) => b.order_index - a.order_index)[0] ?? null
   );
+}
+
+export function scoringFormatLabel(format: RoundScoringFormat): string {
+  if (format === "vote_coefficient") {
+    return "Yes/No + coefficient";
+  }
+  return "Numeric (0–10)";
 }

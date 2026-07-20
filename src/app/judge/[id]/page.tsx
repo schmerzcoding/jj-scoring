@@ -77,17 +77,24 @@ export default async function JudgeCompetitionPage({
     );
   }
 
-  let existingScores: Record<string, number> = {};
+  let existingScores: Record<string, { score: number; advanceVote: boolean | null }> =
+    {};
   if (activeRound) {
     const { data: scores } = await supabase
       .from("scores")
-      .select("registration_id, score")
+      .select("registration_id, score, advance_vote")
       .eq("round_id", activeRound.id)
       .eq("judge_id", user.id);
 
     if (scores) {
       existingScores = Object.fromEntries(
-        scores.map((s) => [s.registration_id, Number(s.score)])
+        scores.map((s) => [
+          s.registration_id,
+          {
+            score: Number(s.score),
+            advanceVote: s.advance_vote,
+          },
+        ])
       );
     }
   }
@@ -141,6 +148,7 @@ export default async function JudgeCompetitionPage({
           roundName={activeRound.name}
           judgeId={user.id}
           participants={filteredRegistrations}
+          scoringFormat={activeRound.scoring_format ?? "numeric"}
           existingScores={existingScores}
         />
       ) : (
@@ -160,6 +168,7 @@ export default async function JudgeCompetitionPage({
               title={round.name}
               entries={entries}
               showAdvanced={round.status === "completed"}
+              scoringFormat={round.scoring_format ?? "numeric"}
             />
           ))}
         </div>

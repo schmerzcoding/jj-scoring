@@ -163,6 +163,7 @@ export default async function CompetitionDetailPage({
                 title={round.name}
                 entries={entries}
                 showAdvanced={false}
+                scoringFormat={round.scoring_format ?? "numeric"}
               />
             ))
           )}

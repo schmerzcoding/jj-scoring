@@ -48,7 +48,11 @@ export async function getLeaderboardForRoundServer(
             ])
           )
         : undefined;
-    return standingsToLeaderboard(standings, nameById);
+    return standingsToLeaderboard(
+      standings,
+      nameById,
+      round.scoring_format ?? "numeric"
+    );
   }
 
   if (round.status !== "completed") {
@@ -62,14 +66,15 @@ export async function getLeaderboardForRoundServer(
 
     const { data: scores } = await supabase
       .from("scores")
-      .select("registration_id, score")
+      .select("registration_id, score, advance_vote")
       .eq("round_id", round.id);
 
     return buildLeaderboard(
       eligible,
       scores ?? [],
       round.max_advance_leaders,
-      round.max_advance_followers
+      round.max_advance_followers,
+      round.scoring_format ?? "numeric"
     );
   }
 

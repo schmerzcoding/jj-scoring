@@ -10,7 +10,8 @@ import type { Round, RoundStanding } from "@/types/database";
 
 export function standingsToLeaderboard(
   standings: RoundStanding[],
-  nameByRegistrationId?: Map<string, string>
+  nameByRegistrationId?: Map<string, string>,
+  scoringFormat: Round["scoring_format"] = "numeric"
 ): LeaderboardEntry[] {
   return standings
     .map((standing) => ({
@@ -25,6 +26,9 @@ export function standingsToLeaderboard(
       judgeCount: standing.judge_count,
       rankInRole: standing.rank_in_role,
       advanced: standing.advanced,
+      scoringFormat: scoringFormat ?? "numeric",
+      yesVotes: standing.yes_votes ?? 0,
+      coefficientTotal: Number(standing.coefficient_total ?? 0),
     }))
     .sort((a, b) => {
       if (a.role !== b.role) return a.role.localeCompare(b.role);
@@ -62,7 +66,7 @@ export async function fetchLeaderboardForRound(
       const nameById = new Map(
         participants.map((p) => [p.id, p.display_name ?? p.profile?.full_name ?? "Unknown"])
       );
-      return standingsToLeaderboard(standings, nameById);
+      return standingsToLeaderboard(standings, nameById, round.scoring_format ?? "numeric");
     }
   }
 
@@ -80,14 +84,15 @@ export async function fetchLeaderboardForRound(
 
   const { data: scores } = await supabase
     .from("scores")
-    .select("registration_id, score")
+    .select("registration_id, score, advance_vote")
     .eq("round_id", round.id);
 
   return buildLeaderboard(
     eligible,
     scores ?? [],
     round.max_advance_leaders,
-    round.max_advance_followers
+    round.max_advance_followers,
+    round.scoring_format ?? "numeric"
   );
 }
 
@@ -136,6 +141,8 @@ export async function completeRound(
         judge_count: entry.judgeCount,
         rank_in_role: entry.rankInRole,
         advanced: entry.advanced,
+        yes_votes: entry.yesVotes,
+        coefficient_total: entry.coefficientTotal,
       }))
     );
 

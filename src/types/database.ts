@@ -84,6 +84,7 @@ export type Database = {
           max_advance_leaders: number | null;
           max_advance_followers: number | null;
           leaderboard_published: boolean;
+          scoring_format: Database["public"]["Enums"]["round_scoring_format"];
           created_at: string;
         };
         Insert: {
@@ -97,6 +98,7 @@ export type Database = {
           max_advance_leaders?: number | null;
           max_advance_followers?: number | null;
           leaderboard_published?: boolean;
+          scoring_format?: Database["public"]["Enums"]["round_scoring_format"];
           created_at?: string;
         };
         Update: {
@@ -110,6 +112,7 @@ export type Database = {
           max_advance_leaders?: number | null;
           max_advance_followers?: number | null;
           leaderboard_published?: boolean;
+          scoring_format?: Database["public"]["Enums"]["round_scoring_format"];
           created_at?: string;
         };
         Relationships: [];
@@ -126,6 +129,8 @@ export type Database = {
           judge_count: number;
           rank_in_role: number;
           advanced: boolean;
+          yes_votes: number;
+          coefficient_total: number;
           created_at: string;
         };
         Insert: {
@@ -139,6 +144,8 @@ export type Database = {
           judge_count?: number;
           rank_in_role: number;
           advanced?: boolean;
+          yes_votes?: number;
+          coefficient_total?: number;
           created_at?: string;
         };
         Update: {
@@ -152,6 +159,8 @@ export type Database = {
           judge_count?: number;
           rank_in_role?: number;
           advanced?: boolean;
+          yes_votes?: number;
+          coefficient_total?: number;
           created_at?: string;
         };
         Relationships: [];
@@ -220,6 +229,7 @@ export type Database = {
           judge_id: string;
           registration_id: string;
           score: number;
+          advance_vote: boolean | null;
           notes: string | null;
           created_at: string;
           updated_at: string;
@@ -230,6 +240,7 @@ export type Database = {
           judge_id: string;
           registration_id: string;
           score: number;
+          advance_vote?: boolean | null;
           notes?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -240,6 +251,7 @@ export type Database = {
           judge_id?: string;
           registration_id?: string;
           score?: number;
+          advance_vote?: boolean | null;
           notes?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -277,6 +289,7 @@ export type Database = {
       registration_status: "pending" | "approved" | "rejected";
       round_role_type: "leader" | "follower" | "both";
       round_status: "pending" | "active" | "completed";
+      round_scoring_format: "numeric" | "vote_coefficient";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -294,6 +307,8 @@ export type RegistrationStatus =
   Database["public"]["Enums"]["registration_status"];
 export type RoundRoleType = Database["public"]["Enums"]["round_role_type"];
 export type RoundStatus = Database["public"]["Enums"]["round_status"];
+export type RoundScoringFormat =
+  Database["public"]["Enums"]["round_scoring_format"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Competition = Database["public"]["Tables"]["competitions"]["Row"];
