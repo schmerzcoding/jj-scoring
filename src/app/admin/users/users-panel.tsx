@@ -152,7 +152,7 @@ export function UsersPanel({
                           key={role}
                           type="button"
                           disabled
-                          title="Próximamente"
+                          title="Coming soon"
                           className={cn(
                             "cursor-not-allowed rounded-lg px-3 py-1.5 text-xs font-medium opacity-45",
                             user.role === role
@@ -162,7 +162,7 @@ export function UsersPanel({
                         >
                           {roleLabel(role)}
                           <span className="ml-1 text-[10px] uppercase tracking-wide opacity-80">
-                            · Próximamente
+                            · Coming soon
                           </span>
                         </button>
                       ))}

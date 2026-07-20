@@ -20,9 +20,9 @@ export type AssignableRole = (typeof ASSIGNABLE_ROLES)[number];
 export function roleLabel(role: UserRole): string {
   const labels: Record<UserRole, string> = {
     admin: "Admin",
-    judge: "Jurado",
-    organizer: "Organizador",
-    participant: "Competidor",
+    judge: "Judge",
+    organizer: "Organizer",
+    participant: "Participant",
   };
   return labels[role];
 }
