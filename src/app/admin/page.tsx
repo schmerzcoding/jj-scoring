@@ -4,6 +4,7 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ResetCompetitionsButton } from "./reset-competitions-button";
 
 export default async function AdminDashboard() {
   const supabase = await createClient();
@@ -118,6 +119,8 @@ export default async function AdminDashboard() {
           ))}
         </div>
       </div>
+
+      <ResetCompetitionsButton competitionCount={competitions?.length ?? 0} />
     </div>
   );
 }
