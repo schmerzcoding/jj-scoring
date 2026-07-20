@@ -5,15 +5,10 @@ import { createClient, fromTable } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import type { ProfileFormValues } from "@/lib/profile";
 import type { ProfileDanceRole, ProfileGender } from "@/types/database";
 
-export type ProfileFormValues = {
-  fullName: string;
-  bio: string;
-  gender: ProfileGender | "";
-  danceRole: ProfileDanceRole | "";
-  age: string;
-};
+export type { ProfileFormValues } from "@/lib/profile";
 
 const GENDER_OPTIONS = [
   { value: "", label: "Select gender" },
@@ -145,22 +140,6 @@ export function ProfileForm({
       </Button>
     </form>
   );
-}
-
-export function profileToFormValues(profile: {
-  full_name: string;
-  bio: string | null;
-  gender: ProfileGender | null;
-  dance_role: ProfileDanceRole | null;
-  age: number | null;
-}): ProfileFormValues {
-  return {
-    fullName: profile.full_name ?? "",
-    bio: profile.bio ?? "",
-    gender: profile.gender ?? "",
-    danceRole: profile.dance_role ?? "",
-    age: profile.age?.toString() ?? "",
-  };
 }
 
 export async function saveProfileValues(

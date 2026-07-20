@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { isEmailVerified, needsProfileSetup } from "@/lib/auth";
-import { profileToFormValues, type ProfileFormValues } from "@/components/profile-form";
+import { profileToFormValues, EMPTY_PROFILE_FORM_VALUES } from "@/lib/profile";
 import { ProfileSetupForm } from "./profile-setup-form";
 
 export default async function ProfileSetupPage() {
@@ -21,17 +21,9 @@ export default async function ProfileSetupPage() {
 
   if (!needsProfileSetup(profile)) redirect("/profile");
 
-  const emptyValues: ProfileFormValues = {
-    fullName: "",
-    bio: "",
-    gender: "",
-    danceRole: "",
-    age: "",
-  };
-
   const initialValues = profile
     ? profileToFormValues(profile)
-    : emptyValues;
+    : EMPTY_PROFILE_FORM_VALUES;
 
   return (
     <div className="mx-auto max-w-lg">

@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import {
   ProfileForm,
-  profileToFormValues,
   saveProfileValues,
 } from "@/components/profile-form";
+import { profileToFormValues } from "@/lib/profile";
 import type { Profile } from "@/types/database";
 
 export function ProfileEditForm({
