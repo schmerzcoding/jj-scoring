@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { getPostLoginPath, isEmailVerified } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,14 +22,41 @@ export default function LoginPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (authError) {
+      const needsVerification =
+        authError.message.toLowerCase().includes("email not confirmed") ||
+        authError.message.toLowerCase().includes("not confirmed");
+
+      if (needsVerification) {
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+        return;
+      }
+
       setError(authError.message);
       setLoading(false);
+      return;
+    }
+
+    const user = data.user;
+    if (user && !isEmailVerified(user)) {
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      return;
+    }
+
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      router.push(getPostLoginPath(profile));
+      router.refresh();
       return;
     }
 

@@ -1,0 +1,189 @@
+"use client";
+
+import { useState } from "react";
+import { createClient, fromTable } from "@/lib/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import type { ProfileDanceRole, ProfileGender } from "@/types/database";
+
+export type ProfileFormValues = {
+  fullName: string;
+  bio: string;
+  gender: ProfileGender | "";
+  danceRole: ProfileDanceRole | "";
+  age: string;
+};
+
+const GENDER_OPTIONS = [
+  { value: "", label: "Select gender" },
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "non_binary", label: "Non-binary" },
+  { value: "other", label: "Other" },
+  { value: "prefer_not_to_say", label: "Prefer not to say" },
+];
+
+const DANCE_ROLE_OPTIONS = [
+  { value: "", label: "Select dance role" },
+  { value: "leader", label: "Leader" },
+  { value: "follower", label: "Follower" },
+  { value: "both", label: "Both" },
+];
+
+export function ProfileForm({
+  initialValues,
+  submitLabel,
+  onSubmit,
+}: {
+  initialValues: ProfileFormValues;
+  submitLabel: string;
+  onSubmit: (values: ProfileFormValues) => Promise<{ error?: string }>;
+}) {
+  const [values, setValues] = useState(initialValues);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSuccess(false);
+
+    if (!values.fullName.trim()) {
+      setError("Full name is required.");
+      return;
+    }
+
+    if (!values.danceRole) {
+      setError("Please select your usual dance role.");
+      return;
+    }
+
+    const ageValue = values.age ? parseInt(values.age, 10) : NaN;
+    if (!values.age || isNaN(ageValue) || ageValue < 13 || ageValue > 120) {
+      setError("Please enter a valid age (13–120).");
+      return;
+    }
+
+    setLoading(true);
+    const result = await onSubmit(values);
+    setLoading(false);
+
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
+    setSuccess(true);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input
+        label="Full name"
+        value={values.fullName}
+        onChange={(e) => setValues({ ...values, fullName: e.target.value })}
+        required
+      />
+
+      <div className="space-y-1">
+        <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+          About you
+        </label>
+        <textarea
+          id="bio"
+          value={values.bio}
+          onChange={(e) => setValues({ ...values, bio: e.target.value })}
+          rows={4}
+          placeholder="Tell organizers a bit about your dancing experience..."
+          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+        />
+      </div>
+
+      <Select
+        label="Gender"
+        value={values.gender}
+        onChange={(e) =>
+          setValues({
+            ...values,
+            gender: e.target.value as ProfileGender | "",
+          })
+        }
+        options={GENDER_OPTIONS}
+      />
+
+      <Select
+        label="Usual dance role"
+        value={values.danceRole}
+        onChange={(e) =>
+          setValues({
+            ...values,
+            danceRole: e.target.value as ProfileDanceRole | "",
+          })
+        }
+        options={DANCE_ROLE_OPTIONS}
+      />
+
+      <Input
+        label="Age"
+        type="number"
+        min="13"
+        max="120"
+        value={values.age}
+        onChange={(e) => setValues({ ...values, age: e.target.value })}
+        required
+      />
+
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      {success && (
+        <p className="text-sm text-green-600">Profile saved successfully.</p>
+      )}
+
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Saving..." : submitLabel}
+      </Button>
+    </form>
+  );
+}
+
+export function profileToFormValues(profile: {
+  full_name: string;
+  bio: string | null;
+  gender: ProfileGender | null;
+  dance_role: ProfileDanceRole | null;
+  age: number | null;
+}): ProfileFormValues {
+  return {
+    fullName: profile.full_name ?? "",
+    bio: profile.bio ?? "",
+    gender: profile.gender ?? "",
+    danceRole: profile.dance_role ?? "",
+    age: profile.age?.toString() ?? "",
+  };
+}
+
+export async function saveProfileValues(
+  userId: string,
+  values: ProfileFormValues,
+  markCompleted: boolean
+): Promise<{ error?: string }> {
+  const supabase = createClient();
+
+  const { error } = await fromTable(supabase, "profiles")
+    .update({
+      full_name: values.fullName.trim(),
+      bio: values.bio.trim() || null,
+      gender: values.gender || null,
+      dance_role: values.danceRole || null,
+      age: parseInt(values.age, 10),
+      ...(markCompleted ? { profile_completed: true } : {}),
+    })
+    .eq("id", userId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return {};
+}

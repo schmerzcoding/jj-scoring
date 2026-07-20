@@ -42,6 +42,12 @@ export async function Navbar() {
             </Link>
           )}
 
+          {user && profile?.profile_completed && profile.role === "participant" && (
+            <Link href="/profile" className="text-sm text-gray-600 hover:text-gray-900">
+              Profile
+            </Link>
+          )}
+
           {user ? (
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-500">

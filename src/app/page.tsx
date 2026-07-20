@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/utils";
+import { getPostLoginPath, isEmailVerified, needsProfileSetup } from "@/lib/auth";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -18,14 +19,21 @@ export default async function HomePage() {
     .limit(3);
 
   if (user) {
+    if (!isEmailVerified(user)) {
+      redirect("/verify-email");
+    }
+
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("*")
       .eq("id", user.id)
       .single();
 
-    if (profile?.role === "admin") redirect("/admin");
-    if (profile?.role === "judge") redirect("/judge");
+    if (needsProfileSetup(profile)) {
+      redirect("/profile/setup");
+    }
+
+    redirect(getPostLoginPath(profile));
   }
 
   return (

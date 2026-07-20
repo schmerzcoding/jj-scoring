@@ -36,15 +36,18 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-3. Run the database migration in the Supabase SQL Editor:
+3. Run the database migrations in the Supabase SQL Editor (in order):
 
 ```
 supabase/migrations/001_initial_schema.sql
+supabase/migrations/007_extended_profiles.sql
 ```
+
+4. Configure email verification with Brevo — see [docs/BREVO_SETUP.md](docs/BREVO_SETUP.md)
 
 ### 3. Create your admin account
 
-1. Sign up through the app at `/signup`
+1. Sign up through the app at `/signup` (verify email, then complete profile)
 2. In Supabase SQL Editor, promote your user to admin:
 
 ```sql

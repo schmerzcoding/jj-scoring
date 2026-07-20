@@ -14,6 +14,11 @@ export type Database = {
           id: string;
           full_name: string;
           role: Database["public"]["Enums"]["user_role"];
+          bio: string | null;
+          gender: Database["public"]["Enums"]["profile_gender"] | null;
+          dance_role: Database["public"]["Enums"]["profile_dance_role"] | null;
+          age: number | null;
+          profile_completed: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -21,6 +26,11 @@ export type Database = {
           id: string;
           full_name: string;
           role?: Database["public"]["Enums"]["user_role"];
+          bio?: string | null;
+          gender?: Database["public"]["Enums"]["profile_gender"] | null;
+          dance_role?: Database["public"]["Enums"]["profile_dance_role"] | null;
+          age?: number | null;
+          profile_completed?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -28,6 +38,11 @@ export type Database = {
           id?: string;
           full_name?: string;
           role?: Database["public"]["Enums"]["user_role"];
+          bio?: string | null;
+          gender?: Database["public"]["Enums"]["profile_gender"] | null;
+          dance_role?: Database["public"]["Enums"]["profile_dance_role"] | null;
+          age?: number | null;
+          profile_completed?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -290,6 +305,13 @@ export type Database = {
       round_role_type: "leader" | "follower" | "both";
       round_status: "pending" | "active" | "completed";
       round_scoring_format: "numeric" | "vote_coefficient";
+      profile_gender:
+        | "male"
+        | "female"
+        | "non_binary"
+        | "other"
+        | "prefer_not_to_say";
+      profile_dance_role: "leader" | "follower" | "both";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -309,6 +331,9 @@ export type RoundRoleType = Database["public"]["Enums"]["round_role_type"];
 export type RoundStatus = Database["public"]["Enums"]["round_status"];
 export type RoundScoringFormat =
   Database["public"]["Enums"]["round_scoring_format"];
+export type ProfileGender = Database["public"]["Enums"]["profile_gender"];
+export type ProfileDanceRole =
+  Database["public"]["Enums"]["profile_dance_role"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Competition = Database["public"]["Tables"]["competitions"]["Row"];

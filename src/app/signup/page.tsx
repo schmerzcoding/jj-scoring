@@ -10,7 +10,6 @@ import { Card } from "@/components/ui/card";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,11 +21,14 @@ export default function SignupPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
+    const redirectTo = `${window.location.origin}/auth/callback?next=/profile/setup`;
+
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role: "participant" },
+        emailRedirectTo: redirectTo,
+        data: { role: "participant" },
       },
     });
 
@@ -43,20 +45,21 @@ export default function SignupPage() {
       return;
     }
 
-    router.push("/competitions");
+    if (data.user && !data.session) {
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+    } else {
+      router.push("/profile/setup");
+    }
     router.refresh();
   }
 
   return (
     <div className="mx-auto max-w-md">
-      <Card title="Sign up" description="Create your dancer account">
+      <Card
+        title="Sign up"
+        description="Create your account — you'll verify your email, then complete your profile"
+      >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Full name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
           <Input
             label="Email"
             type="email"
