@@ -7,21 +7,42 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CountrySelect } from "@/components/country-select";
+import {
+  uploadCompetitionBanner,
+} from "@/components/competition-banner-upload";
 
 export default function NewCompetitionPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [countryCode, setCountryCode] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [status, setStatus] = useState("open");
   const [registrationOpen, setRegistrationOpen] = useState(false);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  function handleBannerSelect(file: File | null) {
+    setBannerFile(file);
+    if (bannerPreview) {
+      URL.revokeObjectURL(bannerPreview);
+    }
+    setBannerPreview(file ? URL.createObjectURL(file) : null);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (!countryCode) {
+      setError("Please select the competition country.");
+      return;
+    }
+
     setLoading(true);
 
     const supabase = createClient();
@@ -40,6 +61,7 @@ export default function NewCompetitionPage() {
         name,
         description: description || null,
         location: location || null,
+        country_code: countryCode,
         event_date: eventDate || null,
         status: status as "draft" | "open" | "closed" | "in_progress" | "completed",
         registration_open: registrationOpen,
@@ -52,6 +74,16 @@ export default function NewCompetitionPage() {
       setError(insertError.message);
       setLoading(false);
       return;
+    }
+
+    if (bannerFile && data?.id) {
+      const bannerResult = await uploadCompetitionBanner(data.id, bannerFile);
+      if (bannerResult.error) {
+        setError(`Competition created, but banner upload failed: ${bannerResult.error}`);
+        setLoading(false);
+        router.push(`/admin/competitions/${data.id}`);
+        return;
+      }
     }
 
     router.push(`/admin/competitions/${data.id}`);
@@ -78,10 +110,17 @@ export default function NewCompetitionPage() {
               className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
+          <CountrySelect
+            label="Country"
+            value={countryCode}
+            onChange={setCountryCode}
+            required
+          />
           <Input
             label="Location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            placeholder="City, venue, etc."
           />
           <Input
             label="Event date"
@@ -89,6 +128,39 @@ export default function NewCompetitionPage() {
             value={eventDate}
             onChange={(e) => setEventDate(e.target.value)}
           />
+          <div>
+            <p className="mb-2 block text-sm font-medium text-gray-700">
+              Banner image
+            </p>
+            <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+              {bannerPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={bannerPreview}
+                  alt="Banner preview"
+                  className="aspect-[3/1] w-full object-cover"
+                />
+              ) : (
+                <div className="flex aspect-[3/1] items-center justify-center text-sm text-gray-400">
+                  No banner selected
+                </div>
+              )}
+            </div>
+            <label className="mt-2 inline-flex cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              Choose banner
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(e) =>
+                  handleBannerSelect(e.target.files?.[0] ?? null)
+                }
+              />
+            </label>
+            <p className="mt-1 text-xs text-gray-500">
+              Wide festival or event image. JPEG, PNG, WebP. Max 5 MB.
+            </p>
+          </div>
           <Select
             label="Status"
             value={status}

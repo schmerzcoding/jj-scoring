@@ -6,6 +6,7 @@ export type ProfileFormValues = {
   gender: ProfileGender | "";
   danceRole: ProfileDanceRole | "";
   age: string;
+  countryCode: string;
 };
 
 export const EMPTY_PROFILE_FORM_VALUES: ProfileFormValues = {
@@ -14,6 +15,7 @@ export const EMPTY_PROFILE_FORM_VALUES: ProfileFormValues = {
   gender: "",
   danceRole: "",
   age: "",
+  countryCode: "",
 };
 
 export function profileToFormValues(profile: {
@@ -22,6 +24,7 @@ export function profileToFormValues(profile: {
   gender: ProfileGender | null;
   dance_role: ProfileDanceRole | null;
   age: number | null;
+  country_code?: string | null;
 }): ProfileFormValues {
   return {
     fullName: profile.full_name ?? "",
@@ -29,5 +32,6 @@ export function profileToFormValues(profile: {
     gender: profile.gender ?? "",
     danceRole: profile.dance_role ?? "",
     age: profile.age?.toString() ?? "",
+    countryCode: profile.country_code ?? "",
   };
 }

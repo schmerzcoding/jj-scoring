@@ -5,6 +5,7 @@ import { createClient, fromTable } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { CountrySelect } from "@/components/country-select";
 import type { ProfileFormValues } from "@/lib/profile";
 import type { ProfileDanceRole, ProfileGender } from "@/types/database";
 
@@ -101,6 +102,12 @@ export function ProfileForm({
         />
       </div>
 
+      <CountrySelect
+        label="Country of origin"
+        value={values.countryCode}
+        onChange={(countryCode) => setValues({ ...values, countryCode })}
+      />
+
       <Select
         label="Gender"
         value={values.gender}
@@ -161,6 +168,7 @@ export async function saveProfileValues(
       gender: values.gender || null,
       dance_role: values.danceRole || null,
       age: parseInt(values.age, 10),
+      country_code: values.countryCode || null,
       ...(markCompleted ? { profile_completed: true } : {}),
     })
     .eq("id", userId);

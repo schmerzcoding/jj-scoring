@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/status-badge";
 import { UserAvatar } from "@/components/avatar-upload";
 import { formatDate, formatScore } from "@/lib/utils";
+import { getCountryName } from "@/lib/countries";
 import type {
   Achievement,
   RegistrationWithCompetition,
@@ -15,6 +16,7 @@ export function ProfileSummary({
   danceRole,
   age,
   gender,
+  countryCode,
   avatarUrl,
 }: {
   fullName: string;
@@ -22,6 +24,7 @@ export function ProfileSummary({
   danceRole: string | null;
   age: number | null;
   gender: string | null;
+  countryCode?: string | null;
   avatarUrl?: string | null;
 }) {
   return (
@@ -40,6 +43,7 @@ export function ProfileSummary({
                 Gender: {gender.replace(/_/g, " ")}
               </span>
             )}
+            {countryCode && <span>{getCountryName(countryCode)}</span>}
           </div>
           {bio && <p className="mt-4 text-sm text-gray-600">{bio}</p>}
         </div>

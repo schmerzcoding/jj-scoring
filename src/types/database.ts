@@ -20,6 +20,7 @@ export type Database = {
           age: number | null;
           profile_completed: boolean;
           avatar_url: string | null;
+          country_code: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -33,6 +34,7 @@ export type Database = {
           age?: number | null;
           profile_completed?: boolean;
           avatar_url?: string | null;
+          country_code?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -46,6 +48,7 @@ export type Database = {
           age?: number | null;
           profile_completed?: boolean;
           avatar_url?: string | null;
+          country_code?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -60,6 +63,8 @@ export type Database = {
           registration_open: boolean;
           location: string | null;
           event_date: string | null;
+          country_code: string | null;
+          banner_url: string | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -72,6 +77,8 @@ export type Database = {
           registration_open?: boolean;
           location?: string | null;
           event_date?: string | null;
+          country_code?: string | null;
+          banner_url?: string | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -84,6 +91,8 @@ export type Database = {
           registration_open?: boolean;
           location?: string | null;
           event_date?: string | null;
+          country_code?: string | null;
+          banner_url?: string | null;
           created_by?: string;
           created_at?: string;
           updated_at?: string;

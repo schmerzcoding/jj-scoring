@@ -35,6 +35,7 @@ export default async function ProfilePage() {
         danceRole={profile.dance_role}
         age={profile.age}
         gender={profile.gender}
+        countryCode={profile.country_code}
         avatarUrl={profile.avatar_url}
       />
 

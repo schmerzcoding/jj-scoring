@@ -7,6 +7,7 @@ import { RegistrationsPanel } from "./registrations-panel";
 import { RoundsPanel } from "./rounds-panel";
 import { JudgesPanel } from "./judges-panel";
 import { CompetitionSettings } from "./competition-settings";
+import { CompetitionBranding } from "./competition-branding";
 
 export default async function AdminCompetitionPage({
   params,
@@ -124,6 +125,7 @@ export default async function AdminCompetitionPage({
       )}
 
       <CompetitionSettings competition={competition} />
+      <CompetitionBranding competition={competition} />
 
       <RegistrationsPanel registrations={registrationsWithProfiles} />
 
