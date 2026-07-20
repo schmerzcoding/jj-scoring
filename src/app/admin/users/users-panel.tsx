@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { cn, getStatusColor } from "@/lib/utils";
 import {
   ASSIGNABLE_ROLES,
+  COMING_SOON_ROLES,
   canDeleteUser,
   roleLabel,
   type AdminUserRow,
@@ -144,6 +145,25 @@ export function UsersPanel({
                           )}
                         >
                           {roleLabel(role)}
+                        </button>
+                      ))}
+                      {COMING_SOON_ROLES.map((role) => (
+                        <button
+                          key={role}
+                          type="button"
+                          disabled
+                          title="Próximamente"
+                          className={cn(
+                            "cursor-not-allowed rounded-lg px-3 py-1.5 text-xs font-medium opacity-45",
+                            user.role === role
+                              ? "bg-brand-600/60 text-white"
+                              : "border border-border bg-surface-raised text-muted"
+                          )}
+                        >
+                          {roleLabel(role)}
+                          <span className="ml-1 text-[10px] uppercase tracking-wide opacity-80">
+                            · Próximamente
+                          </span>
                         </button>
                       ))}
                     </div>

@@ -11,8 +11,9 @@ export type AdminUserRow = {
 export const ASSIGNABLE_ROLES = [
   "participant",
   "judge",
-  "organizer",
 ] as const satisfies readonly UserRole[];
+
+export const COMING_SOON_ROLES = ["organizer"] as const satisfies readonly UserRole[];
 
 export type AssignableRole = (typeof ASSIGNABLE_ROLES)[number];
 
