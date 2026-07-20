@@ -34,7 +34,12 @@ Step-by-step visual identity for the app. Dark elegant theme with wine/burgundy 
 - **Profile:** summary header, dashboard sections, achievements, edit/setup forms
 - **Competition detail:** banner hero, rounds, registration, leaderboards
 
+## Step 3 — done
+
+- **Admin:** dashboard, competition detail, new competition form, panels (registrations, rounds, judges, settings, branding)
+- **Judge:** dashboard, scoring panel with Yes/No toggle, round chips, leaderboards
+- **Danger zone:** dark red warning styling
+
 ## Next steps
 
-- **Step 3:** Admin & judge panels, forms, tables
 - **Step 4:** Polish — loading states, empty states, micro-interactions
