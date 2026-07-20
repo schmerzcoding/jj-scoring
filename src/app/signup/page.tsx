@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { isEmailVerified } from "@/lib/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -45,7 +45,13 @@ export default function SignupPage() {
       return;
     }
 
-    if (data.user && !data.session) {
+    if (!data.user) {
+      setError("Account could not be created. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    if (!isEmailVerified(data.user)) {
       router.push(`/verify-email?email=${encodeURIComponent(email)}`);
     } else {
       router.push("/profile/setup");

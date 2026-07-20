@@ -2,6 +2,16 @@
 
 This app uses **Supabase Auth** for accounts and **Brevo** (formerly Sendinblue) as the SMTP provider for verification emails.
 
+## ⚠️ Important: Enable email confirmation first
+
+If signup sends users **directly to profile setup** without an email, **Confirm email is disabled** in Supabase. No code change will fix this — you must enable it in the dashboard:
+
+1. Supabase → **Authentication** → **Providers** → **Email**
+2. Turn **ON** → **Confirm email**
+3. Save
+
+After enabling, **new signups** will receive a verification email (once Brevo SMTP is configured below). Existing auto-confirmed users are already active and won't receive a retroactive email.
+
 ## 1. Create a Brevo account
 
 1. Sign up at [brevo.com](https://www.brevo.com)
@@ -25,10 +35,9 @@ This app uses **Supabase Auth** for accounts and **Brevo** (formerly Sendinblue)
 ## 3. Configure Supabase Auth SMTP
 
 1. Open your project at [supabase.com](https://supabase.com)
-2. Go to **Project Settings → Authentication**
-3. Enable **Confirm email** (required for verification flow)
-4. Go to **Project Settings → Authentication → SMTP Settings**
-5. Enable **Custom SMTP** and enter:
+2. Go to **Authentication → Providers → Email** and confirm **Confirm email** is **ON**
+3. Go to **Project Settings → Authentication → SMTP Settings**
+4. Enable **Custom SMTP** and enter:
 
 ```
 Host: smtp-relay.brevo.com
@@ -40,7 +49,7 @@ Sender email: noreply@yourdomain.com  (must be verified in Brevo)
 Sender name: J&J Scoring
 ```
 
-6. Save and send a test email from Supabase if available.
+5. Save and send a test email from Supabase if available.
 
 ## 4. Configure redirect URLs
 
@@ -86,6 +95,7 @@ This adds profile fields (`bio`, `gender`, `dance_role`, `age`, `profile_complet
 
 | Issue | Fix |
 |-------|-----|
+| **Signup skips email, goes to profile setup** | **Confirm email is OFF** in Supabase → Authentication → Providers → Email. Turn it ON, then test with a **new** email address |
 | Email not arriving | Check Brevo sender verification; check spam; review Brevo transactional logs |
 | `Email rate limit exceeded` | Brevo free tier is higher than Supabase default; custom SMTP fixes this |
 | Link redirects to login with error | Add `/auth/callback` to Supabase redirect URLs |
