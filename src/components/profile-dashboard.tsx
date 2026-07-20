@@ -20,6 +20,7 @@ export function ProfileSummary({
   gender,
   countryCode,
   avatarUrl,
+  action,
 }: {
   fullName: string;
   bio: string | null;
@@ -28,13 +29,17 @@ export function ProfileSummary({
   gender: string | null;
   countryCode?: string | null;
   avatarUrl?: string | null;
+  action?: React.ReactNode;
 }) {
   return (
     <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <UserAvatar name={fullName} avatarUrl={avatarUrl} size="lg" />
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">{fullName}</h1>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <h1 className="text-2xl font-bold text-foreground">{fullName}</h1>
+            {action}
+          </div>
           <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted">
             {danceRole && (
               <span className="capitalize">Usual role: {danceRole}</span>
@@ -56,13 +61,16 @@ export function ProfileSummary({
 
 export function EnrollmentsSection({
   enrollments,
+  className,
 }: {
   enrollments: RegistrationWithCompetition[];
+  className?: string;
 }) {
   return (
     <Card
       title="Current registrations"
       description="Competitions you are signed up for"
+      className={className}
     >
       {enrollments.length === 0 ? (
         <EmptyState
@@ -89,13 +97,16 @@ export function EnrollmentsSection({
 
 export function HistorySection({
   history,
+  className,
 }: {
   history: RegistrationWithCompetition[];
+  className?: string;
 }) {
   return (
     <Card
       title="Competition history"
       description="Events you have completed"
+      className={className}
     >
       {history.length === 0 ? (
         <EmptyState
@@ -117,13 +128,16 @@ export function HistorySection({
 
 export function AchievementsSection({
   achievements,
+  className,
 }: {
   achievements: Achievement[];
+  className?: string;
 }) {
   return (
     <Card
       title="Achievements"
       description="Results and milestones from your rounds"
+      className={className}
     >
       {achievements.length === 0 ? (
         <EmptyState
@@ -133,7 +147,7 @@ export function AchievementsSection({
           compact
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3">
           {achievements.map((achievement) => (
             <AchievementCard key={achievement.id} achievement={achievement} />
           ))}

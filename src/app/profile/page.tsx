@@ -5,9 +5,8 @@ import {
   AchievementsSection,
   EnrollmentsSection,
   HistorySection,
-  ProfileSummary,
 } from "@/components/profile-dashboard";
-import { ProfileEditForm } from "./profile-edit-form";
+import { ProfileHeader } from "./profile-header";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -28,26 +27,27 @@ export default async function ProfilePage() {
   const competitionData = await fetchProfileCompetitionData(supabase, user.id);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
-      <ProfileSummary
-        fullName={profile.full_name}
-        bio={profile.bio}
-        danceRole={profile.dance_role}
-        age={profile.age}
-        gender={profile.gender}
-        countryCode={profile.country_code}
-        avatarUrl={profile.avatar_url}
-      />
-
-      <EnrollmentsSection enrollments={competitionData.enrollments} />
-      <AchievementsSection achievements={competitionData.achievements} />
-      <HistorySection history={competitionData.history} />
-
-      <ProfileEditForm
+    <div className="mx-auto max-w-6xl space-y-8">
+      <ProfileHeader
         userId={user.id}
         email={user.email ?? ""}
         profile={profile}
       />
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <EnrollmentsSection
+          enrollments={competitionData.enrollments}
+          className="h-full"
+        />
+        <AchievementsSection
+          achievements={competitionData.achievements}
+          className="h-full"
+        />
+        <HistorySection
+          history={competitionData.history}
+          className="h-full"
+        />
+      </div>
     </div>
   );
 }
