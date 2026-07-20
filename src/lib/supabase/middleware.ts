@@ -2,6 +2,7 @@ import { createServerClient, type SetAllCookies } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import {
   isAuthPublicPath,
+  isAllowedDuringProfileSetup,
   isEmailVerified,
   needsProfileSetup,
   requireEmailVerification,
@@ -60,10 +61,7 @@ export async function updateSession(request: NextRequest) {
     .single();
 
   if (needsProfileSetup(profile)) {
-    const allowedDuringSetup =
-      pathname === "/profile/setup" || isAuthPublicPath(pathname);
-
-    if (!allowedDuringSetup) {
+    if (!isAllowedDuringProfileSetup(pathname, profile?.role)) {
       const url = request.nextUrl.clone();
       url.pathname = "/profile/setup";
       return NextResponse.redirect(url);

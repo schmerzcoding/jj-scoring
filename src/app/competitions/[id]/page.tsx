@@ -1,8 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
+import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
+import { canRegisterForCompetitions } from "@/lib/auth";
 import { RegistrationForm } from "./registration-form";
 import { Leaderboard } from "@/components/leaderboard";
 import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";
@@ -27,6 +30,16 @@ export default async function CompetitionDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  let userProfile = null;
+  if (user) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("role, profile_completed")
+      .eq("id", user.id)
+      .single();
+    userProfile = data;
+  }
 
   let existingRegistration = null;
   if (user) {
@@ -114,9 +127,28 @@ export default async function CompetitionDetailPage({
         </div>
       </div>
 
-      {competition.registration_open && user && !existingRegistration && (
-        <RegistrationForm competitionId={id} />
-      )}
+      {competition.registration_open &&
+        user &&
+        !existingRegistration &&
+        canRegisterForCompetitions(userProfile) && (
+          <RegistrationForm competitionId={id} />
+        )}
+
+      {competition.registration_open &&
+        user &&
+        !existingRegistration &&
+        userProfile &&
+        !canRegisterForCompetitions(userProfile) && (
+          <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+            <h2 className="font-semibold text-foreground">Register for this competition</h2>
+            <p className="mt-2 text-sm text-muted">
+              Complete your dancer profile before signing up for a competition.
+            </p>
+            <Link href="/profile/setup" className="mt-4 inline-block">
+              <Button>Complete profile</Button>
+            </Link>
+          </div>
+        )}
 
       {existingRegistration && (
         <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">

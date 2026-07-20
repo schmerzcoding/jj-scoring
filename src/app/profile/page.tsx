@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { isAdminRole } from "@/lib/auth";
 import { fetchProfileCompetitionData } from "@/lib/profile-stats";
 import {
   AchievementsSection,
@@ -23,6 +24,7 @@ export default async function ProfilePage() {
     .single();
 
   if (!profile) redirect("/profile/setup");
+  if (isAdminRole(profile.role)) redirect("/admin");
 
   const competitionData = await fetchProfileCompetitionData(supabase, user.id);
 

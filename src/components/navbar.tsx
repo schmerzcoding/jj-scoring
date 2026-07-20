@@ -22,7 +22,7 @@ export async function Navbar() {
 
   const userMenuItems: UserMenuItem[] = [];
 
-  if (profile?.role === "participant") {
+  if (profile && profile.role !== "admin") {
     userMenuItems.push({
       href: profile.profile_completed ? "/profile" : "/profile/setup",
       label: profile.profile_completed ? "Profile" : "Complete profile",

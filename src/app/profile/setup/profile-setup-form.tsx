@@ -13,9 +13,11 @@ import {
 export function ProfileSetupForm({
   userId,
   initialValues,
+  redirectPath = "/competitions",
 }: {
   userId: string;
   initialValues: ProfileFormValues;
+  redirectPath?: string;
 }) {
   const router = useRouter();
   const [displayName, setDisplayName] = useState(initialValues.fullName);
@@ -23,7 +25,7 @@ export function ProfileSetupForm({
   async function handleSubmit(values: ProfileFormValues) {
     const result = await saveProfileValues(userId, values, true);
     if (!result.error) {
-      router.push("/competitions");
+      router.push(redirectPath);
       router.refresh();
     }
     return result;
@@ -32,7 +34,7 @@ export function ProfileSetupForm({
   return (
     <Card
       title="Complete your profile"
-      description="Tell us a bit about yourself before joining competitions."
+      description="Tell us a bit about yourself so you can join competitions when you're ready."
     >
       <div className="mb-6 border-b border-border pb-6">
         <AvatarUpload
