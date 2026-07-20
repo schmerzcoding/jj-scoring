@@ -14,7 +14,7 @@ export function StatusBadge({ status, className }: BadgeProps) {
         className
       )}
     >
-      {status.replace("_", " ")}
+      {status.replace(/_/g, " ")}
     </span>
   );
 }

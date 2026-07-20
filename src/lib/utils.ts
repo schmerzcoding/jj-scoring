@@ -29,6 +29,10 @@ export function getStatusColor(status: string): string {
     approved: "bg-emerald-950/80 text-emerald-300 ring-1 ring-emerald-800/50",
     rejected: "bg-red-950/80 text-red-300 ring-1 ring-red-800/50",
     active: "bg-sky-950/80 text-sky-300 ring-1 ring-sky-800/50",
+    organizer: "bg-violet-950/80 text-violet-300 ring-1 ring-violet-800/50",
+    judge: "bg-indigo-950/80 text-indigo-300 ring-1 ring-indigo-800/50",
+    admin: "bg-brand-950/80 text-brand-300 ring-1 ring-brand-800/50",
+    participant: "bg-zinc-800 text-zinc-300 ring-1 ring-zinc-700",
   };
   return colors[status] ?? "bg-zinc-800 text-zinc-300 ring-1 ring-zinc-700";
 }
