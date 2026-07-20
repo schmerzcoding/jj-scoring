@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { LogOutButton } from "./logout-button";
-import { UserAvatar } from "./avatar-upload";
+import { UserMenu, type UserMenuItem } from "./user-menu";
 
 export async function Navbar() {
   const supabase = await createClient();
@@ -19,6 +18,22 @@ export async function Navbar() {
     profile = data;
   }
 
+  const displayName = profile?.full_name ?? user?.email ?? "User";
+
+  const userMenuItems: UserMenuItem[] = [];
+
+  if (profile?.role === "participant") {
+    userMenuItems.push({
+      href: profile.profile_completed ? "/profile" : "/profile/setup",
+      label: profile.profile_completed ? "Profile" : "Complete profile",
+    });
+  }
+
+  userMenuItems.push({
+    label: "Log out",
+    danger: true,
+  });
+
   return (
     <header className="border-b border-gray-200 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
@@ -27,7 +42,10 @@ export async function Navbar() {
         </Link>
 
         <nav className="flex items-center gap-6">
-          <Link href="/competitions" className="text-sm text-gray-600 hover:text-gray-900">
+          <Link
+            href="/competitions"
+            className="text-sm text-gray-600 hover:text-gray-900"
+          >
             Competitions
           </Link>
 
@@ -43,24 +61,12 @@ export async function Navbar() {
             </Link>
           )}
 
-          {user && profile?.role === "participant" && profile.profile_completed && (
-            <Link href="/profile" className="text-sm text-gray-600 hover:text-gray-900">
-              Profile
-            </Link>
-          )}
-
           {user ? (
-            <div className="flex items-center gap-4">
-              <UserAvatar
-                name={profile?.full_name ?? user.email ?? "User"}
-                avatarUrl={profile?.avatar_url}
-                size="sm"
-              />
-              <span className="text-sm text-gray-500">
-                {profile?.full_name ?? user.email}
-              </span>
-              <LogOutButton />
-            </div>
+            <UserMenu
+              name={displayName}
+              avatarUrl={profile?.avatar_url}
+              items={userMenuItems}
+            />
           ) : (
             <div className="flex items-center gap-3">
               <Link
