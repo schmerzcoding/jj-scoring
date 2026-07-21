@@ -1,94 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getPostLoginPath } from "@/lib/auth";
+import { PasswordForm } from "@/components/password-form";
 
 export default function ResetPasswordPage() {
-  const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-
-    const supabase = createClient();
-    const { error: updateError } = await supabase.auth.updateUser({ password });
-
-    if (updateError) {
-      setError(updateError.message);
+  useEffect(() => {
+    async function loadUser() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setEmail(user?.email ?? null);
       setLoading(false);
-      return;
     }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    void loadUser();
+  }, []);
 
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role, profile_completed")
-        .eq("id", user.id)
-        .single();
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-md">
+        <Card title="Choose a new password" description="Loading...">
+          <p className="text-sm text-muted">Please wait...</p>
+        </Card>
+      </div>
+    );
+  }
 
-      router.push(getPostLoginPath(profile));
-      router.refresh();
-      return;
-    }
-
-    router.push("/login?reset=success");
-    router.refresh();
+  if (!email) {
+    return (
+      <div className="mx-auto max-w-md">
+        <Card
+          title="Link expired"
+          description="This password reset link is invalid or has expired."
+        >
+          <p className="text-center text-sm text-muted">
+            <Link
+              href="/forgot-password"
+              className="text-brand-400 hover:text-brand-300 hover:underline"
+            >
+              Request a new reset link
+            </Link>
+          </p>
+        </Card>
+      </div>
+    );
   }
 
   return (
     <div className="mx-auto max-w-md">
       <Card
         title="Choose a new password"
-        description="Enter and confirm your new password below."
+        description="Enter your new password twice. It must be different from your current password."
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="New password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            minLength={6}
-            required
-          />
-          <Input
-            label="Confirm password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            minLength={6}
-            required
-          />
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <Button type="submit" className="w-full" loading={loading}>
-            {loading ? "Saving..." : "Update password"}
-          </Button>
-        </form>
+        <PasswordForm mode="reset" email={email} />
         <p className="mt-4 text-center text-sm text-muted">
           Link expired?{" "}
           <Link

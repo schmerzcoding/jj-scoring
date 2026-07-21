@@ -50,7 +50,7 @@ export function isAllowedDuringProfileSetup(
   role: UserRole | undefined
 ): boolean {
   if (isAuthPublicPath(pathname)) return true;
-  if (pathname === "/profile/setup" || pathname === "/profile") return true;
+  if (pathname === "/profile/setup" || pathname.startsWith("/profile")) return true;
   if (pathname.startsWith("/competitions")) return true;
   if (role === "judge" && pathname.startsWith("/judge")) return true;
   if (role === "organizer" && pathname.startsWith("/organizer")) return true;

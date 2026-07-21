@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProfileSummary } from "@/components/profile-dashboard";
@@ -28,9 +29,16 @@ export function ProfileHeader({
         countryCode={profile.country_code}
         avatarUrl={profile.avatar_url}
         action={
-          <Button variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
-            Edit profile
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" size="sm" onClick={() => setEditOpen(true)}>
+              Edit profile
+            </Button>
+            <Link href="/profile/change-password">
+              <Button variant="ghost" size="sm">
+                Change password
+              </Button>
+            </Link>
+          </div>
         }
       />
 

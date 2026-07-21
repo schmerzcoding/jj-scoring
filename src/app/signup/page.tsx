@@ -9,17 +9,25 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getPostLoginPath } from "@/lib/auth";
 import { authCallbackUrl } from "@/lib/auth-redirect";
+import { validatePasswordPair } from "@/lib/password-validation";
 
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    const validationError = validatePasswordPair(password, confirmPassword);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setLoading(true);
 
     const supabase = createClient();
@@ -87,6 +95,16 @@ export default function SignupPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            minLength={6}
+            required
+          />
+          <Input
+            label="Confirm password"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            autoComplete="new-password"
             minLength={6}
             required
           />
