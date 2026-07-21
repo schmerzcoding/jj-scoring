@@ -1,6 +1,8 @@
-# J&J Scoring
+# Waddle Social
 
-A web application for managing Jack & Jill dance competition scoring. Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **Supabase**.
+Dance events platform for Dublin and beyond — socials, workshops, masterclasses, congresses, and competitions. Built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **Supabase**.
+
+**Production:** https://www.waddlesocial.com
 
 ## Features
 

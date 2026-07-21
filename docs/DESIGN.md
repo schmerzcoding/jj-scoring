@@ -1,4 +1,4 @@
-# Design system — J&J Scoring
+# Design system — Waddle Social
 
 Step-by-step visual identity for the app. Dark elegant theme with wine/burgundy accents.
 

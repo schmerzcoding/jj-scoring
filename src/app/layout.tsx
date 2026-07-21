@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Navbar } from "@/components/navbar";
+import { BRAND_NAME, BRAND_URL } from "@/lib/brand";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "J&J Scoring",
-  description: "Jack & Jill competition scoring platform",
+  metadataBase: new URL(BRAND_URL),
+  title: BRAND_NAME,
+  description: "Dance events in Dublin and beyond — socials, workshops, congresses, and competitions.",
 };
-
 export default function RootLayout({
   children,
 }: {

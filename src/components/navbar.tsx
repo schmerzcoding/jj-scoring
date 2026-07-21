@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { BrandLogo } from "@/components/brand-logo";
 import { UserMenu, type UserMenuItem } from "./user-menu";
 
 export async function Navbar() {
@@ -44,7 +45,7 @@ export async function Navbar() {
           href="/"
           className="text-xl font-bold tracking-tight text-foreground transition-colors hover:text-brand-400"
         >
-          J<span className="text-brand-500">&</span>J Scoring
+          <BrandLogo />
         </Link>
 
         <nav className="flex items-center gap-6">

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getPostLoginPath, requireEmailVerification } from "@/lib/auth";
+import { BRAND_NAME } from "@/lib/brand";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -71,7 +72,7 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md">
-      <Card title="Log in" description="Access your J&J Scoring account">
+      <Card title="Log in" description={`Access your ${BRAND_NAME} account`}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Email"

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
@@ -39,19 +40,17 @@ export default async function HomePage() {
   return (
     <div className="space-y-12">
       <section className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-          Jack <span className="text-brand-500">&</span> Jill Scoring
-        </h1>
+        <BrandLogo as="h1" className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl" />
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
-          Manage competitions, register as leader or follower, and score
-          participants round by round — all in one place.
+          Discover dance events in Dublin and beyond — socials, workshops,
+          masterclasses, congresses, and competitions — all in one place.
         </p>
         <div className="mt-8 flex justify-center gap-4">
           <Link
             href="/competitions"
             className="rounded-xl bg-brand-600 px-6 py-3 text-sm font-medium text-white shadow-md shadow-brand-950/40 transition-all hover:bg-brand-500"
           >
-            Browse Competitions
+            Browse Events
           </Link>
           {!user && (
             <Link
@@ -67,7 +66,7 @@ export default async function HomePage() {
       {competitions && competitions.length > 0 && (
         <section>
           <h2 className="mb-6 text-2xl font-semibold text-foreground">
-            Upcoming Competitions
+            Upcoming Events
           </h2>
           <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {competitions.map((comp) => (
@@ -95,7 +94,7 @@ export default async function HomePage() {
       <section className="stagger-children grid gap-8 sm:grid-cols-3">
         <FeatureCard
           title="For Organizers"
-          description="Create events, manage rounds, approve registrations, and assign judges."
+          description="Create events, manage registrations, assign judges, and run competitions."
         />
         <FeatureCard
           title="For Judges"

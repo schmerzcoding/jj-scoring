@@ -30,7 +30,7 @@ After enabling, **new signups** will receive a verification email (once Brevo SM
 | Username | Your Brevo login email |
 | Password | The SMTP key you generated |
 | Sender email | A verified sender in Brevo |
-| Sender name | e.g. `J&J Scoring` |
+| Sender name | e.g. `Waddle Social` |
 
 ## 3. Configure Supabase Auth SMTP
 
@@ -46,7 +46,7 @@ Minimum interval between emails: 60 (or as needed)
 Username: your-brevo-login@email.com
 Password: your-brevo-smtp-key
 Sender email: noreply@yourdomain.com  (must be verified in Brevo)
-Sender name: J&J Scoring
+Sender name: Waddle Social
 ```
 
 5. Save and send a test email from Supabase if available.
@@ -57,10 +57,12 @@ In **Authentication → URL Configuration**:
 
 | Setting | Value |
 |---------|-------|
-| Site URL | `https://jj-scoring-orcin.vercel.app` (production) |
-| Redirect URLs | Add both: |
-| | `https://jj-scoring-orcin.vercel.app/auth/callback` |
-| | `http://localhost:3000/auth/callback` |
+| Site URL | `https://www.waddlesocial.com` (production) |
+| Redirect URLs | Add all of: |
+| | `https://www.waddlesocial.com/**` |
+| | `https://waddlesocial.com/**` |
+| | `http://localhost:3000/**` |
+| | `https://jj-scoring-orcin.vercel.app/**` (legacy, optional) |
 
 The app sends users to `/auth/callback?next=/profile/setup` after they click the verification link.
 
@@ -68,7 +70,7 @@ The app sends users to `/auth/callback?next=/profile/setup` after they click the
 
 In **Authentication → Email Templates → Confirm signup**:
 
-- Subject example: `Confirm your J&J Scoring account`
+- Subject example: `Confirm your Waddle Social account`
 - Body can use Supabase variables: `{{ .ConfirmationURL }}`, `{{ .SiteURL }}`
 
 Make sure the confirmation link uses the redirect URL configured above.

@@ -4,7 +4,7 @@ Guía para enviar correos de verificación desde **tu propio dominio** (ej. `nor
 
 ## ⚠️ Importante: no puedes usar `vercel.app`
 
-Direcciones como `noreply@jj-scoring-orcin.vercel.app` **no funcionan** para email, porque no controlas el dominio `vercel.app`.
+Direcciones como `noreply@jj-scoring-orcin.vercel.app` **no funcionan** para email, porque no controlas el dominio `vercel.app`. Usa tu dominio: `noreply@waddlesocial.com`.
 
 Necesitas un dominio que **tú poseas**, por ejemplo:
 - `jjscoring.com`
@@ -87,7 +87,7 @@ Elige **Authenticate the domain yourself**. Brevo te mostrará registros similar
 1. En Brevo → **Senders, Domains & dedicated IPs** → pestaña **Senders**
 2. **Add a sender**
 3. Email: `noreply@tudominio.com` (o `hello@`, `no-reply@` — debe ser del dominio autenticado)
-4. Nombre: `J&J Scoring`
+4. Nombre: `Waddle Social`
 5. Brevo puede pedir verificación del buzón; si no tienes buzón real, usa un alias o `noreply` sin inbox (depende del plan — a veces basta con dominio autenticado)
 
 ---
@@ -103,7 +103,7 @@ Port: 587
 Username: [tu email de login de Brevo]
 Password: [SMTP key de Brevo — Settings → SMTP & API]
 Sender email: noreply@tudominio.com
-Sender name: J&J Scoring
+Sender name: Waddle Social
 ```
 
 3. **Authentication → Providers → Email** → **Confirm email** = ON
