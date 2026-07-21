@@ -43,6 +43,7 @@ export async function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Link
           href="/"
+          aria-label="Waddle Social home"
           className="text-xl font-bold tracking-tight text-foreground transition-colors hover:text-brand-400"
         >
           <BrandLogo />
