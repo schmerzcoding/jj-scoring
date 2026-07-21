@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getPostLoginPath } from "@/lib/auth";
+import { authCallbackUrl } from "@/lib/auth-redirect";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function SignupPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback?next=/profile/setup`;
+    const redirectTo = authCallbackUrl("/profile/setup");
 
     const { data, error: authError } = await supabase.auth.signUp({
       email,

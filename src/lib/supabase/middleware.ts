@@ -42,6 +42,10 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
+  if (pathname === "/reset-password" || pathname === "/forgot-password") {
+    return supabaseResponse;
+  }
+
   if (requireEmailVerification() && !isEmailVerified(user)) {
     if (
       !isAuthPublicPath(pathname) &&

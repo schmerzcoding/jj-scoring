@@ -61,6 +61,7 @@ export const AUTH_PUBLIC_PATHS = [
   "/login",
   "/signup",
   "/verify-email",
+  "/forgot-password",
   "/auth/callback",
 ] as const;
 

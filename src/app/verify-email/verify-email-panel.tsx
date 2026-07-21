@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { authCallbackUrl } from "@/lib/auth-redirect";
 
 export function VerifyEmailPanel({
   email: initialEmail,
@@ -30,7 +31,7 @@ export function VerifyEmailPanel({
     setMessage("");
 
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback?next=/profile/setup`;
+    const redirectTo = authCallbackUrl("/profile/setup");
 
     const { error: resendError } = await supabase.auth.resend({
       type: "signup",
