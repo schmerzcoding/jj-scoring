@@ -72,6 +72,7 @@ export type Database = {
           dance_style_other: string | null;
           workshop_levels: Database["public"]["Enums"]["workshop_level"][];
           instructors: string | null;
+          masterclass_topic: string | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -93,6 +94,7 @@ export type Database = {
           dance_style_other?: string | null;
           workshop_levels?: Database["public"]["Enums"]["workshop_level"][];
           instructors?: string | null;
+          masterclass_topic?: string | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -114,6 +116,7 @@ export type Database = {
           dance_style_other?: string | null;
           workshop_levels?: Database["public"]["Enums"]["workshop_level"][];
           instructors?: string | null;
+          masterclass_topic?: string | null;
           created_by?: string;
           created_at?: string;
           updated_at?: string;

@@ -11,7 +11,7 @@ import { CountrySelect } from "@/components/country-select";
 import { uploadCompetitionBanner } from "@/components/competition-banner-upload";
 import { EventScheduleFields } from "@/components/event-schedule-fields";
 import { WorkshopCreateFields } from "@/components/workshop-create-fields";
-import { EVENT_TYPE_SELECT_OPTIONS } from "@/lib/events";
+import { EVENT_TYPE_SELECT_OPTIONS, isClassEvent } from "@/lib/events";
 import { parseInstructors } from "@/lib/workshops";
 import type {
   CompetitionStatus,
@@ -23,7 +23,7 @@ import type {
 const EVENT_TYPE_DESCRIPTIONS: Record<EventType, string> = {
   social: "A social dance night. Add date, times, and venue details.",
   workshop: "A focused class. Specify dance style, levels, and instructor(s).",
-  masterclass: "An advanced session with a guest teacher.",
+  masterclass: "A focused session. Specify dance style, levels, instructor(s), and optional topic.",
   congress: "A multi-day festival or congress.",
   competition: "A Jack & Jill or scored dance competition.",
 };
@@ -55,6 +55,7 @@ export function CreateEventForm({
   const [danceStyleOther, setDanceStyleOther] = useState("");
   const [workshopLevels, setWorkshopLevels] = useState<WorkshopLevel[]>([]);
   const [instructors, setInstructors] = useState("");
+  const [masterclassTopic, setMasterclassTopic] = useState("");
   const [status, setStatus] = useState<CompetitionStatus>("draft");
   const [registrationOpen, setRegistrationOpen] = useState(false);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
@@ -70,15 +71,16 @@ export function CreateEventForm({
     setBannerPreview(file ? URL.createObjectURL(file) : null);
   }
 
-  function validateWorkshopFields(): string | null {
+  function validateClassEventFields(type: EventType): string | null {
+    const typeLabel = type === "masterclass" ? "masterclass" : "workshop";
     if (!danceStyle) {
-      return "Please select a dance style for this workshop.";
+      return `Please select a dance style for this ${typeLabel}.`;
     }
     if (danceStyle === "other" && !danceStyleOther.trim()) {
       return "Please specify the dance style.";
     }
     if (workshopLevels.length === 0) {
-      return "Select at least one workshop level.";
+      return `Select at least one ${typeLabel} level.`;
     }
     if (parseInstructors(instructors).length === 0) {
       return "Please enter at least one instructor.";
@@ -100,10 +102,10 @@ export function CreateEventForm({
       return;
     }
 
-    if (eventType === "workshop") {
-      const workshopError = validateWorkshopFields();
-      if (workshopError) {
-        setError(workshopError);
+    if (isClassEvent(eventType)) {
+      const classEventError = validateClassEventFields(eventType);
+      if (classEventError) {
+        setError(classEventError);
         return;
       }
     }
@@ -121,7 +123,7 @@ export function CreateEventForm({
       return;
     }
 
-    const isWorkshop = eventType === "workshop";
+    const isClass = isClassEvent(eventType);
 
     const { data, error: insertError } = await fromTable(supabase, "competitions")
       .insert({
@@ -133,11 +135,15 @@ export function CreateEventForm({
         start_time: startTime || null,
         end_time: endTime || null,
         event_type: eventType,
-        dance_style: isWorkshop ? danceStyle : null,
+        dance_style: isClass ? danceStyle : null,
         dance_style_other:
-          isWorkshop && danceStyle === "other" ? danceStyleOther.trim() : null,
-        workshop_levels: isWorkshop ? workshopLevels : [],
-        instructors: isWorkshop ? normalizeInstructors(instructors) : null,
+          isClass && danceStyle === "other" ? danceStyleOther.trim() : null,
+        workshop_levels: isClass ? workshopLevels : [],
+        instructors: isClass ? normalizeInstructors(instructors) : null,
+        masterclass_topic:
+          eventType === "masterclass" && masterclassTopic.trim()
+            ? masterclassTopic.trim()
+            : null,
         status,
         registration_open: registrationOpen,
         created_by: user.id,
@@ -215,16 +221,19 @@ export function CreateEventForm({
             onEndTimeChange={setEndTime}
           />
 
-          {eventType === "workshop" && (
+          {isClassEvent(eventType) && (
             <WorkshopCreateFields
+              eventType={eventType}
               danceStyle={danceStyle}
               danceStyleOther={danceStyleOther}
               workshopLevels={workshopLevels}
               instructors={instructors}
+              masterclassTopic={masterclassTopic}
               onDanceStyleChange={setDanceStyle}
               onDanceStyleOtherChange={setDanceStyleOther}
               onWorkshopLevelsChange={setWorkshopLevels}
               onInstructorsChange={setInstructors}
+              onMasterclassTopicChange={setMasterclassTopic}
             />
           )}
 

@@ -23,6 +23,10 @@ export function isCompetitionEvent(type: EventType): boolean {
   return type === "competition";
 }
 
+export function isClassEvent(type: EventType): boolean {
+  return type === "workshop" || type === "masterclass";
+}
+
 export const EVENT_TYPE_SELECT_OPTIONS = EVENT_TYPES.map((type) => ({
   value: type,
   label: eventTypeLabel(type),

@@ -1,30 +1,51 @@
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { eventTypeLabel } from "@/lib/events";
 import {
   DANCE_STYLE_SELECT_OPTIONS,
   WORKSHOP_LEVEL_OPTIONS,
 } from "@/lib/workshops";
-import type { DanceStyle, WorkshopLevel } from "@/types/database";
+import type { DanceStyle, EventType, WorkshopLevel } from "@/types/database";
+
+const CLASS_EVENT_TYPES = ["workshop", "masterclass"] as const satisfies readonly EventType[];
+
+type ClassEventType = (typeof CLASS_EVENT_TYPES)[number];
+
+function isClassEventType(type: EventType): type is ClassEventType {
+  return CLASS_EVENT_TYPES.includes(type as ClassEventType);
+}
 
 export function WorkshopCreateFields({
+  eventType,
   danceStyle,
   danceStyleOther,
   workshopLevels,
   instructors,
+  masterclassTopic,
   onDanceStyleChange,
   onDanceStyleOtherChange,
   onWorkshopLevelsChange,
   onInstructorsChange,
+  onMasterclassTopicChange,
 }: {
+  eventType: EventType;
   danceStyle: DanceStyle | "";
   danceStyleOther: string;
   workshopLevels: WorkshopLevel[];
   instructors: string;
+  masterclassTopic: string;
   onDanceStyleChange: (value: DanceStyle | "") => void;
   onDanceStyleOtherChange: (value: string) => void;
   onWorkshopLevelsChange: (levels: WorkshopLevel[]) => void;
   onInstructorsChange: (value: string) => void;
+  onMasterclassTopicChange: (value: string) => void;
 }) {
+  if (!isClassEventType(eventType)) return null;
+
+  const isMasterclass = eventType === "masterclass";
+  const typeLabel = eventTypeLabel(eventType).toLowerCase();
+
   function toggleLevel(level: WorkshopLevel) {
     if (workshopLevels.includes(level)) {
       onWorkshopLevelsChange(workshopLevels.filter((entry) => entry !== level));
@@ -34,11 +55,20 @@ export function WorkshopCreateFields({
   }
 
   return (
-    <div className="space-y-4 rounded-xl border border-cyan-900/40 bg-cyan-950/20 p-4">
+    <div
+      className={cn(
+        "space-y-4 rounded-xl border p-4",
+        isMasterclass
+          ? "border-orange-900/40 bg-orange-950/20"
+          : "border-cyan-900/40 bg-cyan-950/20"
+      )}
+    >
       <div>
-        <h3 className="text-sm font-semibold text-foreground">Workshop details</h3>
+        <h3 className="text-sm font-semibold text-foreground">
+          {eventTypeLabel(eventType)} details
+        </h3>
         <p className="mt-1 text-xs text-muted">
-          Style, level, and instructor information for this workshop.
+          Style, level, and instructor information for this {typeLabel}.
         </p>
       </div>
 
@@ -60,9 +90,18 @@ export function WorkshopCreateFields({
         />
       )}
 
+      {isMasterclass && (
+        <Input
+          label="Theme or topic"
+          value={masterclassTopic}
+          onChange={(e) => onMasterclassTopicChange(e.target.value)}
+          placeholder="e.g. Musicality and body movement"
+        />
+      )}
+
       <fieldset className="space-y-2">
         <legend className="block text-sm font-medium text-muted-foreground">
-          Workshop levels
+          {isMasterclass ? "Masterclass levels" : "Workshop levels"}
         </legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {WORKSHOP_LEVEL_OPTIONS.map((option) => (
