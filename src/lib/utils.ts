@@ -14,6 +14,37 @@ export function formatDate(date: string | null): string {
   });
 }
 
+export function formatTime(time: string | null): string {
+  if (!time) return "";
+  const [hours, minutes] = time.split(":");
+  if (!hours || !minutes) return time;
+  const date = new Date();
+  date.setHours(Number(hours), Number(minutes), 0, 0);
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+export function formatEventSchedule(
+  date: string | null,
+  startTime: string | null,
+  endTime: string | null
+): string {
+  const dateLabel = formatDate(date);
+  const startLabel = formatTime(startTime);
+  const endLabel = formatTime(endTime);
+
+  if (dateLabel === "TBD" && !startLabel && !endLabel) return "TBD";
+  if (startLabel && endLabel) {
+    return `${dateLabel} · ${startLabel} – ${endLabel}`;
+  }
+  if (startLabel) {
+    return `${dateLabel} · ${startLabel}`;
+  }
+  return dateLabel;
+}
+
 export function formatScore(score: number): string {
   return score.toFixed(2);
 }

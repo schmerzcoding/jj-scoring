@@ -9,8 +9,33 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CountrySelect } from "@/components/country-select";
 import { uploadCompetitionBanner } from "@/components/competition-banner-upload";
+import { EventScheduleFields } from "@/components/event-schedule-fields";
+import { WorkshopCreateFields } from "@/components/workshop-create-fields";
 import { EVENT_TYPE_SELECT_OPTIONS } from "@/lib/events";
-import type { CompetitionStatus, EventType } from "@/types/database";
+import { parseInstructors } from "@/lib/workshops";
+import type {
+  CompetitionStatus,
+  DanceStyle,
+  EventType,
+  WorkshopLevel,
+} from "@/types/database";
+
+const EVENT_TYPE_DESCRIPTIONS: Record<EventType, string> = {
+  social: "A social dance night. Add date, times, and venue details.",
+  workshop: "A focused class. Specify dance style, levels, and instructor(s).",
+  masterclass: "An advanced session with a guest teacher.",
+  congress: "A multi-day festival or congress.",
+  competition: "A Jack & Jill or scored dance competition.",
+};
+
+function normalizeInstructors(value: string): string {
+  return parseInstructors(value).join(", ");
+}
+
+function isEndAfterStart(startTime: string, endTime: string): boolean {
+  if (!startTime || !endTime) return true;
+  return endTime > startTime;
+}
 
 export function CreateEventForm({
   manageBasePath,
@@ -24,6 +49,12 @@ export function CreateEventForm({
   const [location, setLocation] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [eventDate, setEventDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [danceStyle, setDanceStyle] = useState<DanceStyle | "">("");
+  const [danceStyleOther, setDanceStyleOther] = useState("");
+  const [workshopLevels, setWorkshopLevels] = useState<WorkshopLevel[]>([]);
+  const [instructors, setInstructors] = useState("");
   const [status, setStatus] = useState<CompetitionStatus>("draft");
   const [registrationOpen, setRegistrationOpen] = useState(false);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
@@ -39,6 +70,22 @@ export function CreateEventForm({
     setBannerPreview(file ? URL.createObjectURL(file) : null);
   }
 
+  function validateWorkshopFields(): string | null {
+    if (!danceStyle) {
+      return "Please select a dance style for this workshop.";
+    }
+    if (danceStyle === "other" && !danceStyleOther.trim()) {
+      return "Please specify the dance style.";
+    }
+    if (workshopLevels.length === 0) {
+      return "Select at least one workshop level.";
+    }
+    if (parseInstructors(instructors).length === 0) {
+      return "Please enter at least one instructor.";
+    }
+    return null;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -46,6 +93,19 @@ export function CreateEventForm({
     if (!countryCode) {
       setError("Please select the event country.");
       return;
+    }
+
+    if (!isEndAfterStart(startTime, endTime)) {
+      setError("End time must be after start time.");
+      return;
+    }
+
+    if (eventType === "workshop") {
+      const workshopError = validateWorkshopFields();
+      if (workshopError) {
+        setError(workshopError);
+        return;
+      }
     }
 
     setLoading(true);
@@ -61,6 +121,8 @@ export function CreateEventForm({
       return;
     }
 
+    const isWorkshop = eventType === "workshop";
+
     const { data, error: insertError } = await fromTable(supabase, "competitions")
       .insert({
         name,
@@ -68,7 +130,14 @@ export function CreateEventForm({
         location: location || null,
         country_code: countryCode,
         event_date: eventDate || null,
+        start_time: startTime || null,
+        end_time: endTime || null,
         event_type: eventType,
+        dance_style: isWorkshop ? danceStyle : null,
+        dance_style_other:
+          isWorkshop && danceStyle === "other" ? danceStyleOther.trim() : null,
+        workshop_levels: isWorkshop ? workshopLevels : [],
+        instructors: isWorkshop ? normalizeInstructors(instructors) : null,
         status,
         registration_open: registrationOpen,
         created_by: user.id,
@@ -99,7 +168,7 @@ export function CreateEventForm({
     <div className="mx-auto max-w-2xl">
       <Card
         title="Create event"
-        description="Add a dance event for Dublin and beyond. You can refine type-specific details later."
+        description={EVENT_TYPE_DESCRIPTIONS[eventType]}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select
@@ -137,12 +206,28 @@ export function CreateEventForm({
             onChange={(e) => setLocation(e.target.value)}
             placeholder="City, venue, etc."
           />
-          <Input
-            label="Event date"
-            type="date"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
+          <EventScheduleFields
+            eventDate={eventDate}
+            startTime={startTime}
+            endTime={endTime}
+            onEventDateChange={setEventDate}
+            onStartTimeChange={setStartTime}
+            onEndTimeChange={setEndTime}
           />
+
+          {eventType === "workshop" && (
+            <WorkshopCreateFields
+              danceStyle={danceStyle}
+              danceStyleOther={danceStyleOther}
+              workshopLevels={workshopLevels}
+              instructors={instructors}
+              onDanceStyleChange={setDanceStyle}
+              onDanceStyleOtherChange={setDanceStyleOther}
+              onWorkshopLevelsChange={setWorkshopLevels}
+              onInstructorsChange={setInstructors}
+            />
+          )}
+
           <div>
             <p className="mb-2 block text-sm font-medium text-muted-foreground">
               Banner image

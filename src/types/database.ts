@@ -66,6 +66,12 @@ export type Database = {
           country_code: string | null;
           banner_url: string | null;
           event_type: Database["public"]["Enums"]["event_type"];
+          start_time: string | null;
+          end_time: string | null;
+          dance_style: Database["public"]["Enums"]["dance_style"] | null;
+          dance_style_other: string | null;
+          workshop_levels: Database["public"]["Enums"]["workshop_level"][];
+          instructors: string | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -81,6 +87,12 @@ export type Database = {
           country_code?: string | null;
           banner_url?: string | null;
           event_type?: Database["public"]["Enums"]["event_type"];
+          start_time?: string | null;
+          end_time?: string | null;
+          dance_style?: Database["public"]["Enums"]["dance_style"] | null;
+          dance_style_other?: string | null;
+          workshop_levels?: Database["public"]["Enums"]["workshop_level"][];
+          instructors?: string | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -96,6 +108,12 @@ export type Database = {
           country_code?: string | null;
           banner_url?: string | null;
           event_type?: Database["public"]["Enums"]["event_type"];
+          start_time?: string | null;
+          end_time?: string | null;
+          dance_style?: Database["public"]["Enums"]["dance_style"] | null;
+          dance_style_other?: string | null;
+          workshop_levels?: Database["public"]["Enums"]["workshop_level"][];
+          instructors?: string | null;
           created_by?: string;
           created_at?: string;
           updated_at?: string;
@@ -333,6 +351,13 @@ export type Database = {
         | "masterclass"
         | "congress"
         | "competition";
+      dance_style: "salsa" | "bachata" | "kizomba" | "zouk" | "other";
+      workshop_level:
+        | "beginners"
+        | "improvers"
+        | "intermediate"
+        | "advanced"
+        | "open_level";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -356,6 +381,8 @@ export type ProfileGender = Database["public"]["Enums"]["profile_gender"];
 export type ProfileDanceRole =
   Database["public"]["Enums"]["profile_dance_role"];
 export type EventType = Database["public"]["Enums"]["event_type"];
+export type DanceStyle = Database["public"]["Enums"]["dance_style"];
+export type WorkshopLevel = Database["public"]["Enums"]["workshop_level"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Competition = Database["public"]["Tables"]["competitions"]["Row"];

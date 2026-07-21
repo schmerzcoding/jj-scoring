@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
+import { EventWorkshopSummary } from "@/components/event-workshop-summary";
 import { eventTypeLabel } from "@/lib/events";
-import { formatDate } from "@/lib/utils";
+import { formatEventSchedule } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
 import type { Competition } from "@/types/database";
 
@@ -69,7 +70,11 @@ export function CompetitionList({
                   <EventTypeBadge type={competition.event_type ?? "competition"} />
                 </div>
                 <p className="mt-1 text-sm text-muted">
-                  {formatDate(competition.event_date)}
+                  {formatEventSchedule(
+                    competition.event_date,
+                    competition.start_time,
+                    competition.end_time
+                  )}
                 </p>
                 {competition.country_code && (
                   <p className="mt-1 text-sm text-muted">
@@ -125,11 +130,17 @@ export function CompetitionList({
                     <EventTypeBadge type={selected.event_type ?? "competition"} />
                   </div>
                   <p className="mt-1 text-sm text-muted">
-                    {formatDate(selected.event_date)}
+                    {formatEventSchedule(
+                      selected.event_date,
+                      selected.start_time,
+                      selected.end_time
+                    )}
                   </p>
                 </div>
                 <StatusBadge status={selected.status} />
               </div>
+
+              <EventWorkshopSummary event={selected} />
 
               <dl className="grid gap-2 text-sm">
                 {selected.country_code && (

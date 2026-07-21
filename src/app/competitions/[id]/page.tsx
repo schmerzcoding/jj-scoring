@@ -2,13 +2,16 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
+import { EventTypeBadge } from "@/components/event-type-badge";
+import { EventWorkshopSummary } from "@/components/event-workshop-summary";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { formatEventSchedule } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
 import { canRegisterForCompetitions } from "@/lib/auth";
 import { RegistrationForm } from "./registration-form";
 import { Leaderboard } from "@/components/leaderboard";
 import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";
+import { isCompetitionEvent } from "@/lib/events";
 import type { ParticipantRow } from "@/lib/leaderboard";
 
 export default async function CompetitionDetailPage({
@@ -26,6 +29,8 @@ export default async function CompetitionDetailPage({
     .single();
 
   if (!competition) notFound();
+
+  const isCompetition = isCompetitionEvent(competition.event_type);
 
   const {
     data: { user },
@@ -109,9 +114,12 @@ export default async function CompetitionDetailPage({
       <div>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              {competition.name}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-3xl font-bold text-foreground">
+                {competition.name}
+              </h1>
+              <EventTypeBadge type={competition.event_type ?? "competition"} />
+            </div>
             {competition.description && (
               <p className="mt-2 text-muted">{competition.description}</p>
             )}
@@ -123,18 +131,27 @@ export default async function CompetitionDetailPage({
             <span>{getCountryName(competition.country_code)}</span>
           )}
           {competition.location && <span>{competition.location}</span>}
-          <span>{formatDate(competition.event_date)}</span>
+          <span>
+            {formatEventSchedule(
+              competition.event_date,
+              competition.start_time,
+              competition.end_time
+            )}
+          </span>
+        </div>
+        <div className="mt-4">
+          <EventWorkshopSummary event={competition} />
         </div>
       </div>
 
-      {competition.registration_open &&
+      {isCompetition && competition.registration_open &&
         user &&
         !existingRegistration &&
         canRegisterForCompetitions(userProfile) && (
           <RegistrationForm competitionId={id} />
         )}
 
-      {competition.registration_open &&
+      {isCompetition && competition.registration_open &&
         user &&
         !existingRegistration &&
         userProfile &&
@@ -150,7 +167,7 @@ export default async function CompetitionDetailPage({
           </div>
         )}
 
-      {existingRegistration && (
+      {isCompetition && existingRegistration && (
         <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
           <h2 className="font-semibold text-foreground">Your Registration</h2>
           <div className="mt-3 flex items-center gap-4">
@@ -167,7 +184,7 @@ export default async function CompetitionDetailPage({
         </div>
       )}
 
-      {rounds && rounds.length > 0 && (
+      {isCompetition && rounds && rounds.length > 0 && (
         <div>
           <h2 className="text-xl font-semibold text-foreground">Rounds</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -194,7 +211,8 @@ export default async function CompetitionDetailPage({
         </div>
       )}
 
-      {(hasPublishedRounds || hasCompletedRounds || publishedLeaderboards.length > 0) && (
+      {isCompetition &&
+        (hasPublishedRounds || hasCompletedRounds || publishedLeaderboards.length > 0) && (
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-foreground">Results</h2>
           {publishedLeaderboards.length === 0 ? (

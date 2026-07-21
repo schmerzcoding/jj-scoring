@@ -3,7 +3,8 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
-import { formatDate } from "@/lib/utils";
+import { EventWorkshopSummary } from "@/components/event-workshop-summary";
+import { formatEventSchedule } from "@/lib/utils";
 import { isCompetitionEvent } from "@/lib/events";
 import { isOrganizerRole } from "@/lib/permissions";
 import { RegistrationsPanel } from "@/app/admin/competitions/[id]/registrations-panel";
@@ -127,7 +128,16 @@ export default async function OrganizerEventPage({
             </div>
             <div className="mt-2 flex gap-4 text-sm text-muted">
               {competition.location && <span>{competition.location}</span>}
-              <span>{formatDate(competition.event_date)}</span>
+              <span>
+                {formatEventSchedule(
+                  competition.event_date,
+                  competition.start_time,
+                  competition.end_time
+                )}
+              </span>
+            </div>
+            <div className="mt-4 max-w-xl">
+              <EventWorkshopSummary event={competition} />
             </div>
           </div>
           <StatusBadge status={competition.status} />
