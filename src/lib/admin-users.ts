@@ -16,7 +16,7 @@ export const MANAGEABLE_ROLE_OPTIONS: {
 }[] = [
   { value: "participant", label: "Participant" },
   { value: "judge", label: "Judge" },
-  { value: "organizer", label: "Organizer (coming soon)", disabled: true },
+  { value: "organizer", label: "Organizer" },
 ];
 
 export function roleLabel(role: UserRole): string {

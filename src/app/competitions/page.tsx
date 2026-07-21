@@ -12,9 +12,9 @@ export default async function CompetitionsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-foreground">Competitions</h1>
+      <h1 className="text-3xl font-bold text-foreground">Events</h1>
       <p className="mt-2 text-muted">
-        Browse open and upcoming Jack & Jill events.
+        Browse dance events in Dublin and beyond — socials, workshops, congresses, and competitions.
       </p>
 
       <div className="mt-8">

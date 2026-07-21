@@ -49,7 +49,7 @@ export async function Navbar() {
 
         <nav className="flex items-center gap-6">
           <Link href="/competitions" className={navLinkClass}>
-            Competitions
+            Events
           </Link>
 
           {user && profile?.role === "admin" && (
@@ -61,6 +61,12 @@ export async function Navbar() {
           {user && profile?.role === "judge" && (
             <Link href="/judge" className={navLinkClass}>
               Judge Panel
+            </Link>
+          )}
+
+          {user && profile?.role === "organizer" && (
+            <Link href="/organizer" className={navLinkClass}>
+              Organizer
             </Link>
           )}
 

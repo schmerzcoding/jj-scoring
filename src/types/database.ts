@@ -65,6 +65,7 @@ export type Database = {
           event_date: string | null;
           country_code: string | null;
           banner_url: string | null;
+          event_type: Database["public"]["Enums"]["event_type"];
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -79,6 +80,7 @@ export type Database = {
           event_date?: string | null;
           country_code?: string | null;
           banner_url?: string | null;
+          event_type?: Database["public"]["Enums"]["event_type"];
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -93,6 +95,7 @@ export type Database = {
           event_date?: string | null;
           country_code?: string | null;
           banner_url?: string | null;
+          event_type?: Database["public"]["Enums"]["event_type"];
           created_by?: string;
           created_at?: string;
           updated_at?: string;
@@ -324,6 +327,12 @@ export type Database = {
         | "other"
         | "prefer_not_to_say";
       profile_dance_role: "leader" | "follower" | "both";
+      event_type:
+        | "social"
+        | "workshop"
+        | "masterclass"
+        | "congress"
+        | "competition";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -346,6 +355,7 @@ export type RoundScoringFormat =
 export type ProfileGender = Database["public"]["Enums"]["profile_gender"];
 export type ProfileDanceRole =
   Database["public"]["Enums"]["profile_dance_role"];
+export type EventType = Database["public"]["Enums"]["event_type"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Competition = Database["public"]["Tables"]["competitions"]["Row"];

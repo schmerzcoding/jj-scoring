@@ -5,13 +5,14 @@ import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
 import { formatDate } from "@/lib/utils";
 import { isCompetitionEvent } from "@/lib/events";
-import { RegistrationsPanel } from "./registrations-panel";
-import { RoundsPanel } from "./rounds-panel";
-import { JudgesPanel } from "./judges-panel";
-import { CompetitionSettings } from "./competition-settings";
-import { CompetitionBranding } from "./competition-branding";
+import { isOrganizerRole } from "@/lib/permissions";
+import { RegistrationsPanel } from "@/app/admin/competitions/[id]/registrations-panel";
+import { RoundsPanel } from "@/app/admin/competitions/[id]/rounds-panel";
+import { JudgesPanel } from "@/app/admin/competitions/[id]/judges-panel";
+import { CompetitionSettings } from "@/app/admin/competitions/[id]/competition-settings";
+import { CompetitionBranding } from "@/app/admin/competitions/[id]/competition-branding";
 
-export default async function AdminCompetitionPage({
+export default async function OrganizerEventPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -29,7 +30,9 @@ export default async function AdminCompetitionPage({
     .select("role")
     .eq("id", user.id)
     .single();
-  if (profile?.role !== "admin") redirect("/");
+  if (!profile || (!isOrganizerRole(profile.role) && profile.role !== "admin")) {
+    redirect("/");
+  }
 
   const { data: competition } = await supabase
     .from("competitions")
@@ -37,6 +40,10 @@ export default async function AdminCompetitionPage({
     .eq("id", id)
     .single();
   if (!competition) notFound();
+
+  if (profile.role === "organizer" && competition.created_by !== user.id) {
+    redirect("/organizer");
+  }
 
   const isCompetition = isCompetitionEvent(competition.event_type);
 
@@ -106,14 +113,17 @@ export default async function AdminCompetitionPage({
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/admin" className="text-sm text-brand-400 hover:text-brand-300 hover:underline">
+        <Link
+          href="/organizer"
+          className="text-sm text-brand-400 hover:text-brand-300 hover:underline"
+        >
           &larr; Back to dashboard
         </Link>
         <div className="mt-2 flex items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-3xl font-bold text-foreground">{competition.name}</h1>
-              <EventTypeBadge type={competition.event_type ?? "competition"} />
+              <EventTypeBadge type={competition.event_type} />
             </div>
             <div className="mt-2 flex gap-4 text-sm text-muted">
               {competition.location && <span>{competition.location}</span>}
@@ -128,8 +138,8 @@ export default async function AdminCompetitionPage({
         <div className="rounded-xl border border-amber-800/50 bg-amber-950/40 p-4">
           <p className="text-sm text-amber-200">
             This event is in <strong className="text-amber-100">draft</strong> and is hidden from
-            the public list. Change status to <strong className="text-amber-100">Open</strong> below and
-            enable registration when you are ready.
+            the public list. Change status to <strong className="text-amber-100">Open</strong> below
+            and enable registration when you are ready.
           </p>
         </div>
       )}

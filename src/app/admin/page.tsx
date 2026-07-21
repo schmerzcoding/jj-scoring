@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
+import { EventTypeBadge } from "@/components/event-type-badge";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -59,14 +60,14 @@ export default async function AdminDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-          <p className="mt-1 text-muted">Manage competitions, users, and registrations.</p>
+          <p className="mt-1 text-muted">Manage events, users, and registrations.</p>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/admin/users">
             <Button variant="secondary">Users</Button>
           </Link>
           <Link href="/admin/competitions/new">
-            <Button>New Competition</Button>
+            <Button>New Event</Button>
           </Link>
         </div>
       </div>
@@ -98,16 +99,16 @@ export default async function AdminDashboard() {
       )}
 
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Competitions</h2>
+        <h2 className="text-xl font-semibold text-foreground">Events</h2>
         <div className="mt-4 grid gap-4">
           {competitions?.length === 0 && (
             <EmptyState
               icon="calendar"
-              title="No competitions yet"
-              description="Create your first Jack & Jill event to get started."
+              title="No events yet"
+              description="Create your first dance event to get started."
               action={
                 <Link href="/admin/competitions/new">
-                  <Button>New Competition</Button>
+                  <Button>New Event</Button>
                 </Link>
               }
             />
@@ -120,7 +121,10 @@ export default async function AdminDashboard() {
               className="flex items-center justify-between rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20 transition-all hover:border-brand-800/40"
             >
               <div>
-                <h3 className="font-semibold text-foreground">{comp.name}</h3>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="font-semibold text-foreground">{comp.name}</h3>
+                  <EventTypeBadge type={comp.event_type ?? "competition"} />
+                </div>
                 <div className="mt-1 flex gap-4 text-sm text-muted">
                   {comp.location && <span>{comp.location}</span>}
                   <span>{formatDate(comp.event_date)}</span>

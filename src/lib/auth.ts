@@ -41,6 +41,7 @@ export function getPostLoginPath(
   if (isAdminRole(profile?.role)) return "/admin";
   if (needsProfileSetup(profile)) return "/profile/setup";
   if (profile?.role === "judge") return "/judge";
+  if (profile?.role === "organizer") return "/organizer";
   return "/competitions";
 }
 
@@ -52,6 +53,7 @@ export function isAllowedDuringProfileSetup(
   if (pathname === "/profile/setup" || pathname === "/profile") return true;
   if (pathname.startsWith("/competitions")) return true;
   if (role === "judge" && pathname.startsWith("/judge")) return true;
+  if (role === "organizer" && pathname.startsWith("/organizer")) return true;
   return false;
 }
 

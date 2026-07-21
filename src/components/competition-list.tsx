@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/status-badge";
+import { EventTypeBadge } from "@/components/event-type-badge";
+import { eventTypeLabel } from "@/lib/events";
 import { formatDate } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
 import type { Competition } from "@/types/database";
@@ -29,8 +31,8 @@ export function CompetitionList({
     return (
       <EmptyState
         icon="calendar"
-        title="No competitions yet"
-        description="Check back soon — new events will appear here when organizers publish them."
+        title="No events yet"
+        description="Check back soon — new dance events will appear here when organizers publish them."
       />
     );
   }
@@ -60,9 +62,12 @@ export function CompetitionList({
 
             <div className="space-y-3 p-4">
               <div>
-                <h2 className="text-lg font-semibold text-foreground">
-                  {competition.name}
-                </h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {competition.name}
+                  </h2>
+                  <EventTypeBadge type={competition.event_type ?? "competition"} />
+                </div>
                 <p className="mt-1 text-sm text-muted">
                   {formatDate(competition.event_date)}
                 </p>
@@ -110,12 +115,15 @@ export function CompetitionList({
             <div className="space-y-4 p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2
-                    id="competition-modal-title"
-                    className="text-xl font-bold text-foreground"
-                  >
-                    {selected.name}
-                  </h2>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2
+                      id="competition-modal-title"
+                      className="text-xl font-bold text-foreground"
+                    >
+                      {selected.name}
+                    </h2>
+                    <EventTypeBadge type={selected.event_type ?? "competition"} />
+                  </div>
                   <p className="mt-1 text-sm text-muted">
                     {formatDate(selected.event_date)}
                   </p>
@@ -159,7 +167,11 @@ export function CompetitionList({
 
               <div className="flex flex-wrap gap-3 pt-2">
                 <Link href={`/competitions/${selected.id}`}>
-                  <Button>Go to competition</Button>
+                  <Button>
+                    {selected.event_type && selected.event_type !== "competition"
+                      ? `View ${eventTypeLabel(selected.event_type).toLowerCase()}`
+                      : "Go to competition"}
+                  </Button>
                 </Link>
                 <Button
                   type="button"
