@@ -37,10 +37,10 @@ export default function SignupPage() {
     if (authError) {
       const message =
         authError.message ||
-        "Sign up failed. Check that the database migration was run in Supabase.";
+        "Sign up failed. Check Supabase Auth logs for details.";
       setError(
         authError.status === 500
-          ? `${message} (Server error — run supabase/migrations/001 and 002 in SQL Editor)`
+          ? `${message} If email confirmation is enabled, verify Brevo SMTP in Supabase. Also run migration 014 in the SQL Editor.`
           : message
       );
       setLoading(false);
