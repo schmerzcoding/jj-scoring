@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Navbar } from "@/components/navbar";
+import { SiteFooter } from "@/components/site-footer";
 import { BRAND_NAME, BRAND_URL } from "@/lib/brand";
 import "./globals.css";
 
@@ -18,11 +19,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} app-glow`}>
+      <body className={`${inter.className} app-glow flex min-h-screen flex-col`}>
         <Navbar />
-        <main className="animate-fade-in mx-auto min-h-[calc(100vh-4rem)] max-w-7xl px-4 py-8">
+        <main className="animate-fade-in mx-auto w-full max-w-7xl flex-1 px-4 py-8">
           {children}
         </main>
+        <SiteFooter />
       </body>
     </html>
   );
