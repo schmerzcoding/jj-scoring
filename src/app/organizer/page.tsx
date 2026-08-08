@@ -38,9 +38,14 @@ export default async function OrganizerDashboard() {
             Create and manage dance events — socials, workshops, congresses, and more.
           </p>
         </div>
-        <Link href="/organizer/events/new">
-          <Button>Create event</Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/organizer/events/new">
+            <Button>Create event</Button>
+          </Link>
+          <Link href="/organizer/sales">
+            <Button variant="secondary">Ticket sales</Button>
+          </Link>
+        </div>
       </div>
 
       <div>

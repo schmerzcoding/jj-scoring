@@ -309,6 +309,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      ticket_purchases: {
+        Row: {
+          id: string;
+          competition_id: string;
+          user_id: string | null;
+          role: Database["public"]["Enums"]["registration_role"] | null;
+          amount_cents: number;
+          currency: string;
+          status: Database["public"]["Enums"]["ticket_purchase_status"];
+          purchased_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          user_id?: string | null;
+          role?: Database["public"]["Enums"]["registration_role"] | null;
+          amount_cents: number;
+          currency?: string;
+          status?: Database["public"]["Enums"]["ticket_purchase_status"];
+          purchased_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          competition_id?: string;
+          user_id?: string | null;
+          role?: Database["public"]["Enums"]["registration_role"] | null;
+          amount_cents?: number;
+          currency?: string;
+          status?: Database["public"]["Enums"]["ticket_purchase_status"];
+          purchased_at?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       round_results: {
@@ -361,6 +397,7 @@ export type Database = {
         | "intermediate"
         | "advanced"
         | "open_level";
+      ticket_purchase_status: "paid" | "refunded";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -395,6 +432,8 @@ export type Registration = Database["public"]["Tables"]["registrations"]["Row"];
 export type CompetitionJudge =
   Database["public"]["Tables"]["competition_judges"]["Row"];
 export type Score = Database["public"]["Tables"]["scores"]["Row"];
+export type TicketPurchase =
+  Database["public"]["Tables"]["ticket_purchases"]["Row"];
 export type RoundResult = Database["public"]["Views"]["round_results"]["Row"];
 
 export type RegistrationWithProfile = Registration & {

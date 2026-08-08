@@ -55,9 +55,14 @@ export async function Navbar() {
           </Link>
 
           {user && profile?.role === "admin" && (
-            <Link href="/admin" className={navLinkClass}>
-              Admin
-            </Link>
+            <>
+              <Link href="/admin" className={navLinkClass}>
+                Admin
+              </Link>
+              <Link href="/admin/sales" className={navLinkClass}>
+                Sales
+              </Link>
+            </>
           )}
 
           {user && profile?.role === "judge" && (
@@ -67,9 +72,14 @@ export async function Navbar() {
           )}
 
           {user && profile?.role === "organizer" && (
-            <Link href="/organizer" className={navLinkClass}>
-              Organizer
-            </Link>
+            <>
+              <Link href="/organizer" className={navLinkClass}>
+                Organizer
+              </Link>
+              <Link href="/organizer/sales" className={navLinkClass}>
+                Sales
+              </Link>
+            </>
           )}
 
           {user ? (

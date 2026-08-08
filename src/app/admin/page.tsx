@@ -63,6 +63,9 @@ export default async function AdminDashboard() {
           <p className="mt-1 text-muted">Manage events, users, and registrations.</p>
         </div>
         <div className="flex items-center gap-3">
+          <Link href="/admin/sales">
+            <Button variant="secondary">Ticket sales</Button>
+          </Link>
           <Link href="/admin/users">
             <Button variant="secondary">Users</Button>
           </Link>

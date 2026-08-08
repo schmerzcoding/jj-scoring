@@ -49,6 +49,15 @@ export function formatScore(score: number): string {
   return score.toFixed(2);
 }
 
+export function formatEuro(cents: number, currency = "EUR"): string {
+  return new Intl.NumberFormat("en-IE", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(cents / 100);
+}
+
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     draft: "bg-zinc-800 text-zinc-300 ring-1 ring-zinc-700",
