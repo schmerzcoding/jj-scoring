@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { BrandLogo } from "@/components/brand-logo";
-import { UserMenu, type UserMenuItem } from "./user-menu";
+import { MobileNav, type MobileNavLink } from "@/components/mobile-nav";
+import type { UserMenuItem } from "./user-menu";
 
 export async function Navbar() {
   const supabase = await createClient();
@@ -35,12 +36,29 @@ export async function Navbar() {
     danger: true,
   });
 
-  const navLinkClass =
-    "text-sm text-muted-foreground transition-colors hover:text-brand-400";
+  const links: MobileNavLink[] = [{ href: "/competitions", label: "Events" }];
+
+  if (user && profile?.role === "admin") {
+    links.push(
+      { href: "/admin", label: "Admin" },
+      { href: "/admin/sales", label: "Sales" },
+    );
+  }
+
+  if (user && profile?.role === "judge") {
+    links.push({ href: "/judge", label: "Judge Panel" });
+  }
+
+  if (user && profile?.role === "organizer") {
+    links.push(
+      { href: "/organizer", label: "Organizer" },
+      { href: "/organizer/sales", label: "Sales" },
+    );
+  }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border-subtle bg-surface-raised/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+    <header className="sticky top-0 z-40 border-b border-border-subtle bg-surface-raised/85 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Link
           href="/"
           aria-label="Waddle Social home"
@@ -49,59 +67,26 @@ export async function Navbar() {
           <BrandLogo />
         </Link>
 
-        <nav className="flex items-center gap-6">
-          <Link href="/competitions" className={navLinkClass}>
-            Events
-          </Link>
-
-          {user && profile?.role === "admin" && (
-            <>
-              <Link href="/admin" className={navLinkClass}>
-                Admin
-              </Link>
-              <Link href="/admin/sales" className={navLinkClass}>
-                Sales
-              </Link>
-            </>
-          )}
-
-          {user && profile?.role === "judge" && (
-            <Link href="/judge" className={navLinkClass}>
-              Judge Panel
-            </Link>
-          )}
-
-          {user && profile?.role === "organizer" && (
-            <>
-              <Link href="/organizer" className={navLinkClass}>
-                Organizer
-              </Link>
-              <Link href="/organizer/sales" className={navLinkClass}>
-                Sales
-              </Link>
-            </>
-          )}
-
-          {user ? (
-            <UserMenu
-              name={displayName}
-              avatarUrl={profile?.avatar_url}
-              items={userMenuItems}
-            />
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link href="/login" className={navLinkClass}>
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-md shadow-brand-950/40 transition-all hover:bg-brand-500"
-              >
-                Sign up
-              </Link>
-            </div>
-          )}
-        </nav>
+        <MobileNav
+          links={links}
+          authLinks={
+            user
+              ? undefined
+              : [
+                  { href: "/login", label: "Log in" },
+                  { href: "/signup", label: "Sign up" },
+                ]
+          }
+          user={
+            user
+              ? {
+                  name: displayName,
+                  avatarUrl: profile?.avatar_url,
+                  items: userMenuItems,
+                }
+              : null
+          }
+        />
       </div>
     </header>
   );
