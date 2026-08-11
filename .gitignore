@@ -15,6 +15,10 @@
 /.next/
 /out/
 
+# Serwist
+public/sw*
+public/swe-worker*
+
 # production
 /build
 
