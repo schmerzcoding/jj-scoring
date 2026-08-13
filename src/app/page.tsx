@@ -40,7 +40,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-12">
       <section className="text-center">
-        <BrandLogo as="h1" className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl" />
+        <BrandLogo variant="hero" />
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
           Discover dance events in Dublin and beyond — socials, workshops,
           masterclasses, congresses, and competitions — all in one place.
@@ -48,7 +48,7 @@ export default async function HomePage() {
         <div className="mt-8 flex justify-center gap-4">
           <Link
             href="/competitions"
-            className="rounded-xl bg-brand-600 px-6 py-3 text-sm font-medium text-white shadow-md shadow-brand-950/40 transition-all hover:bg-brand-500"
+            className="rounded-xl bg-brand-600 px-6 py-3 text-sm font-medium text-white shadow-md shadow-black/30 transition-all hover:bg-brand-700"
           >
             Browse Events
           </Link>

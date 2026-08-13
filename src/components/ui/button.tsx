@@ -23,7 +23,7 @@ export function Button({
         "disabled:pointer-events-none disabled:opacity-45",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
         {
-          "bg-brand-600 text-white shadow-md shadow-brand-950/40 hover:bg-brand-500 hover:shadow-lg hover:shadow-brand-900/35 active:scale-[0.98]":
+          "bg-brand-600 text-white shadow-md shadow-black/30 hover:bg-brand-700 active:scale-[0.98]":
             variant === "primary",
           "border border-border bg-surface-overlay text-foreground hover:border-brand-700/50 hover:bg-surface-hover active:scale-[0.98]":
             variant === "secondary",

@@ -36,20 +36,20 @@ export async function Navbar() {
   });
 
   const navLinkClass =
-    "text-sm text-muted-foreground transition-colors hover:text-brand-400";
+    "text-sm font-medium text-white/85 transition-colors hover:text-white";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border-subtle bg-surface-raised/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+    <header className="navbar-gradient sticky top-0 z-40 shadow-lg shadow-black/30">
+      <div className="flex h-16 items-center sm:h-20 md:h-[5.5rem]">
         <Link
           href="/"
           aria-label="Waddle Social home"
-          className="text-xl font-bold tracking-tight text-foreground transition-colors hover:text-brand-400"
+          className="flex shrink-0 items-center pl-3 transition-opacity hover:opacity-90 sm:pl-3"
         >
           <BrandLogo />
         </Link>
 
-        <nav className="flex items-center gap-6">
+        <nav className="ml-auto flex items-center gap-6 pr-4 sm:pr-6 lg:pr-8">
           <Link href="/competitions" className={navLinkClass}>
             Events
           </Link>
@@ -95,7 +95,7 @@ export async function Navbar() {
               </Link>
               <Link
                 href="/signup"
-                className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-md shadow-brand-950/40 transition-all hover:bg-brand-500"
+                className="rounded-xl bg-brand-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-black/25 transition-all hover:bg-brand-600"
               >
                 Sign up
               </Link>

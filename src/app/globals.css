@@ -1,30 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand — elegant wine / burgundy red */
-  --color-brand-50: #fdf2f4;
-  --color-brand-100: #fce8ec;
-  --color-brand-200: #f8ccd6;
-  --color-brand-300: #f0a3b5;
-  --color-brand-400: #e56b87;
-  --color-brand-500: #d43d62;
-  --color-brand-600: #b8304f;
-  --color-brand-700: #9a2842;
-  --color-brand-800: #7f2338;
-  --color-brand-900: #6b2032;
+  /* Brand — Waddle Social official palette */
+  --color-brand-300: #8115d7;
+  --color-brand-400: #8115d7;
+  --color-brand-500: #8115d7;
+  --color-brand-600: #8115d7;
+  --color-brand-700: #30004e;
+  --color-brand-800: #30004e;
+  --color-brand-950: #30004e;
 
-  /* Dark surfaces */
-  --color-surface: #0e0e11;
-  --color-surface-raised: #16161c;
-  --color-surface-overlay: #1e1e26;
-  --color-surface-hover: #26262f;
+  /* Surfaces — black + purple mix only */
+  --color-surface: #000000;
+  --color-surface-raised: color-mix(in srgb, #30004e 35%, #000000);
+  --color-surface-overlay: color-mix(in srgb, #30004e 50%, #000000);
+  --color-surface-hover: color-mix(in srgb, #8115d7 18%, #30004e 32%, #000000);
 
-  /* Borders & text */
-  --color-border: #2a2a35;
-  --color-border-subtle: #212129;
-  --color-foreground: #f4f4f6;
-  --color-muted: #9494a8;
-  --color-muted-foreground: #b4b4c0;
+  /* Borders & text — black, white, two purples only */
+  --color-border: color-mix(in srgb, #8115d7 30%, #30004e 20%, #000000);
+  --color-border-subtle: color-mix(in srgb, #30004e 45%, #000000);
+  --color-foreground: #ffffff;
+  --color-muted: color-mix(in srgb, #ffffff 55%, #000000);
+  --color-muted-foreground: color-mix(in srgb, #ffffff 72%, #8115d7 28%);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
@@ -34,19 +31,35 @@ body {
 }
 
 ::selection {
-  @apply bg-brand-700/40 text-foreground;
+  background-color: color-mix(in srgb, #8115d7 45%, #30004e 55%);
+  color: #ffffff;
 }
 
-/* Subtle ambient glow on main pages */
+/* Navbar — same gradient as the horizontal logo banner (light → dark) */
+.navbar-gradient {
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #ffffff 12%,
+    #8115d7 38%,
+    #30004e 70%,
+    #000000 100%
+  );
+}
+
+/* Dramatic page background using the four official colors */
 .app-glow {
+  background-color: #000000;
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(184 48 79 / 0.15), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgb(154 40 66 / 0.08), transparent);
+    radial-gradient(ellipse 85% 65% at 88% 5%, rgb(129 21 215 / 0.55), transparent),
+    radial-gradient(ellipse 75% 60% at 8% 95%, rgb(48 0 78 / 0.65), transparent),
+    radial-gradient(ellipse 50% 45% at 50% 40%, rgb(129 21 215 / 0.2), transparent),
+    linear-gradient(145deg, #000000 0%, #30004e 40%, #000000 70%, #30004e 100%);
 }
 
 select option {
-  background-color: #16161c;
-  color: #f4f4f6;
+  background-color: #30004e;
+  color: #ffffff;
 }
 
 /* Page & list animations */
