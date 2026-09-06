@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} app-glow flex min-h-screen flex-col`}>
         <Navbar />
-        <main className="animate-fade-in mx-auto w-full max-w-7xl flex-1 px-4 py-8">
+        <main className="animate-fade-in mx-auto w-full max-w-7xl flex-1 px-4 py-5 text-[15px] leading-relaxed sm:py-8 sm:text-base sm:leading-normal">
           {children}
         </main>
         <SiteFooter />

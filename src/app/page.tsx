@@ -38,26 +38,26 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10 pt-6 sm:space-y-12 sm:pt-0">
       <section className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 className="text-2xl font-bold tracking-tight text-white sm:text-4xl">
           {BRAND_NAME}
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
+        <p className="mx-auto mt-3 max-w-2xl text-base text-muted sm:mt-4 sm:text-lg">
           Discover dance events in Dublin and beyond — socials, workshops,
           masterclasses, congresses, and competitions — all in one place.
         </p>
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="mt-6 flex flex-wrap justify-center gap-3 sm:mt-8 sm:gap-4">
           <Link
             href="/competitions"
-            className="rounded-xl bg-brand-600 px-6 py-3 text-sm font-medium text-white shadow-md shadow-black/30 transition-all hover:bg-brand-700"
+            className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-black/30 transition-all hover:bg-brand-700 sm:px-6 sm:py-3"
           >
             Browse Events
           </Link>
           {!user && (
             <Link
               href="/signup"
-              className="rounded-xl border border-border bg-surface-overlay px-6 py-3 text-sm font-medium text-foreground transition-colors hover:border-brand-700/50 hover:bg-surface-hover"
+              className="rounded-xl border border-border bg-surface-overlay px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-brand-700/50 hover:bg-surface-hover sm:px-6 sm:py-3"
             >
               Create Account
             </Link>
@@ -67,7 +67,7 @@ export default async function HomePage() {
 
       {competitions && competitions.length > 0 && (
         <section>
-          <h2 className="mb-6 text-2xl font-semibold text-foreground">
+          <h2 className="mb-4 text-xl font-semibold text-foreground sm:mb-6 sm:text-2xl">
             Upcoming Events
           </h2>
           <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
