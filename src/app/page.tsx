@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BrandLogo } from "@/components/brand-logo";
+import { BRAND_NAME } from "@/lib/brand";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
@@ -40,7 +40,9 @@ export default async function HomePage() {
   return (
     <div className="space-y-12">
       <section className="text-center">
-        <BrandLogo variant="hero" />
+        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          {BRAND_NAME}
+        </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted">
           Discover dance events in Dublin and beyond — socials, workshops,
           masterclasses, congresses, and competitions — all in one place.

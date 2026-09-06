@@ -15,4 +15,5 @@ export const BRAND_ASSETS = {
   appIcon: "/branding/app-icon.png",
   logoHorizontal: "/branding/logo-horizontal.png",
   logoMark: "/branding/logo-mark.png",
+  pageBackground: "/branding/page-background.jpg",
 } as const;

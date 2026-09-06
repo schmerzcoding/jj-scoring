@@ -37,6 +37,8 @@ body {
 
 /* Navbar — same gradient as the horizontal logo banner (light → dark) */
 .navbar-gradient {
+  position: relative;
+  isolation: isolate;
   background: linear-gradient(
     90deg,
     #ffffff 0%,
@@ -47,14 +49,39 @@ body {
   );
 }
 
-/* Dramatic page background using the four official colors */
+.navbar-gradient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.72;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 96px 96px;
+}
+
+.navbar-gradient > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Page background — designer asset, fixed while content scrolls */
 .app-glow {
   background-color: #000000;
-  background-image:
-    radial-gradient(ellipse 85% 65% at 88% 5%, rgb(129 21 215 / 0.55), transparent),
-    radial-gradient(ellipse 75% 60% at 8% 95%, rgb(48 0 78 / 0.65), transparent),
-    radial-gradient(ellipse 50% 45% at 50% 40%, rgb(129 21 215 / 0.2), transparent),
-    linear-gradient(145deg, #000000 0%, #30004e 40%, #000000 70%, #30004e 100%);
+  background-image: url("/branding/page-background.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+@media (max-width: 768px) {
+  /* iOS Safari handles fixed backgrounds poorly — scroll on mobile for now */
+  .app-glow {
+    background-attachment: scroll;
+  }
 }
 
 select option {
