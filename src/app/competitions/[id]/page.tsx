@@ -123,13 +123,13 @@ export default async function CompetitionDetailPage({
         <CheckoutSuccessSync sessionId={sessionId} />
       )}
       {checkout === "success" && (
-        <div className="rounded-xl border border-brand-700/50 bg-brand-950/40 px-4 py-3 text-sm text-foreground">
+        <div className="alert-banner">
           Payment received. Your ticket is confirmed
           {isCompetition ? " and your registration is pending approval." : "."}
         </div>
       )}
       {checkout === "cancelled" && (
-        <div className="rounded-xl border border-border bg-surface-overlay px-4 py-3 text-sm text-muted">
+        <div className="alert-banner alert-banner-muted">
           Checkout was cancelled. You can try again when you are ready.
         </div>
       )}
