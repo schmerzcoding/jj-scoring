@@ -11,7 +11,8 @@ import { CountrySelect } from "@/components/country-select";
 import { uploadCompetitionBanner } from "@/components/competition-banner-upload";
 import { EventScheduleFields } from "@/components/event-schedule-fields";
 import { WorkshopCreateFields } from "@/components/workshop-create-fields";
-import { EVENT_TYPE_SELECT_OPTIONS, isClassEvent } from "@/lib/events";
+import { EVENT_TYPE_SELECT_OPTIONS, isClassEvent, isCompetitionEvent } from "@/lib/events";
+import { eventHasPaidTickets, parseEuroInputToCents } from "@/lib/ticket-pricing";
 import { parseInstructors } from "@/lib/workshops";
 import type {
   CompetitionStatus,
@@ -58,6 +59,9 @@ export function CreateEventForm({
   const [masterclassTopic, setMasterclassTopic] = useState("");
   const [status, setStatus] = useState<CompetitionStatus>("draft");
   const [registrationOpen, setRegistrationOpen] = useState(false);
+  const [ticketPriceEuro, setTicketPriceEuro] = useState("");
+  const [leaderPriceEuro, setLeaderPriceEuro] = useState("");
+  const [followerPriceEuro, setFollowerPriceEuro] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -124,6 +128,19 @@ export function CreateEventForm({
     }
 
     const isClass = isClassEvent(eventType);
+    const ticketPriceCents = parseEuroInputToCents(ticketPriceEuro);
+    const leaderPriceCents = isCompetitionEvent(eventType)
+      ? parseEuroInputToCents(leaderPriceEuro)
+      : null;
+    const followerPriceCents = isCompetitionEvent(eventType)
+      ? parseEuroInputToCents(followerPriceEuro)
+      : null;
+    const hasPaidTickets = eventHasPaidTickets({
+      event_type: eventType,
+      ticket_price_cents: ticketPriceCents,
+      leader_price_cents: leaderPriceCents,
+      follower_price_cents: followerPriceCents,
+    });
 
     const { data, error: insertError } = await fromTable(supabase, "competitions")
       .insert({
@@ -145,7 +162,10 @@ export function CreateEventForm({
             ? masterclassTopic.trim()
             : null,
         status,
-        registration_open: registrationOpen,
+        registration_open: registrationOpen || hasPaidTickets,
+        ticket_price_cents: ticketPriceCents,
+        leader_price_cents: leaderPriceCents,
+        follower_price_cents: followerPriceCents,
         created_by: user.id,
       })
       .select("id")
@@ -273,7 +293,13 @@ export function CreateEventForm({
           <Select
             label="Status"
             value={status}
-            onChange={(e) => setStatus(e.target.value as CompetitionStatus)}
+            onChange={(e) => {
+              const nextStatus = e.target.value as CompetitionStatus;
+              setStatus(nextStatus);
+              if (nextStatus === "open") {
+                setRegistrationOpen(true);
+              }
+            }}
             options={[
               { value: "draft", label: "Draft" },
               { value: "open", label: "Open" },
@@ -291,6 +317,50 @@ export function CreateEventForm({
             />
             <span className="text-sm text-foreground">Registration open</span>
           </label>
+          <p className="text-xs text-muted">
+            Ticket sales require both a price and registration open. Setting status to Open
+            or adding a price enables registration automatically.
+          </p>
+
+          <div className="space-y-3 rounded-xl border border-border bg-surface-raised/60 p-4">
+            <p className="text-sm font-medium text-foreground">Ticket prices (EUR)</p>
+            <p className="text-xs text-muted">
+              Leave blank for free events. Paid events use Stripe Checkout.
+            </p>
+            {isCompetitionEvent(eventType) ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Input
+                  label="Leader pass (€)"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={leaderPriceEuro}
+                  onChange={(e) => setLeaderPriceEuro(e.target.value)}
+                  placeholder="25.00"
+                />
+                <Input
+                  label="Follower pass (€)"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={followerPriceEuro}
+                  onChange={(e) => setFollowerPriceEuro(e.target.value)}
+                  placeholder="25.00"
+                />
+              </div>
+            ) : (
+              <Input
+                label="Ticket price (€)"
+                type="number"
+                min="0"
+                step="0.01"
+                value={ticketPriceEuro}
+                onChange={(e) => setTicketPriceEuro(e.target.value)}
+                placeholder="15.00"
+              />
+            )}
+          </div>
+
           {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="flex gap-3">
             <Button type="submit" loading={loading}>

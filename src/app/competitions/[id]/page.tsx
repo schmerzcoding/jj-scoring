@@ -7,8 +7,11 @@ import { EventWorkshopSummary } from "@/components/event-workshop-summary";
 import { Button } from "@/components/ui/button";
 import { formatEventSchedule } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
-import { canRegisterForCompetitions } from "@/lib/auth";
+import { canPurchaseEventTicket, canRegisterForCompetitions } from "@/lib/auth";
+import { eventHasPaidTickets } from "@/lib/ticket-pricing";
 import { RegistrationForm } from "./registration-form";
+import { TicketPurchaseForm } from "@/components/ticket-purchase-form";
+import { CheckoutSuccessSync } from "@/components/checkout-success-sync";
 import { Leaderboard } from "@/components/leaderboard";
 import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";
 import { isCompetitionEvent } from "@/lib/events";
@@ -16,10 +19,13 @@ import type { ParticipantRow } from "@/lib/leaderboard";
 
 export default async function CompetitionDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ checkout?: string; session_id?: string }>;
 }) {
   const { id } = await params;
+  const { checkout, session_id: sessionId } = await searchParams;
   const supabase = await createClient();
 
   const { data: competition } = await supabase
@@ -31,6 +37,7 @@ export default async function CompetitionDetailPage({
   if (!competition) notFound();
 
   const isCompetition = isCompetitionEvent(competition.event_type);
+  const hasPaidTickets = eventHasPaidTickets(competition);
 
   const {
     data: { user },
@@ -55,6 +62,18 @@ export default async function CompetitionDetailPage({
       .eq("user_id", user.id)
       .maybeSingle();
     existingRegistration = data;
+  }
+
+  let existingTicketPurchase = null;
+  if (user) {
+    const { data } = await supabase
+      .from("ticket_purchases")
+      .select("*")
+      .eq("competition_id", id)
+      .eq("user_id", user.id)
+      .eq("status", "paid")
+      .maybeSingle();
+    existingTicketPurchase = data;
   }
 
   const { data: rounds } = await supabase
@@ -100,6 +119,21 @@ export default async function CompetitionDetailPage({
 
   return (
     <div className="space-y-8">
+      {checkout === "success" && sessionId && (
+        <CheckoutSuccessSync sessionId={sessionId} />
+      )}
+      {checkout === "success" && (
+        <div className="rounded-xl border border-brand-700/50 bg-brand-950/40 px-4 py-3 text-sm text-foreground">
+          Payment received. Your ticket is confirmed
+          {isCompetition ? " and your registration is pending approval." : "."}
+        </div>
+      )}
+      {checkout === "cancelled" && (
+        <div className="rounded-xl border border-border bg-surface-overlay px-4 py-3 text-sm text-muted">
+          Checkout was cancelled. You can try again when you are ready.
+        </div>
+      )}
+
       {competition.banner_url && (
         <div className="overflow-hidden rounded-2xl border border-border shadow-lg shadow-black/30">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -144,8 +178,89 @@ export default async function CompetitionDetailPage({
         </div>
       </div>
 
+      {competition.registration_open &&
+        user &&
+        hasPaidTickets &&
+        !existingTicketPurchase &&
+        canPurchaseEventTicket(userProfile, isCompetition) && (
+          <TicketPurchaseForm event={competition} />
+        )}
+
+      {hasPaidTickets &&
+        !competition.registration_open &&
+        !existingTicketPurchase && (
+          <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+            <h2 className="font-semibold text-foreground">Tickets</h2>
+            <p className="mt-2 text-sm text-muted">
+              Ticket sales are not open for this event yet.
+            </p>
+          </div>
+        )}
+
+      {!hasPaidTickets &&
+        !isCompetition &&
+        competition.status === "open" &&
+        !existingTicketPurchase && (
+          <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+            <h2 className="font-semibold text-foreground">Free event</h2>
+            <p className="mt-2 text-sm text-muted">
+              No ticket purchase is required for this event.
+            </p>
+          </div>
+        )}
+
+      {competition.registration_open &&
+        user &&
+        hasPaidTickets &&
+        !existingTicketPurchase &&
+        userProfile &&
+        !canPurchaseEventTicket(userProfile, isCompetition) && (
+          <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+            <h2 className="font-semibold text-foreground">Buy a ticket</h2>
+            <p className="mt-2 text-sm text-muted">
+              {isCompetition
+                ? "Complete your dancer profile before purchasing a ticket."
+                : "Your account cannot purchase tickets for this event."}
+            </p>
+            {isCompetition && (
+              <Link href="/profile/setup" className="mt-4 inline-block">
+                <Button>Complete profile</Button>
+              </Link>
+            )}
+          </div>
+        )}
+
+      {competition.registration_open && !user && hasPaidTickets && (
+        <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+          <h2 className="font-semibold text-foreground">Tickets available</h2>
+          <p className="mt-2 text-sm text-muted">Log in or create an account to buy a ticket.</p>
+          <div className="mt-4 flex gap-3">
+            <Link href="/login">
+              <Button>Log in</Button>
+            </Link>
+            <Link href="/signup">
+              <Button variant="secondary">Sign up</Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {existingTicketPurchase && (
+        <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+          <h2 className="font-semibold text-foreground">Your ticket</h2>
+          <p className="mt-2 text-sm text-muted">
+            Payment confirmed
+            {existingTicketPurchase.role
+              ? ` — ${existingTicketPurchase.role} pass`
+              : ""}
+            .
+          </p>
+        </div>
+      )}
+
       {isCompetition && competition.registration_open &&
         user &&
+        !hasPaidTickets &&
         !existingRegistration &&
         canRegisterForCompetitions(userProfile) && (
           <RegistrationForm competitionId={id} />
@@ -153,6 +268,7 @@ export default async function CompetitionDetailPage({
 
       {isCompetition && competition.registration_open &&
         user &&
+        !hasPaidTickets &&
         !existingRegistration &&
         userProfile &&
         !canRegisterForCompetitions(userProfile) && (

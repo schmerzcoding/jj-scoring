@@ -35,6 +35,15 @@ export function canRegisterForCompetitions(
   return profile.profile_completed;
 }
 
+export function canPurchaseEventTicket(
+  profile: Pick<Profile, "role" | "profile_completed"> | null,
+  isCompetition: boolean
+): boolean {
+  if (!profile || isAdminRole(profile.role)) return false;
+  if (isCompetition) return profile.profile_completed;
+  return true;
+}
+
 export function getPostLoginPath(
   profile: Pick<Profile, "role" | "profile_completed"> | null
 ): string {

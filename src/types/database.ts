@@ -73,6 +73,9 @@ export type Database = {
           workshop_levels: Database["public"]["Enums"]["workshop_level"][];
           instructors: string | null;
           masterclass_topic: string | null;
+          ticket_price_cents: number | null;
+          leader_price_cents: number | null;
+          follower_price_cents: number | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -95,6 +98,9 @@ export type Database = {
           workshop_levels?: Database["public"]["Enums"]["workshop_level"][];
           instructors?: string | null;
           masterclass_topic?: string | null;
+          ticket_price_cents?: number | null;
+          leader_price_cents?: number | null;
+          follower_price_cents?: number | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -117,6 +123,9 @@ export type Database = {
           workshop_levels?: Database["public"]["Enums"]["workshop_level"][];
           instructors?: string | null;
           masterclass_topic?: string | null;
+          ticket_price_cents?: number | null;
+          leader_price_cents?: number | null;
+          follower_price_cents?: number | null;
           created_by?: string;
           created_at?: string;
           updated_at?: string;
@@ -318,6 +327,8 @@ export type Database = {
           amount_cents: number;
           currency: string;
           status: Database["public"]["Enums"]["ticket_purchase_status"];
+          stripe_checkout_session_id: string | null;
+          stripe_payment_intent_id: string | null;
           purchased_at: string;
           created_at: string;
         };
@@ -329,6 +340,8 @@ export type Database = {
           amount_cents: number;
           currency?: string;
           status?: Database["public"]["Enums"]["ticket_purchase_status"];
+          stripe_checkout_session_id?: string | null;
+          stripe_payment_intent_id?: string | null;
           purchased_at?: string;
           created_at?: string;
         };
@@ -340,6 +353,8 @@ export type Database = {
           amount_cents?: number;
           currency?: string;
           status?: Database["public"]["Enums"]["ticket_purchase_status"];
+          stripe_checkout_session_id?: string | null;
+          stripe_payment_intent_id?: string | null;
           purchased_at?: string;
           created_at?: string;
         };
@@ -397,7 +412,7 @@ export type Database = {
         | "intermediate"
         | "advanced"
         | "open_level";
-      ticket_purchase_status: "paid" | "refunded";
+      ticket_purchase_status: "pending" | "paid" | "refunded";
     };
     CompositeTypes: {
       [_ in never]: never;
