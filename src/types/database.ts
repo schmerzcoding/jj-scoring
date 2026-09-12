@@ -324,11 +324,15 @@ export type Database = {
           competition_id: string;
           user_id: string | null;
           role: Database["public"]["Enums"]["registration_role"] | null;
+          pass_type: Database["public"]["Enums"]["ticket_pass_type"];
           amount_cents: number;
           currency: string;
           status: Database["public"]["Enums"]["ticket_purchase_status"];
           stripe_checkout_session_id: string | null;
           stripe_payment_intent_id: string | null;
+          qr_token: string | null;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
           purchased_at: string;
           created_at: string;
         };
@@ -337,11 +341,15 @@ export type Database = {
           competition_id: string;
           user_id?: string | null;
           role?: Database["public"]["Enums"]["registration_role"] | null;
+          pass_type?: Database["public"]["Enums"]["ticket_pass_type"];
           amount_cents: number;
           currency?: string;
           status?: Database["public"]["Enums"]["ticket_purchase_status"];
           stripe_checkout_session_id?: string | null;
           stripe_payment_intent_id?: string | null;
+          qr_token?: string | null;
+          checked_in_at?: string | null;
+          checked_in_by?: string | null;
           purchased_at?: string;
           created_at?: string;
         };
@@ -350,11 +358,15 @@ export type Database = {
           competition_id?: string;
           user_id?: string | null;
           role?: Database["public"]["Enums"]["registration_role"] | null;
+          pass_type?: Database["public"]["Enums"]["ticket_pass_type"];
           amount_cents?: number;
           currency?: string;
           status?: Database["public"]["Enums"]["ticket_purchase_status"];
           stripe_checkout_session_id?: string | null;
           stripe_payment_intent_id?: string | null;
+          qr_token?: string | null;
+          checked_in_at?: string | null;
+          checked_in_by?: string | null;
           purchased_at?: string;
           created_at?: string;
         };
@@ -413,6 +425,7 @@ export type Database = {
         | "advanced"
         | "open_level";
       ticket_purchase_status: "pending" | "paid" | "refunded";
+      ticket_pass_type: "standard" | "social_pass" | "jj_pass" | "full_pass";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -438,6 +451,9 @@ export type ProfileDanceRole =
 export type EventType = Database["public"]["Enums"]["event_type"];
 export type DanceStyle = Database["public"]["Enums"]["dance_style"];
 export type WorkshopLevel = Database["public"]["Enums"]["workshop_level"];
+export type TicketPassType = Database["public"]["Enums"]["ticket_pass_type"];
+export type TicketPurchaseStatus =
+  Database["public"]["Enums"]["ticket_purchase_status"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Competition = Database["public"]["Tables"]["competitions"]["Row"];

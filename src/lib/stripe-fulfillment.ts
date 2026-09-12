@@ -1,6 +1,8 @@
 import type Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isCompetitionEvent } from "@/lib/events";
+import { resolvePassTypeForPurchase } from "@/lib/ticket-pass";
+import { ensureTicketQrToken, generateQrToken } from "@/lib/ticket-qr";
 import type { RegistrationRole } from "@/types/database";
 
 export async function fulfillCheckoutSession(
@@ -26,8 +28,22 @@ export async function fulfillCheckoutSession(
   }
 
   if (purchase.status === "paid") {
+    await ensureTicketQrToken(admin, purchase.id);
     return { ok: true };
   }
+
+  const { data: competitionForPass } = await admin
+    .from("competitions")
+    .select("event_type")
+    .eq("id", purchase.competition_id)
+    .single();
+
+  const passType = competitionForPass
+    ? resolvePassTypeForPurchase(
+        competitionForPass.event_type,
+        purchase.role as RegistrationRole | null
+      )
+    : "standard";
 
   const paymentIntentId =
     typeof session.payment_intent === "string"
@@ -38,6 +54,8 @@ export async function fulfillCheckoutSession(
     .from("ticket_purchases")
     .update({
       status: "paid",
+      pass_type: passType,
+      qr_token: purchase.qr_token ?? generateQrToken(),
       stripe_checkout_session_id: session.id,
       stripe_payment_intent_id: paymentIntentId,
       purchased_at: new Date().toISOString(),
@@ -53,6 +71,8 @@ export async function fulfillCheckoutSession(
     .select("event_type")
     .eq("id", purchase.competition_id)
     .single();
+
+  await ensureTicketQrToken(admin, purchase.id);
 
   if (
     !competition ||

@@ -9,6 +9,7 @@ import { formatEventSchedule } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
 import { canPurchaseEventTicket, canRegisterForCompetitions } from "@/lib/auth";
 import { eventHasPaidTickets } from "@/lib/ticket-pricing";
+import { formatPassTypeLabel } from "@/lib/ticket-pass";
 import { RegistrationForm } from "./registration-form";
 import { TicketPurchaseForm } from "@/components/ticket-purchase-form";
 import { CheckoutSuccessSync } from "@/components/checkout-success-sync";
@@ -249,12 +250,16 @@ export default async function CompetitionDetailPage({
         <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
           <h2 className="font-semibold text-foreground">Your ticket</h2>
           <p className="mt-2 text-sm text-muted">
-            Payment confirmed
-            {existingTicketPurchase.role
-              ? ` — ${existingTicketPurchase.role} pass`
-              : ""}
+            Payment confirmed —{" "}
+            {formatPassTypeLabel(
+              existingTicketPurchase.pass_type ?? "standard",
+              existingTicketPurchase.role
+            )}
             .
           </p>
+          <Link href={`/profile/tickets/${existingTicketPurchase.id}`} className="mt-4 inline-block">
+            <Button>View QR code</Button>
+          </Link>
         </div>
       )}
 

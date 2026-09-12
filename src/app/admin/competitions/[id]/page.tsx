@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
 import { EventWorkshopSummary } from "@/components/event-workshop-summary";
@@ -130,7 +131,14 @@ export default async function AdminCompetitionPage({
               <EventWorkshopSummary event={competition} />
             </div>
           </div>
-          <StatusBadge status={competition.status} />
+          <div className="flex flex-col items-end gap-3">
+            <StatusBadge status={competition.status} />
+            <Link href={`/admin/competitions/${id}/check-in`}>
+              <Button size="sm" variant="secondary">
+                Door check-in
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 

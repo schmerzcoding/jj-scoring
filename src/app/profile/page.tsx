@@ -2,11 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { isAdminRole } from "@/lib/auth";
 import { fetchProfileCompetitionData } from "@/lib/profile-stats";
+import { fetchProfileTickets } from "@/lib/profile-tickets";
 import {
   AchievementsSection,
   EnrollmentsSection,
   HistorySection,
 } from "@/components/profile-dashboard";
+import { MyEventsSection } from "@/components/my-events-section";
 import { ProfileHeader } from "./profile-header";
 
 export default async function ProfilePage() {
@@ -26,7 +28,10 @@ export default async function ProfilePage() {
   if (!profile) redirect("/profile/setup");
   if (isAdminRole(profile.role)) redirect("/admin");
 
-  const competitionData = await fetchProfileCompetitionData(supabase, user.id);
+  const [competitionData, ticketData] = await Promise.all([
+    fetchProfileCompetitionData(supabase, user.id),
+    fetchProfileTickets(supabase, user.id),
+  ]);
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -34,6 +39,11 @@ export default async function ProfilePage() {
         userId={user.id}
         email={user.email ?? ""}
         profile={profile}
+      />
+
+      <MyEventsSection
+        upcoming={ticketData.upcoming}
+        past={ticketData.past}
       />
 
       <div className="grid gap-6 md:grid-cols-2">
