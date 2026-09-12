@@ -85,6 +85,23 @@ body {
   color: color-mix(in srgb, #ffffff 88%, #000000);
 }
 
+/* QR scanner — keep video visible on mobile browsers */
+.ticket-qr-reader {
+  position: relative;
+}
+
+.ticket-qr-reader video {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+  border-radius: 0.75rem;
+  object-fit: cover;
+}
+
+.ticket-qr-reader #qr-shaded-region {
+  border-radius: 0.75rem;
+}
+
 /* Page background — designer asset with a dark veil for readable foreground content */
 .app-glow {
   background-color: #000000;

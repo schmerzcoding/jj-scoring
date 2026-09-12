@@ -1,9 +1,34 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Html5Qrcode } from "html5-qrcode";
+import {
+  Html5Qrcode,
+  Html5QrcodeSupportedFormats,
+} from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+const READER_ID = "ticket-qr-reader";
+
+async function waitForReaderMount(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+}
+
+function pickRearCameraId(
+  cameras: { id: string; label: string }[]
+): string | { facingMode: string } {
+  if (cameras.length === 0) {
+    return { facingMode: "environment" };
+  }
+
+  const rearCamera = cameras.find((camera) =>
+    /back|rear|environment|trás|trasera/i.test(camera.label)
+  );
+
+  return rearCamera?.id ?? cameras[cameras.length - 1]?.id ?? cameras[0].id;
+}
 
 type VerifyResult = {
   attendeeName: string;
@@ -21,7 +46,9 @@ export function TicketCheckInScanner({
   eventName: string;
 }) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const lastScanRef = useRef("");
   const [scanning, setScanning] = useState(false);
+  const [startingCamera, setStartingCamera] = useState(false);
   const [manualToken, setManualToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -63,40 +90,64 @@ export function TicketCheckInScanner({
     setCameraError("");
     setError("");
     setResult(null);
+    setStartingCamera(true);
 
     if (scannerRef.current) {
       await stopScanner();
     }
 
-    const scanner = new Html5Qrcode("ticket-qr-reader");
+    // The reader must be visible with dimensions before the camera starts (iOS Safari).
+    setScanning(true);
+    await waitForReaderMount();
+
+    const scanner = new Html5Qrcode(READER_ID, {
+      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      verbose: false,
+    });
     scannerRef.current = scanner;
 
     try {
+      const cameras = await Html5Qrcode.getCameras();
+      const cameraId = pickRearCameraId(cameras);
+      const qrboxSize = Math.min(280, Math.max(200, window.innerWidth - 96));
+
       await scanner.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
+        cameraId,
+        {
+          fps: 10,
+          qrbox: { width: qrboxSize, height: qrboxSize },
+          aspectRatio: 1,
+        },
         (decodedText) => {
+          if (decodedText === lastScanRef.current) return;
+          lastScanRef.current = decodedText;
           void verifyToken(decodedText);
         },
         () => {
           // ignore scan failures between frames
         }
       );
-      setScanning(true);
     } catch {
+      setScanning(false);
       setCameraError(
         "Could not access the camera. Use manual entry or check browser permissions."
       );
       scannerRef.current = null;
+    } finally {
+      setStartingCamera(false);
     }
   }
 
   async function stopScanner() {
     const scanner = scannerRef.current;
-    if (!scanner) return;
+    if (!scanner) {
+      setScanning(false);
+      setStartingCamera(false);
+      return;
+    }
 
     try {
-      if (scanning) {
+      if (scanner.isScanning) {
         await scanner.stop();
       }
       scanner.clear();
@@ -105,7 +156,9 @@ export function TicketCheckInScanner({
     }
 
     scannerRef.current = null;
+    lastScanRef.current = "";
     setScanning(false);
+    setStartingCamera(false);
   }
 
   useEffect(() => {
@@ -124,9 +177,15 @@ export function TicketCheckInScanner({
         </p>
 
         <div
-          id="ticket-qr-reader"
-          className={`mt-4 overflow-hidden rounded-xl ${scanning ? "block" : "hidden"}`}
+          id={READER_ID}
+          className={`ticket-qr-reader mt-4 w-full overflow-hidden rounded-xl bg-black ${
+            scanning ? "min-h-[300px]" : "hidden"
+          }`}
         />
+
+        {startingCamera && (
+          <p className="mt-4 text-sm text-muted">Starting camera…</p>
+        )}
 
         {cameraError && (
           <p className="mt-4 text-sm text-red-400">{cameraError}</p>
@@ -134,7 +193,11 @@ export function TicketCheckInScanner({
 
         <div className="mt-4 flex flex-wrap gap-3">
           {!scanning ? (
-            <Button type="button" onClick={() => void startScanner()}>
+            <Button
+              type="button"
+              loading={startingCamera}
+              onClick={() => void startScanner()}
+            >
               Start camera
             </Button>
           ) : (
