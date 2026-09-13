@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { isCompetitionEvent } from "@/lib/events";
+import { isCompetitionEvent, supportsMultiTicketTypes } from "@/lib/events";
 import {
   eventHasPaidTickets,
   formatCentsToEuroInput,
@@ -17,11 +17,14 @@ import type { Competition, CompetitionStatus } from "@/types/database";
 
 export function CompetitionSettings({
   competition,
+  hasPaidTicketCatalog = false,
 }: {
   competition: Competition;
+  hasPaidTicketCatalog?: boolean;
 }) {
   const router = useRouter();
   const isCompetition = isCompetitionEvent(competition.event_type);
+  const usesTicketTypeCatalog = supportsMultiTicketTypes(competition.event_type);
   const [status, setStatus] = useState<CompetitionStatus>(competition.status);
   const [registrationOpen, setRegistrationOpen] = useState(
     competition.registration_open
@@ -42,32 +45,51 @@ export function CompetitionSettings({
     setLoading(true);
     setError("");
 
-    const ticketPriceCents = isCompetition
-      ? null
-      : parseEuroInputToCents(ticketPriceEuro);
-    const leaderPriceCents = isCompetition
-      ? parseEuroInputToCents(leaderPriceEuro)
-      : null;
-    const followerPriceCents = isCompetition
-      ? parseEuroInputToCents(followerPriceEuro)
-      : null;
+    const ticketPriceCents = usesTicketTypeCatalog
+      ? competition.ticket_price_cents
+      : isCompetition
+        ? null
+        : parseEuroInputToCents(ticketPriceEuro);
+    const leaderPriceCents = usesTicketTypeCatalog
+      ? competition.leader_price_cents
+      : isCompetition
+        ? parseEuroInputToCents(leaderPriceEuro)
+        : null;
+    const followerPriceCents = usesTicketTypeCatalog
+      ? competition.follower_price_cents
+      : isCompetition
+        ? parseEuroInputToCents(followerPriceEuro)
+        : null;
 
-    const hasPaidTickets = eventHasPaidTickets({
-      event_type: competition.event_type,
-      ticket_price_cents: ticketPriceCents,
-      leader_price_cents: leaderPriceCents,
-      follower_price_cents: followerPriceCents,
-    });
+    const hasPaidTickets = usesTicketTypeCatalog
+      ? hasPaidTicketCatalog
+      : eventHasPaidTickets({
+          event_type: competition.event_type,
+          ticket_price_cents: ticketPriceCents,
+          leader_price_cents: leaderPriceCents,
+          follower_price_cents: followerPriceCents,
+        });
 
     const supabase = createClient();
+    const updatePayload: {
+      status: CompetitionStatus;
+      registration_open: boolean;
+      ticket_price_cents?: number | null;
+      leader_price_cents?: number | null;
+      follower_price_cents?: number | null;
+    } = {
+      status,
+      registration_open: registrationOpen || hasPaidTickets,
+    };
+
+    if (!usesTicketTypeCatalog) {
+      updatePayload.ticket_price_cents = ticketPriceCents;
+      updatePayload.leader_price_cents = leaderPriceCents;
+      updatePayload.follower_price_cents = followerPriceCents;
+    }
+
     const { error: updateError } = await fromTable(supabase, "competitions")
-      .update({
-        status,
-        registration_open: registrationOpen || hasPaidTickets,
-        ticket_price_cents: ticketPriceCents,
-        leader_price_cents: leaderPriceCents,
-        follower_price_cents: followerPriceCents,
-      })
+      .update(updatePayload)
       .eq("id", competition.id);
 
     if (updateError) {
@@ -117,44 +139,46 @@ export function CompetitionSettings({
           </label>
         </div>
 
-        <div className="space-y-3 rounded-xl border border-border bg-surface-raised/60 p-4">
-          <p className="text-sm font-medium text-foreground">Ticket prices (EUR)</p>
-          <p className="text-xs text-muted">
-            Set a price to enable Stripe ticket sales on the public event page.
-          </p>
-          {isCompetition ? (
-            <div className="grid gap-3 sm:grid-cols-2">
+        {!usesTicketTypeCatalog && (
+          <div className="space-y-3 rounded-xl border border-border bg-surface-raised/60 p-4">
+            <p className="text-sm font-medium text-foreground">Ticket prices (EUR)</p>
+            <p className="text-xs text-muted">
+              Set a price to enable Stripe ticket sales on the public event page.
+            </p>
+            {isCompetition ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Input
+                  label="Leader pass (€)"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={leaderPriceEuro}
+                  onChange={(e) => setLeaderPriceEuro(e.target.value)}
+                  placeholder="25.00"
+                />
+                <Input
+                  label="Follower pass (€)"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={followerPriceEuro}
+                  onChange={(e) => setFollowerPriceEuro(e.target.value)}
+                  placeholder="25.00"
+                />
+              </div>
+            ) : (
               <Input
-                label="Leader pass (€)"
+                label="Ticket price (€)"
                 type="number"
                 min="0"
                 step="0.01"
-                value={leaderPriceEuro}
-                onChange={(e) => setLeaderPriceEuro(e.target.value)}
-                placeholder="25.00"
+                value={ticketPriceEuro}
+                onChange={(e) => setTicketPriceEuro(e.target.value)}
+                placeholder="15.00"
               />
-              <Input
-                label="Follower pass (€)"
-                type="number"
-                min="0"
-                step="0.01"
-                value={followerPriceEuro}
-                onChange={(e) => setFollowerPriceEuro(e.target.value)}
-                placeholder="25.00"
-              />
-            </div>
-          ) : (
-            <Input
-              label="Ticket price (€)"
-              type="number"
-              min="0"
-              step="0.01"
-              value={ticketPriceEuro}
-              onChange={(e) => setTicketPriceEuro(e.target.value)}
-              placeholder="15.00"
-            />
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {error && <p className="text-sm text-red-400">{error}</p>}
 

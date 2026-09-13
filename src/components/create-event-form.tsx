@@ -11,8 +11,23 @@ import { CountrySelect } from "@/components/country-select";
 import { uploadCompetitionBanner } from "@/components/competition-banner-upload";
 import { EventScheduleFields } from "@/components/event-schedule-fields";
 import { WorkshopCreateFields } from "@/components/workshop-create-fields";
-import { EVENT_TYPE_SELECT_OPTIONS, isClassEvent, isCompetitionEvent } from "@/lib/events";
+import {
+  EVENT_TYPE_SELECT_OPTIONS,
+  isClassEvent,
+  isCompetitionEvent,
+  supportsMultiTicketTypes,
+} from "@/lib/events";
 import { eventHasPaidTickets, parseEuroInputToCents } from "@/lib/ticket-pricing";
+import {
+  createEmptyTicketTypeDraft,
+  defaultPassTypeForEvent,
+  hasPaidTicketDrafts,
+  insertCompetitionTicketTypes,
+  insertSingleTicketType,
+  insertTicketTypesFromDrafts,
+  type TicketTypeDraft,
+} from "@/lib/ticket-types";
+import { TicketTypesEditor } from "@/components/ticket-types-editor";
 import { parseInstructors } from "@/lib/workshops";
 import type {
   CompetitionStatus,
@@ -62,6 +77,9 @@ export function CreateEventForm({
   const [ticketPriceEuro, setTicketPriceEuro] = useState("");
   const [leaderPriceEuro, setLeaderPriceEuro] = useState("");
   const [followerPriceEuro, setFollowerPriceEuro] = useState("");
+  const [ticketTypeDrafts, setTicketTypeDrafts] = useState<TicketTypeDraft[]>([
+    createEmptyTicketTypeDraft("standard"),
+  ]);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -135,12 +153,14 @@ export function CreateEventForm({
     const followerPriceCents = isCompetitionEvent(eventType)
       ? parseEuroInputToCents(followerPriceEuro)
       : null;
-    const hasPaidTickets = eventHasPaidTickets({
-      event_type: eventType,
-      ticket_price_cents: ticketPriceCents,
-      leader_price_cents: leaderPriceCents,
-      follower_price_cents: followerPriceCents,
-    });
+    const hasPaidTickets =
+      (supportsMultiTicketTypes(eventType) && hasPaidTicketDrafts(ticketTypeDrafts)) ||
+      eventHasPaidTickets({
+        event_type: eventType,
+        ticket_price_cents: ticketPriceCents,
+        leader_price_cents: leaderPriceCents,
+        follower_price_cents: followerPriceCents,
+      });
 
     const { data, error: insertError } = await fromTable(supabase, "competitions")
       .insert({
@@ -177,6 +197,40 @@ export function CreateEventForm({
       return;
     }
 
+    if (data?.id) {
+      let ticketTypesError: string | undefined;
+
+      if (supportsMultiTicketTypes(eventType)) {
+        ({ error: ticketTypesError } = await insertTicketTypesFromDrafts(
+          supabase,
+          data.id,
+          ticketTypeDrafts
+        ));
+      } else if (isCompetitionEvent(eventType)) {
+        ({ error: ticketTypesError } = await insertCompetitionTicketTypes(
+          supabase,
+          data.id,
+          leaderPriceCents,
+          followerPriceCents
+        ));
+      } else if (ticketPriceCents != null && ticketPriceCents > 0) {
+        ({ error: ticketTypesError } = await insertSingleTicketType(
+          supabase,
+          data.id,
+          "General admission",
+          ticketPriceCents,
+          defaultPassTypeForEvent(eventType)
+        ));
+      }
+
+      if (ticketTypesError) {
+        setError(`Event created, but ticket passes failed: ${ticketTypesError}`);
+        setLoading(false);
+        router.push(`${manageBasePath}/${data.id}`);
+        return;
+      }
+    }
+
     if (bannerFile && data?.id) {
       const bannerResult = await uploadCompetitionBanner(data.id, bannerFile);
       if (bannerResult.error) {
@@ -200,7 +254,15 @@ export function CreateEventForm({
           <Select
             label="Event type"
             value={eventType}
-            onChange={(e) => setEventType(e.target.value as EventType)}
+            onChange={(e) => {
+              const nextType = e.target.value as EventType;
+              setEventType(nextType);
+              if (supportsMultiTicketTypes(nextType)) {
+                setTicketTypeDrafts([
+                  createEmptyTicketTypeDraft(defaultPassTypeForEvent(nextType)),
+                ]);
+              }
+            }}
             options={EVENT_TYPE_SELECT_OPTIONS}
           />
           <Input
@@ -323,11 +385,17 @@ export function CreateEventForm({
           </p>
 
           <div className="space-y-3 rounded-xl border border-border bg-surface-raised/60 p-4">
-            <p className="text-sm font-medium text-foreground">Ticket prices (EUR)</p>
+            <p className="text-sm font-medium text-foreground">Ticket passes (EUR)</p>
             <p className="text-xs text-muted">
               Leave blank for free events. Paid events use Stripe Checkout.
             </p>
-            {isCompetitionEvent(eventType) ? (
+            {supportsMultiTicketTypes(eventType) ? (
+              <TicketTypesEditor
+                drafts={ticketTypeDrafts}
+                onChange={setTicketTypeDrafts}
+                defaultPassType={defaultPassTypeForEvent(eventType)}
+              />
+            ) : isCompetitionEvent(eventType) ? (
               <div className="grid gap-3 sm:grid-cols-2">
                 <Input
                   label="Leader pass (€)"

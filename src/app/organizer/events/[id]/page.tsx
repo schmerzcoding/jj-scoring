@@ -6,7 +6,9 @@ import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
 import { EventWorkshopSummary } from "@/components/event-workshop-summary";
 import { formatEventSchedule } from "@/lib/utils";
-import { isCompetitionEvent } from "@/lib/events";
+import { isCompetitionEvent, supportsMultiTicketTypes } from "@/lib/events";
+import { eventHasTicketTypes, fetchAllTicketTypes } from "@/lib/ticket-types";
+import { TicketTypesPanel } from "@/components/ticket-types-panel";
 import { isOrganizerRole } from "@/lib/permissions";
 import { RegistrationsPanel } from "@/app/admin/competitions/[id]/registrations-panel";
 import { RoundsPanel } from "@/app/admin/competitions/[id]/rounds-panel";
@@ -48,6 +50,7 @@ export default async function OrganizerEventPage({
   }
 
   const isCompetition = isCompetitionEvent(competition.event_type);
+  const ticketTypes = await fetchAllTicketTypes(supabase, id);
 
   const { data: registrations } = await supabase
     .from("registrations")
@@ -162,17 +165,18 @@ export default async function OrganizerEventPage({
         </div>
       )}
 
-      <CompetitionSettings competition={competition} />
-      <CompetitionBranding competition={competition} />
-
-      {!isCompetition && (
-        <div className="rounded-xl border border-border bg-card/50 p-6">
-          <p className="text-sm text-muted">
-            Registration, rounds, and judging are available for competition events. Type-specific
-            setup for {competition.event_type} events will be added soon.
-          </p>
-        </div>
+      <CompetitionSettings
+        competition={competition}
+        hasPaidTicketCatalog={eventHasTicketTypes(ticketTypes)}
+      />
+      {supportsMultiTicketTypes(competition.event_type) && (
+        <TicketTypesPanel
+          competitionId={id}
+          eventType={competition.event_type}
+          initialTypes={ticketTypes}
+        />
       )}
+      <CompetitionBranding competition={competition} />
 
       {isCompetition && (
         <>

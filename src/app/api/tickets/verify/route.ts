@@ -81,7 +81,17 @@ export async function POST(request: Request) {
     attendeeName = attendeeProfile?.full_name ?? attendeeName;
   }
 
-  const passTypeLabel = formatPassTypeLabel(ticket.pass_type, ticket.role);
+  let passTypeLabel = formatPassTypeLabel(ticket.pass_type, ticket.role);
+  if (ticket.ticket_type_id) {
+    const { data: ticketType } = await admin
+      .from("ticket_types")
+      .select("name")
+      .eq("id", ticket.ticket_type_id)
+      .maybeSingle();
+    if (ticketType?.name?.trim()) {
+      passTypeLabel = ticketType.name.trim();
+    }
+  }
   const alreadyCheckedIn = Boolean(ticket.checked_in_at);
 
   if (!alreadyCheckedIn) {

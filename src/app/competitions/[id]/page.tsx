@@ -8,15 +8,24 @@ import { Button } from "@/components/ui/button";
 import { formatEventSchedule } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
 import { canPurchaseEventTicket, canRegisterForCompetitions } from "@/lib/auth";
-import { eventHasPaidTickets } from "@/lib/ticket-pricing";
 import { formatPassTypeLabel } from "@/lib/ticket-pass";
+import {
+  eventHasAnyPaidTickets,
+  fetchActiveTicketTypes,
+  getTicketTypeLabel,
+} from "@/lib/ticket-types";
 import { RegistrationForm } from "./registration-form";
 import { TicketPurchaseForm } from "@/components/ticket-purchase-form";
+import {
+  getOwnedTicketTypeIds,
+  TicketCartForm,
+} from "@/components/ticket-cart-form";
 import { CheckoutSuccessSync } from "@/components/checkout-success-sync";
 import { Leaderboard } from "@/components/leaderboard";
 import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";
 import { isCompetitionEvent } from "@/lib/events";
 import type { ParticipantRow } from "@/lib/leaderboard";
+import type { TicketPurchase } from "@/types/database";
 
 export default async function CompetitionDetailPage({
   params,
@@ -38,7 +47,11 @@ export default async function CompetitionDetailPage({
   if (!competition) notFound();
 
   const isCompetition = isCompetitionEvent(competition.event_type);
-  const hasPaidTickets = eventHasPaidTickets(competition);
+  const ticketTypes = await fetchActiveTicketTypes(supabase, id);
+  const hasPaidTickets = eventHasAnyPaidTickets(competition, ticketTypes);
+  const usesTicketTypeCatalog = ticketTypes.some(
+    (type) => type.is_active && type.price_cents > 0
+  );
 
   const {
     data: { user },
@@ -65,7 +78,8 @@ export default async function CompetitionDetailPage({
     existingRegistration = data;
   }
 
-  let existingTicketPurchase = null;
+  let paidTicketPurchases: TicketPurchase[] = [];
+
   if (user) {
     const { data } = await supabase
       .from("ticket_purchases")
@@ -73,9 +87,16 @@ export default async function CompetitionDetailPage({
       .eq("competition_id", id)
       .eq("user_id", user.id)
       .eq("status", "paid")
-      .maybeSingle();
-    existingTicketPurchase = data;
+      .order("purchased_at", { ascending: false });
+    paidTicketPurchases = data ?? [];
   }
+
+  const ownedTypeIds = getOwnedTicketTypeIds(paidTicketPurchases);
+  const availableTicketTypes = ticketTypes.filter(
+    (type) => type.is_active && type.price_cents > 0 && !ownedTypeIds.includes(type.id)
+  );
+  const canBuyMoreTickets = availableTicketTypes.length > 0;
+  const typeNameById = new Map(ticketTypes.map((type) => [type.id, type.name]));
 
   const { data: rounds } = await supabase
     .from("rounds")
@@ -125,7 +146,7 @@ export default async function CompetitionDetailPage({
       )}
       {checkout === "success" && (
         <div className="alert-banner">
-          Payment received. Your ticket is confirmed
+          Payment received. Your ticket{paidTicketPurchases.length === 1 ? "" : "s"} confirmed
           {isCompetition ? " and your registration is pending approval." : "."}
         </div>
       )}
@@ -182,14 +203,29 @@ export default async function CompetitionDetailPage({
       {competition.registration_open &&
         user &&
         hasPaidTickets &&
-        !existingTicketPurchase &&
-        canPurchaseEventTicket(userProfile, isCompetition) && (
+        canBuyMoreTickets &&
+        canPurchaseEventTicket(userProfile, isCompetition) &&
+        usesTicketTypeCatalog && (
+          <TicketCartForm
+            eventId={id}
+            eventName={competition.name}
+            ticketTypes={ticketTypes}
+            ownedTypeIds={ownedTypeIds}
+          />
+        )}
+
+      {competition.registration_open &&
+        user &&
+        hasPaidTickets &&
+        canBuyMoreTickets &&
+        canPurchaseEventTicket(userProfile, isCompetition) &&
+        !usesTicketTypeCatalog && (
           <TicketPurchaseForm event={competition} />
         )}
 
       {hasPaidTickets &&
         !competition.registration_open &&
-        !existingTicketPurchase && (
+        paidTicketPurchases.length === 0 && (
           <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
             <h2 className="font-semibold text-foreground">Tickets</h2>
             <p className="mt-2 text-sm text-muted">
@@ -201,7 +237,7 @@ export default async function CompetitionDetailPage({
       {!hasPaidTickets &&
         !isCompetition &&
         competition.status === "open" &&
-        !existingTicketPurchase && (
+        paidTicketPurchases.length === 0 && (
           <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
             <h2 className="font-semibold text-foreground">Free event</h2>
             <p className="mt-2 text-sm text-muted">
@@ -213,7 +249,7 @@ export default async function CompetitionDetailPage({
       {competition.registration_open &&
         user &&
         hasPaidTickets &&
-        !existingTicketPurchase &&
+        canBuyMoreTickets &&
         userProfile &&
         !canPurchaseEventTicket(userProfile, isCompetition) && (
           <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
@@ -246,20 +282,36 @@ export default async function CompetitionDetailPage({
         </div>
       )}
 
-      {existingTicketPurchase && (
+      {paidTicketPurchases.length > 0 && (
         <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
-          <h2 className="font-semibold text-foreground">Your ticket</h2>
-          <p className="mt-2 text-sm text-muted">
-            Payment confirmed —{" "}
-            {formatPassTypeLabel(
-              existingTicketPurchase.pass_type ?? "standard",
-              existingTicketPurchase.role
-            )}
-            .
-          </p>
-          <Link href={`/profile/tickets/${existingTicketPurchase.id}`} className="mt-4 inline-block">
-            <Button>View QR code</Button>
-          </Link>
+          <h2 className="font-semibold text-foreground">
+            Your ticket{paidTicketPurchases.length === 1 ? "" : "s"}
+          </h2>
+          <div className="mt-4 space-y-3">
+            {paidTicketPurchases.map((purchase) => {
+              const passLabel = getTicketTypeLabel(
+                purchase.ticket_type_id
+                  ? { name: typeNameById.get(purchase.ticket_type_id) ?? "" }
+                  : null,
+                formatPassTypeLabel(purchase.pass_type ?? "standard", purchase.role)
+              );
+
+              return (
+                <div
+                  key={purchase.id}
+                  className="flex flex-col gap-3 rounded-xl border border-border bg-surface-raised/60 p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="font-medium text-foreground">{passLabel}</p>
+                    <p className="mt-1 text-sm text-muted">Payment confirmed</p>
+                  </div>
+                  <Link href={`/profile/tickets/${purchase.id}`}>
+                    <Button size="sm">View QR code</Button>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

@@ -27,6 +27,11 @@ export function isClassEvent(type: EventType): boolean {
   return type === "workshop" || type === "masterclass";
 }
 
+/** Events where organizers define multiple named pass types (e.g. day passes). */
+export function supportsMultiTicketTypes(type: EventType): boolean {
+  return type === "congress" || type === "workshop" || type === "masterclass";
+}
+
 export const EVENT_TYPE_SELECT_OPTIONS = EVENT_TYPES.map((type) => ({
   value: type,
   label: eventTypeLabel(type),

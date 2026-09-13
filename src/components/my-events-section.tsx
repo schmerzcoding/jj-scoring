@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
 import { formatDate } from "@/lib/utils";
 import { formatPassTypeLabel } from "@/lib/ticket-pass";
+import { getTicketTypeLabel } from "@/lib/ticket-types";
 import type { TicketWithEvent } from "@/lib/profile-tickets";
 
 export function MyEventsSection({
@@ -98,7 +99,12 @@ function TicketRow({
           <EventTypeBadge type={competition.event_type} />
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
-          <span>{formatPassTypeLabel(ticket.pass_type, ticket.role)}</span>
+          <span>
+            {getTicketTypeLabel(
+              ticket.ticketTypeName ? { name: ticket.ticketTypeName } : null,
+              formatPassTypeLabel(ticket.pass_type, ticket.role)
+            )}
+          </span>
           <span>·</span>
           <span>{formatDate(competition.event_date)}</span>
           {competition.location && (

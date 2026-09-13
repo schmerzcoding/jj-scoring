@@ -7,6 +7,7 @@ import type {
 
 export type TicketWithEvent = TicketPurchase & {
   competition: Competition;
+  ticketTypeName: string | null;
 };
 
 const UPCOMING_EVENT_STATUSES: CompetitionStatus[] = [
@@ -33,20 +34,37 @@ export async function fetchProfileTickets(
   }
 
   const competitionIds = [...new Set(purchases.map((p) => p.competition_id))];
-  const { data: competitions } = await supabase
-    .from("competitions")
-    .select("*")
-    .in("id", competitionIds);
+  const ticketTypeIds = [
+    ...new Set(
+      purchases.map((purchase) => purchase.ticket_type_id).filter(Boolean)
+    ),
+  ] as string[];
+
+  const [{ data: competitions }, { data: ticketTypes }] = await Promise.all([
+    supabase.from("competitions").select("*").in("id", competitionIds),
+    ticketTypeIds.length > 0
+      ? supabase.from("ticket_types").select("id, name").in("id", ticketTypeIds)
+      : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+  ]);
 
   const competitionById = new Map(
     competitions?.map((competition) => [competition.id, competition]) ?? []
+  );
+  const ticketTypeNameById = new Map(
+    ticketTypes?.map((ticketType) => [ticketType.id, ticketType.name]) ?? []
   );
 
   const withEvent: TicketWithEvent[] = purchases
     .map((purchase) => {
       const competition = competitionById.get(purchase.competition_id);
       if (!competition) return null;
-      return { ...purchase, competition };
+      return {
+        ...purchase,
+        competition,
+        ticketTypeName: purchase.ticket_type_id
+          ? (ticketTypeNameById.get(purchase.ticket_type_id) ?? null)
+          : null,
+      };
     })
     .filter((row): row is TicketWithEvent => row !== null);
 

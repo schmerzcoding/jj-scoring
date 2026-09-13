@@ -318,11 +318,91 @@ export type Database = {
         };
         Relationships: [];
       };
+      ticket_types: {
+        Row: {
+          id: string;
+          competition_id: string;
+          name: string;
+          description: string | null;
+          price_cents: number;
+          pass_type: Database["public"]["Enums"]["ticket_pass_type"];
+          role: Database["public"]["Enums"]["registration_role"] | null;
+          sort_order: number;
+          max_quantity: number | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          name: string;
+          description?: string | null;
+          price_cents: number;
+          pass_type?: Database["public"]["Enums"]["ticket_pass_type"];
+          role?: Database["public"]["Enums"]["registration_role"] | null;
+          sort_order?: number;
+          max_quantity?: number | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          competition_id?: string;
+          name?: string;
+          description?: string | null;
+          price_cents?: number;
+          pass_type?: Database["public"]["Enums"]["ticket_pass_type"];
+          role?: Database["public"]["Enums"]["registration_role"] | null;
+          sort_order?: number;
+          max_quantity?: number | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      checkout_sessions: {
+        Row: {
+          id: string;
+          competition_id: string;
+          user_id: string;
+          stripe_checkout_session_id: string | null;
+          stripe_payment_intent_id: string | null;
+          status: Database["public"]["Enums"]["ticket_purchase_status"];
+          total_cents: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          user_id: string;
+          stripe_checkout_session_id?: string | null;
+          stripe_payment_intent_id?: string | null;
+          status?: Database["public"]["Enums"]["ticket_purchase_status"];
+          total_cents?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          competition_id?: string;
+          user_id?: string;
+          stripe_checkout_session_id?: string | null;
+          stripe_payment_intent_id?: string | null;
+          status?: Database["public"]["Enums"]["ticket_purchase_status"];
+          total_cents?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       ticket_purchases: {
         Row: {
           id: string;
           competition_id: string;
           user_id: string | null;
+          ticket_type_id: string | null;
+          checkout_session_id: string | null;
           role: Database["public"]["Enums"]["registration_role"] | null;
           pass_type: Database["public"]["Enums"]["ticket_pass_type"];
           amount_cents: number;
@@ -340,6 +420,8 @@ export type Database = {
           id?: string;
           competition_id: string;
           user_id?: string | null;
+          ticket_type_id?: string | null;
+          checkout_session_id?: string | null;
           role?: Database["public"]["Enums"]["registration_role"] | null;
           pass_type?: Database["public"]["Enums"]["ticket_pass_type"];
           amount_cents: number;
@@ -357,6 +439,8 @@ export type Database = {
           id?: string;
           competition_id?: string;
           user_id?: string | null;
+          ticket_type_id?: string | null;
+          checkout_session_id?: string | null;
           role?: Database["public"]["Enums"]["registration_role"] | null;
           pass_type?: Database["public"]["Enums"]["ticket_pass_type"];
           amount_cents?: number;
@@ -463,6 +547,9 @@ export type Registration = Database["public"]["Tables"]["registrations"]["Row"];
 export type CompetitionJudge =
   Database["public"]["Tables"]["competition_judges"]["Row"];
 export type Score = Database["public"]["Tables"]["scores"]["Row"];
+export type TicketType = Database["public"]["Tables"]["ticket_types"]["Row"];
+export type CheckoutSession =
+  Database["public"]["Tables"]["checkout_sessions"]["Row"];
 export type TicketPurchase =
   Database["public"]["Tables"]["ticket_purchases"]["Row"];
 export type RoundResult = Database["public"]["Views"]["round_results"]["Row"];

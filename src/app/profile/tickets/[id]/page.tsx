@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import { isAdminRole } from "@/lib/auth";
 import { ensureTicketQrToken } from "@/lib/ticket-qr";
 import { formatPassTypeLabel } from "@/lib/ticket-pass";
+import { getTicketTypeLabel } from "@/lib/ticket-types";
 import { eventTypeLabel } from "@/lib/events";
 import { formatEventSchedule } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
@@ -58,7 +59,20 @@ export default async function ProfileTicketPage({
 
   if (!competition) notFound();
 
-  const passLabel = formatPassTypeLabel(ticket.pass_type, ticket.role);
+  let ticketTypeName: string | null = null;
+  if (ticket.ticket_type_id) {
+    const { data: ticketType } = await supabase
+      .from("ticket_types")
+      .select("name")
+      .eq("id", ticket.ticket_type_id)
+      .maybeSingle();
+    ticketTypeName = ticketType?.name ?? null;
+  }
+
+  const passLabel = getTicketTypeLabel(
+    ticketTypeName ? { name: ticketTypeName } : null,
+    formatPassTypeLabel(ticket.pass_type, ticket.role)
+  );
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
