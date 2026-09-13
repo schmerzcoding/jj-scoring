@@ -38,7 +38,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="space-y-10 pt-6 sm:space-y-12 sm:pt-0">
+    <div className="space-y-10 pt-2 sm:space-y-12 sm:pt-4">
       <section className="text-center">
         <h1 className="text-2xl font-bold tracking-tight text-white sm:text-4xl">
           {BRAND_NAME}

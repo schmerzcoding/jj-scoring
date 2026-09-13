@@ -14,6 +14,7 @@ export const BRAND_COLORS = {
 export const BRAND_ASSETS = {
   appIcon: "/branding/app-icon.png",
   logoHorizontal: "/branding/logo-horizontal.png",
+  logoHorizontalWhite: "/branding/logo-horizontal-white.png",
   logoMark: "/branding/logo-mark.png",
   pageBackground: "/branding/page-background.jpg",
 } as const;

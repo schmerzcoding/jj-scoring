@@ -35,38 +35,6 @@ body {
   color: #ffffff;
 }
 
-/* Navbar — same gradient as the horizontal logo banner (light → dark) */
-.navbar-gradient {
-  position: relative;
-  isolation: isolate;
-  background: linear-gradient(
-    90deg,
-    #ffffff 0%,
-    #ffffff 12%,
-    #8115d7 38%,
-    #30004e 70%,
-    #000000 100%
-  );
-}
-
-.navbar-gradient::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.72;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 96px 96px;
-}
-
-.navbar-gradient > * {
-  position: relative;
-  z-index: 1;
-}
-
 /* High-contrast banners and alerts over the page background */
 .alert-banner {
   border-radius: 0.75rem;

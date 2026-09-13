@@ -81,12 +81,12 @@ export async function Navbar() {
   }
 
   return (
-    <header className="navbar-gradient sticky top-0 z-40 shadow-lg shadow-black/30">
-      <div className="flex h-14 items-center sm:h-20 md:h-[5.5rem]">
+    <header className="sticky top-0 z-40">
+      <div className="flex h-12 items-center sm:h-14">
         <Link
           href="/"
           aria-label="Waddle Social home"
-          className="flex min-w-0 flex-1 items-center pl-3 transition-opacity hover:opacity-90 sm:flex-none sm:pl-3"
+          className="flex min-w-0 flex-1 items-center pl-3 transition-opacity hover:opacity-90 sm:flex-none sm:pl-4"
         >
           <BrandLogo />
         </Link>
