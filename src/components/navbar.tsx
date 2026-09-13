@@ -82,7 +82,7 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="flex h-12 items-center sm:h-14">
+      <div className="flex h-12 items-center sm:h-[4.75rem] md:h-20 lg:h-[5rem]">
         <Link
           href="/"
           aria-label="Waddle Social home"
