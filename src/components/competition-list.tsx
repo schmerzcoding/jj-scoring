@@ -73,6 +73,7 @@ export function CompetitionList({
                   {formatEventSchedule(
                     competition.event_date,
                     competition.start_time,
+                    competition.event_end_date,
                     competition.end_time
                   )}
                 </p>
@@ -133,6 +134,7 @@ export function CompetitionList({
                     {formatEventSchedule(
                       selected.event_date,
                       selected.start_time,
+                      selected.event_end_date,
                       selected.end_time
                     )}
                   </p>

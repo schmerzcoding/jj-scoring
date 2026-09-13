@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
-import { formatDate } from "@/lib/utils";
+import { formatEventDateRange } from "@/lib/utils";
 import { formatPassTypeLabel } from "@/lib/ticket-pass";
 import { getTicketTypeLabel } from "@/lib/ticket-types";
 import type { TicketWithEvent } from "@/lib/profile-tickets";
@@ -106,7 +106,12 @@ function TicketRow({
             )}
           </span>
           <span>·</span>
-          <span>{formatDate(competition.event_date)}</span>
+          <span>
+            {formatEventDateRange(
+              competition.event_date,
+              competition.event_end_date
+            )}
+          </span>
           {competition.location && (
             <>
               <span>·</span>

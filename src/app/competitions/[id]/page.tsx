@@ -189,6 +189,7 @@ export default async function CompetitionDetailPage({
             {formatEventSchedule(
               competition.event_date,
               competition.start_time,
+              competition.event_end_date,
               competition.end_time
             )}
           </span>

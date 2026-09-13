@@ -26,16 +26,67 @@ export function formatTime(time: string | null): string {
   });
 }
 
-export function formatEventSchedule(
-  date: string | null,
-  startTime: string | null,
-  endTime: string | null
+export function formatEventDateRange(
+  startDate: string | null,
+  endDate: string | null
 ): string {
-  const dateLabel = formatDate(date);
+  if (!startDate) return "TBD";
+  if (!endDate || endDate === startDate) return formatDate(startDate);
+
+  const start = new Date(`${startDate}T12:00:00`);
+  const end = new Date(`${endDate}T12:00:00`);
+
+  const sameYear = start.getFullYear() === end.getFullYear();
+  const sameMonth = sameYear && start.getMonth() === end.getMonth();
+
+  if (sameMonth) {
+    const month = start.toLocaleDateString("en-US", { month: "long" });
+    return `${month} ${start.getDate()}–${end.getDate()}, ${start.getFullYear()}`;
+  }
+
+  if (sameYear) {
+    const startPart = start.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+    });
+    const endPart = end.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+    return `${startPart} – ${endPart}`;
+  }
+
+  return `${formatDate(startDate)} – ${formatDate(endDate)}`;
+}
+
+export function formatEventSchedule(
+  startDate: string | null,
+  startTime: string | null,
+  endDate: string | null = null,
+  endTime: string | null = null
+): string {
   const startLabel = formatTime(startTime);
   const endLabel = formatTime(endTime);
+  const multiDay = Boolean(
+    startDate && endDate && endDate !== startDate
+  );
 
-  if (dateLabel === "TBD" && !startLabel && !endLabel) return "TBD";
+  if (!startDate) {
+    if (!startLabel && !endLabel) return "TBD";
+    if (startLabel && endLabel) return `${startLabel} – ${endLabel}`;
+    return startLabel || endLabel || "TBD";
+  }
+
+  if (multiDay) {
+    if (startLabel && endLabel) {
+      return `${formatDate(startDate)} · ${startLabel} – ${formatDate(endDate)} · ${endLabel}`;
+    }
+    return formatEventDateRange(startDate, endDate);
+  }
+
+  const dateLabel = formatDate(startDate);
+
   if (startLabel && endLabel) {
     return `${dateLabel} · ${startLabel} – ${endLabel}`;
   }

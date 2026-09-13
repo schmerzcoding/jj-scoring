@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { formatDate } from "@/lib/utils";
+import { formatEventDateRange } from "@/lib/utils";
 
 export default async function OrganizerDashboard() {
   const supabase = await createClient();
@@ -77,7 +77,9 @@ export default async function OrganizerDashboard() {
                   </div>
                   <div className="mt-1 flex gap-4 text-sm text-muted">
                     {event.location && <span>{event.location}</span>}
-                    <span>{formatDate(event.event_date)}</span>
+                    <span>
+                      {formatEventDateRange(event.event_date, event.event_end_date)}
+                    </span>
                   </div>
                 </div>
                 <StatusBadge status={event.status} />

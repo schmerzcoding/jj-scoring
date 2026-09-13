@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { EventTypeBadge } from "@/components/event-type-badge";
-import { formatDate } from "@/lib/utils";
+import { formatEventDateRange } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ResetCompetitionsButton } from "./reset-competitions-button";
@@ -130,7 +130,9 @@ export default async function AdminDashboard() {
                 </div>
                 <div className="mt-1 flex gap-4 text-sm text-muted">
                   {comp.location && <span>{comp.location}</span>}
-                  <span>{formatDate(comp.event_date)}</span>
+                  <span>
+                    {formatEventDateRange(comp.event_date, comp.event_end_date)}
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-3">

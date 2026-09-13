@@ -45,7 +45,12 @@ export function EventSalesCard({
             <EventTypeBadge type={event.event_type ?? "competition"} />
           </div>
           <p className="mt-1 text-sm text-muted">
-            {formatEventSchedule(event.event_date, event.start_time, event.end_time)}
+            {formatEventSchedule(
+              event.event_date,
+              event.start_time,
+              event.event_end_date,
+              event.end_time
+            )}
           </p>
           {event.country_code && (
             <p className="mt-1 text-sm text-muted">

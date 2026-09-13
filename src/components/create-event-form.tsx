@@ -10,6 +10,10 @@ import { Card } from "@/components/ui/card";
 import { CountrySelect } from "@/components/country-select";
 import { uploadCompetitionBanner } from "@/components/competition-banner-upload";
 import { EventScheduleFields } from "@/components/event-schedule-fields";
+import {
+  resolveStoredEventEndDate,
+  validateEventSchedule,
+} from "@/lib/event-schedule";
 import { WorkshopCreateFields } from "@/components/workshop-create-fields";
 import {
   EVENT_TYPE_SELECT_OPTIONS,
@@ -48,11 +52,6 @@ function normalizeInstructors(value: string): string {
   return parseInstructors(value).join(", ");
 }
 
-function isEndAfterStart(startTime: string, endTime: string): boolean {
-  if (!startTime || !endTime) return true;
-  return endTime > startTime;
-}
-
 export function CreateEventForm({
   manageBasePath,
 }: {
@@ -64,7 +63,8 @@ export function CreateEventForm({
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [countryCode, setCountryCode] = useState("");
-  const [eventDate, setEventDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [danceStyle, setDanceStyle] = useState<DanceStyle | "">("");
@@ -119,8 +119,14 @@ export function CreateEventForm({
       return;
     }
 
-    if (!isEndAfterStart(startTime, endTime)) {
-      setError("End time must be after start time.");
+    const scheduleError = validateEventSchedule({
+      startDate,
+      endDate: endDate || startDate,
+      startTime,
+      endTime,
+    });
+    if (scheduleError) {
+      setError(scheduleError);
       return;
     }
 
@@ -168,7 +174,10 @@ export function CreateEventForm({
         description: description || null,
         location: location || null,
         country_code: countryCode,
-        event_date: eventDate || null,
+        event_date: startDate || null,
+        event_end_date: startDate
+          ? resolveStoredEventEndDate(startDate, endDate || startDate)
+          : null,
         start_time: startTime || null,
         end_time: endTime || null,
         event_type: eventType,
@@ -295,10 +304,12 @@ export function CreateEventForm({
             placeholder="City, venue, etc."
           />
           <EventScheduleFields
-            eventDate={eventDate}
+            startDate={startDate}
+            endDate={endDate}
             startTime={startTime}
             endTime={endTime}
-            onEventDateChange={setEventDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
             onStartTimeChange={setStartTime}
             onEndTimeChange={setEndTime}
           />

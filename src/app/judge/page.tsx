@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
-import { formatDate } from "@/lib/utils";
+import { formatEventDateRange } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export default async function JudgeDashboard() {
@@ -59,7 +59,9 @@ export default async function JudgeDashboard() {
                   </h2>
                   <div className="mt-1 flex gap-4 text-sm text-muted">
                     {comp.location && <span>{comp.location}</span>}
-                    <span>{formatDate(comp.event_date)}</span>
+                    <span>
+                      {formatEventDateRange(comp.event_date, comp.event_end_date)}
+                    </span>
                   </div>
                 </div>
                 <StatusBadge status={comp.status} />

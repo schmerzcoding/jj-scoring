@@ -63,6 +63,7 @@ export type Database = {
           registration_open: boolean;
           location: string | null;
           event_date: string | null;
+          event_end_date: string | null;
           country_code: string | null;
           banner_url: string | null;
           event_type: Database["public"]["Enums"]["event_type"];
@@ -88,6 +89,7 @@ export type Database = {
           registration_open?: boolean;
           location?: string | null;
           event_date?: string | null;
+          event_end_date?: string | null;
           country_code?: string | null;
           banner_url?: string | null;
           event_type?: Database["public"]["Enums"]["event_type"];
@@ -113,6 +115,7 @@ export type Database = {
           registration_open?: boolean;
           location?: string | null;
           event_date?: string | null;
+          event_end_date?: string | null;
           country_code?: string | null;
           banner_url?: string | null;
           event_type?: Database["public"]["Enums"]["event_type"];

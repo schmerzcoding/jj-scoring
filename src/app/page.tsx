@@ -3,7 +3,7 @@ import { BRAND_NAME } from "@/lib/brand";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
-import { formatDate } from "@/lib/utils";
+import { formatEventDateRange } from "@/lib/utils";
 import { getPostLoginPath, isEmailVerified, needsProfileSetup } from "@/lib/auth";
 
 export default async function HomePage() {
@@ -85,7 +85,7 @@ export default async function HomePage() {
                   <p className="mt-2 text-sm text-muted">{comp.location}</p>
                 )}
                 <p className="mt-1 text-sm text-muted">
-                  {formatDate(comp.event_date)}
+                  {formatEventDateRange(comp.event_date, comp.event_end_date)}
                 </p>
               </Link>
             ))}

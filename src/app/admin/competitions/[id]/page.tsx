@@ -9,6 +9,7 @@ import { formatEventSchedule } from "@/lib/utils";
 import { isCompetitionEvent, supportsMultiTicketTypes } from "@/lib/events";
 import { eventHasTicketTypes, fetchAllTicketTypes } from "@/lib/ticket-types";
 import { TicketTypesPanel } from "@/components/ticket-types-panel";
+import { CompetitionScheduleSettings } from "@/components/competition-schedule-settings";
 import { RegistrationsPanel } from "./registrations-panel";
 import { RoundsPanel } from "./rounds-panel";
 import { JudgesPanel } from "./judges-panel";
@@ -126,6 +127,7 @@ export default async function AdminCompetitionPage({
                 {formatEventSchedule(
                   competition.event_date,
                   competition.start_time,
+                  competition.event_end_date,
                   competition.end_time
                 )}
               </span>
@@ -155,6 +157,7 @@ export default async function AdminCompetitionPage({
         </div>
       )}
 
+      <CompetitionScheduleSettings competition={competition} />
       <CompetitionSettings
         competition={competition}
         hasPaidTicketCatalog={eventHasTicketTypes(ticketTypes)}

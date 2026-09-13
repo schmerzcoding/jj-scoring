@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/status-badge";
 import { UserAvatar } from "@/components/avatar-upload";
-import { formatDate, formatScore } from "@/lib/utils";
+import { formatEventDateRange, formatScore } from "@/lib/utils";
 import { getCountryName } from "@/lib/countries";
 import type {
   Achievement,
@@ -176,7 +176,12 @@ function RegistrationRow({
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
           <span className="capitalize">{registration.role}</span>
           <span>·</span>
-          <span>{formatDate(competition.event_date)}</span>
+          <span>
+            {formatEventDateRange(
+              competition.event_date,
+              competition.event_end_date
+            )}
+          </span>
           {competition.location && (
             <>
               <span>·</span>
