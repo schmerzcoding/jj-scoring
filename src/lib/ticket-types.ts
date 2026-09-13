@@ -3,7 +3,12 @@ import {
   eventHasPaidTickets as eventHasLegacyPaidTickets,
   parseEuroInputToCents,
 } from "@/lib/ticket-pricing";
-import type { Competition, TicketPassType, TicketType } from "@/types/database";
+import type {
+  Competition,
+  TicketPassType,
+  TicketPurchase,
+  TicketType,
+} from "@/types/database";
 
 export type TicketTypeDraft = {
   key: string;
@@ -92,6 +97,12 @@ export function getTicketTypeLabel(
   fallback: string
 ): string {
   return ticketType?.name?.trim() || fallback;
+}
+
+export function getOwnedTicketTypeIds(purchases: TicketPurchase[]): string[] {
+  return purchases
+    .filter((purchase) => purchase.status === "paid" && purchase.ticket_type_id)
+    .map((purchase) => purchase.ticket_type_id as string);
 }
 
 export function hasPaidTicketDrafts(drafts: TicketTypeDraft[]): boolean {

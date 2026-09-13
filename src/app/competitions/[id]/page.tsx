@@ -12,14 +12,12 @@ import { formatPassTypeLabel } from "@/lib/ticket-pass";
 import {
   eventHasAnyPaidTickets,
   fetchActiveTicketTypes,
+  getOwnedTicketTypeIds,
   getTicketTypeLabel,
 } from "@/lib/ticket-types";
 import { RegistrationForm } from "./registration-form";
 import { TicketPurchaseForm } from "@/components/ticket-purchase-form";
-import {
-  getOwnedTicketTypeIds,
-  TicketCartForm,
-} from "@/components/ticket-cart-form";
+import { TicketCartForm } from "@/components/ticket-cart-form";
 import { CheckoutSuccessSync } from "@/components/checkout-success-sync";
 import { Leaderboard } from "@/components/leaderboard";
 import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";

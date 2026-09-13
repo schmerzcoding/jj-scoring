@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatPrice } from "@/lib/ticket-pricing";
 import { formatPassTypeLabel } from "@/lib/ticket-pass";
-import type { TicketPurchase, TicketType } from "@/types/database";
+import type { TicketType } from "@/types/database";
 
 export function TicketCartForm({
   eventId,
@@ -176,10 +176,4 @@ export function TicketCartForm({
       </div>
     </Card>
   );
-}
-
-export function getOwnedTicketTypeIds(purchases: TicketPurchase[]): string[] {
-  return purchases
-    .filter((purchase) => purchase.status === "paid" && purchase.ticket_type_id)
-    .map((purchase) => purchase.ticket_type_id as string);
 }
