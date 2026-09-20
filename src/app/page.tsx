@@ -120,9 +120,16 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
-      <h3 className="font-semibold text-foreground">{title}</h3>
-      <p className="mt-2 text-sm text-muted">{description}</p>
+    <div className="glass-feature-card" tabIndex={0}>
+      <div className="glass-feature-card__flares" aria-hidden>
+        <span className="glass-feature-card__flare glass-feature-card__flare--top" />
+        <span className="glass-feature-card__flare glass-feature-card__flare--right" />
+        <span className="glass-feature-card__flare glass-feature-card__flare--bottom" />
+      </div>
+      <div className="glass-feature-card__surface">
+        <h3 className="glass-feature-card__title">{title}</h3>
+        <p className="glass-feature-card__description">{description}</p>
+      </div>
     </div>
   );
 }
