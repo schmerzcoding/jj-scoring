@@ -1,16 +1,52 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { SiteFooter } from "@/components/site-footer";
-import { BRAND_NAME, BRAND_URL } from "@/lib/brand";
+import { BRAND_COLORS, BRAND_NAME, BRAND_URL } from "@/lib/brand";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const APP_DESCRIPTION =
+  "Dance events in Dublin and beyond — socials, workshops, congresses, and competitions.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND_URL),
-  title: BRAND_NAME,
-  description: "Dance events in Dublin and beyond — socials, workshops, congresses, and competitions.",
+  applicationName: BRAND_NAME,
+  title: {
+    default: BRAND_NAME,
+    template: `%s · ${BRAND_NAME}`,
+  },
+  description: APP_DESCRIPTION,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: BRAND_NAME,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: BRAND_NAME,
+    title: BRAND_NAME,
+    description: APP_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary",
+    title: BRAND_NAME,
+    description: APP_DESCRIPTION,
+  },
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: BRAND_COLORS.purpleDark,
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 export default function RootLayout({
   children,
