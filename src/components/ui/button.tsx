@@ -1,10 +1,42 @@
 import { cn } from "@/lib/utils";
 import { Spinner } from "./spinner";
 
+export type ButtonVariant = "primary" | "secondary" | "danger" | "ghost" | "success";
+export type ButtonSize = "sm" | "md" | "lg";
+
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "ghost" | "success";
-  size?: "sm" | "md" | "lg";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   loading?: boolean;
+}
+
+export function buttonClassName(
+  variant: ButtonVariant = "primary",
+  size: ButtonSize = "md",
+  className?: string
+) {
+  return cn(
+    "ui-btn inline-flex items-center justify-center font-medium",
+    "disabled:pointer-events-none disabled:opacity-45",
+    {
+      "ui-btn--primary": variant === "primary",
+      "ui-btn--secondary": variant === "secondary",
+      "rounded-full border border-red-900/60 bg-red-900/80 text-red-100 shadow-md shadow-red-950/30 hover:bg-red-800 active:scale-[0.98]":
+        variant === "danger",
+      "rounded-full bg-emerald-900/80 text-emerald-100 shadow-md shadow-emerald-950/30":
+        variant === "success",
+      "rounded-full text-muted-foreground hover:bg-surface-hover hover:text-foreground":
+        variant === "ghost",
+      "px-4 py-1.5 text-sm": size === "sm",
+      "px-5 py-2.5 text-sm": size === "md",
+      "px-7 py-3 text-base": size === "lg",
+    },
+    className
+  );
+}
+
+export function ButtonSecondaryFrost() {
+  return <span className="ui-btn__frost" aria-hidden="true" />;
 }
 
 export function Button({
@@ -18,34 +50,17 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={cn(
-        "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200",
-        "disabled:pointer-events-none disabled:opacity-45",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
-        {
-          "bg-brand-600 text-white shadow-md shadow-black/30 hover:bg-brand-700 active:scale-[0.98]":
-            variant === "primary",
-          "border border-border bg-surface-overlay text-foreground hover:border-brand-700/50 hover:bg-surface-hover active:scale-[0.98]":
-            variant === "secondary",
-          "bg-red-900/80 text-red-100 shadow-md shadow-red-950/30 hover:bg-red-800 active:scale-[0.98]":
-            variant === "danger",
-          "bg-emerald-900/80 text-emerald-100 shadow-md shadow-emerald-950/30":
-            variant === "success",
-          "text-muted-foreground hover:bg-surface-hover hover:text-foreground":
-            variant === "ghost",
-          "px-3 py-1.5 text-sm": size === "sm",
-          "px-4 py-2.5 text-sm": size === "md",
-          "px-6 py-3 text-base": size === "lg",
-        },
-        className
-      )}
+      className={buttonClassName(variant, size, className)}
       disabled={disabled || loading}
       {...props}
     >
-      {loading && (
-        <Spinner size={size === "sm" ? "sm" : "md"} className="mr-2 shrink-0" />
-      )}
-      {children}
+      {variant === "secondary" && <ButtonSecondaryFrost />}
+      <span className="ui-btn__content">
+        {loading && (
+          <Spinner size={size === "sm" ? "sm" : "md"} className="mr-2 shrink-0" />
+        )}
+        {children}
+      </span>
     </button>
   );
 }

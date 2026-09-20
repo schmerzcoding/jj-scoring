@@ -7,6 +7,7 @@ import { WaddleCupPromoBanner } from "@/components/waddle-cup-promo-banner";
 import { formatEventDateRange } from "@/lib/utils";
 import { fetchWaddleCupEvent } from "@/lib/waddle-cup";
 import { isEmailVerified, requireEmailVerification } from "@/lib/auth";
+import { ButtonSecondaryFrost, buttonClassName } from "@/components/ui/button";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -45,16 +46,14 @@ export default async function HomePage() {
         <div className="mt-6 flex flex-wrap justify-center gap-3 sm:mt-8 sm:gap-4">
           <Link
             href="/competitions"
-            className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-black/30 transition-all hover:bg-brand-700 sm:px-6 sm:py-3"
+            className={buttonClassName("primary", "lg")}
           >
-            Browse Events
+            <span className="ui-btn__content">Browse Events</span>
           </Link>
           {!user && (
-            <Link
-              href="/signup"
-              className="rounded-xl border border-border bg-surface-overlay px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-brand-700/50 hover:bg-surface-hover sm:px-6 sm:py-3"
-            >
-              Create Account
+            <Link href="/signup" className={buttonClassName("secondary", "lg")}>
+              <ButtonSecondaryFrost />
+              <span className="ui-btn__content">Create Account</span>
             </Link>
           )}
         </div>

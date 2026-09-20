@@ -6,6 +6,7 @@ import {
   type MobileNavItem,
 } from "@/components/navbar-mobile-menu";
 import { fetchWaddleCupEvent, waddleCupEventPath } from "@/lib/waddle-cup";
+import { buttonClassName } from "@/components/ui/button";
 import { UserMenu, type UserMenuItem } from "./user-menu";
 
 export async function Navbar() {
@@ -155,11 +156,8 @@ export async function Navbar() {
               <Link href="/login" className={navLinkClass}>
                 Log in
               </Link>
-              <Link
-                href="/signup"
-                className="rounded-xl bg-brand-700 px-4 py-2 text-sm font-medium text-white shadow-md shadow-black/25 transition-all hover:bg-brand-600"
-              >
-                Sign up
+              <Link href="/signup" className={buttonClassName("primary", "sm")}>
+                <span className="ui-btn__content">Sign up</span>
               </Link>
             </div>
           )}
