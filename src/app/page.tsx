@@ -7,7 +7,7 @@ import { WaddleCupPromoBanner } from "@/components/waddle-cup-promo-banner";
 import { formatEventDateRange } from "@/lib/utils";
 import { fetchWaddleCupEvent } from "@/lib/waddle-cup";
 import { isEmailVerified, requireEmailVerification } from "@/lib/auth";
-import { ButtonSecondaryFrost, buttonClassName } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -44,17 +44,13 @@ export default async function HomePage() {
           masterclasses, congresses, and competitions — all in one place.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3 sm:mt-8 sm:gap-4">
-          <Link
-            href="/competitions"
-            className={buttonClassName("primary", "lg")}
-          >
-            <span className="ui-btn__content">Browse Events</span>
-          </Link>
+          <ButtonLink href="/competitions" size="lg">
+            Browse Events
+          </ButtonLink>
           {!user && (
-            <Link href="/signup" className={buttonClassName("secondary", "lg")}>
-              <ButtonSecondaryFrost />
-              <span className="ui-btn__content">Create Account</span>
-            </Link>
+            <ButtonLink href="/signup" variant="secondary" size="lg">
+              Create Account
+            </ButtonLink>
           )}
         </div>
       </section>

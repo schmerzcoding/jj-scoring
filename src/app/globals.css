@@ -486,10 +486,11 @@ select option {
 .ui-btn {
   --btn-cyan: #00dbff;
   --btn-purple: #8115d7;
+  --btn-radius: 0.875rem;
   position: relative;
   isolation: isolate;
   overflow: visible;
-  border-radius: 9999px;
+  border-radius: var(--btn-radius);
   transition:
     transform 0.22s ease,
     box-shadow 0.22s ease,
@@ -504,31 +505,17 @@ select option {
 
 .ui-btn--primary {
   border: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.16) 0%,
-      rgba(255, 255, 255, 0.03) 36%,
-      transparent 62%
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, #30004e 35%, var(--btn-purple) 65%) 0%,
-      color-mix(in srgb, #30004e 22%, var(--btn-purple) 78%) 48%,
-      #1a0029 100%
-    );
-  color: #ffffff;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #30004e 58%, #000000 42%) 0%,
+    color-mix(in srgb, #30004e 42%, var(--btn-purple) 58%) 52%,
+    color-mix(in srgb, #1a0029 72%, #000000 28%) 100%
+  );
+  color: color-mix(in srgb, #ffffff 92%, #30004e 8%);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -14px 22px -16px rgba(26, 0, 41, 0.65),
-    0 0 18px 4px color-mix(in srgb, var(--btn-purple) 22%, transparent),
-    0 0 36px 10px color-mix(in srgb, #30004e 12%, transparent),
-    0 0 14px 3px color-mix(in srgb, var(--btn-cyan) 8%, transparent),
-    0 -2px 14px 2px color-mix(in srgb, #d8b4fe 10%, transparent),
-    0 6px 20px rgba(48, 0, 78, 0.32),
-    0 16px 44px rgba(48, 0, 78, 0.38),
-    0 28px 64px rgba(0, 0, 0, 0.44);
+    0 5px 18px rgba(48, 0, 78, 0.22),
+    0 14px 36px rgba(0, 0, 0, 0.32);
 }
 
 .ui-btn--primary::before {
@@ -539,64 +526,51 @@ select option {
   border-radius: inherit;
   overflow: hidden;
   background: radial-gradient(
-    ellipse 52% 70% at 22% 18%,
-    rgba(255, 255, 255, 0.78) 0%,
-    rgba(255, 255, 255, 0.2) 38%,
-    transparent 68%
+    ellipse 36% 44% at 26% 18%,
+    rgba(255, 255, 255, 0.22) 0%,
+    transparent 52%
   );
   pointer-events: none;
 }
 
+/* Destello desde el borde hacia afuera */
 .ui-btn--primary::after {
   content: "";
   position: absolute;
   z-index: -1;
-  left: 6%;
-  right: 6%;
-  bottom: -22px;
-  height: 38px;
-  border-radius: 9999px;
-  filter: blur(20px);
-  opacity: 0.68;
-  background: radial-gradient(
-    ellipse 80% 100% at 50% 0%,
-    color-mix(in srgb, var(--btn-purple) 62%, var(--btn-cyan) 8%, transparent) 0%,
-    color-mix(in srgb, #30004e 28%, transparent) 42%,
-    transparent 78%
-  );
+  inset: 0;
+  border-radius: inherit;
   pointer-events: none;
-  transition: opacity 0.22s ease, filter 0.22s ease;
+  box-shadow:
+    0 0 8px 2px color-mix(in srgb, var(--btn-purple) 14%, transparent),
+    0 0 18px 6px color-mix(in srgb, #30004e 10%, transparent),
+    0 0 32px 12px color-mix(in srgb, #30004e 5%, transparent);
+  transition: box-shadow 0.22s ease;
 }
 
 .ui-btn--primary:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
-    inset 0 -14px 22px -16px rgba(26, 0, 41, 0.6),
-    0 0 24px 6px color-mix(in srgb, var(--btn-purple) 28%, transparent),
-    0 0 48px 14px color-mix(in srgb, #30004e 16%, transparent),
-    0 0 18px 5px color-mix(in srgb, var(--btn-cyan) 12%, transparent),
-    0 -3px 18px 3px color-mix(in srgb, #d8b4fe 14%, transparent),
-    0 10px 28px rgba(48, 0, 78, 0.4),
-    0 22px 56px rgba(48, 0, 78, 0.44),
-    0 36px 76px rgba(0, 0, 0, 0.48);
+    0 8px 24px rgba(48, 0, 78, 0.28),
+    0 18px 44px rgba(0, 0, 0, 0.36);
 }
 
 .ui-btn--primary:hover::after {
-  opacity: 0.82;
-  filter: blur(24px);
+  box-shadow:
+    0 0 10px 3px color-mix(in srgb, var(--btn-purple) 18%, transparent),
+    0 0 22px 8px color-mix(in srgb, #30004e 12%, transparent),
+    0 0 38px 14px color-mix(in srgb, #30004e 7%, transparent);
 }
 
 .ui-btn--primary:active {
   transform: translateY(0) scale(0.98);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 6px 22px rgba(48, 0, 78, 0.42),
-    0 14px 36px rgba(0, 0, 0, 0.38);
+    0 5px 18px rgba(48, 0, 78, 0.26),
+    0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
 .ui-btn--secondary {
-  border: 1px solid color-mix(in srgb, #ffffff 22%, transparent);
+  border: none;
   background: linear-gradient(
     155deg,
     rgba(255, 255, 255, 0.11) 0%,
@@ -609,14 +583,7 @@ select option {
   backdrop-filter: blur(64px) saturate(165%) brightness(1.06) contrast(1.02);
   -webkit-backdrop-filter: blur(64px) saturate(165%) brightness(1.06) contrast(1.02);
   box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset -1px -1px 0 rgba(255, 255, 255, 0.04),
-    inset 0 6px 10px -9px rgba(255, 255, 255, 0.1),
-    0 0 18px 4px rgba(255, 255, 255, 0.1),
-    0 0 36px 10px rgba(255, 255, 255, 0.06),
-    0 0 14px 3px rgba(255, 255, 255, 0.08),
-    0 -2px 14px 2px rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
     0 6px 20px rgba(0, 0, 0, 0.28),
     0 16px 44px rgba(0, 0, 0, 0.32),
     0 28px 64px rgba(0, 0, 0, 0.38);
@@ -629,43 +596,28 @@ select option {
   inset: 0;
   border-radius: inherit;
   overflow: hidden;
-  background:
-    linear-gradient(
-      125deg,
-      rgba(255, 255, 255, 0.24) 0%,
-      rgba(255, 255, 255, 0.08) 16%,
-      transparent 38%
-    ),
-    radial-gradient(
-      ellipse 52% 70% at 22% 18%,
-      rgba(255, 255, 255, 0.28) 0%,
-      rgba(255, 255, 255, 0.08) 40%,
-      transparent 68%
-    );
+  background: radial-gradient(
+    ellipse 36% 44% at 26% 18%,
+    rgba(255, 255, 255, 0.18) 0%,
+    transparent 52%
+  );
   pointer-events: none;
   transition: opacity 0.22s ease;
 }
 
-/* Textura frost — como glass-feature-card__surface::after */
+/* Destello blanco desde el borde hacia afuera */
 .ui-btn--secondary::after {
   content: "";
   position: absolute;
   z-index: -1;
-  left: 6%;
-  right: 6%;
-  bottom: -22px;
-  height: 38px;
-  border-radius: 9999px;
-  filter: blur(20px);
-  opacity: 0.62;
-  background: radial-gradient(
-    ellipse 80% 100% at 50% 0%,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.18) 42%,
-    transparent 78%
-  );
+  inset: 0;
+  border-radius: inherit;
   pointer-events: none;
-  transition: opacity 0.22s ease, filter 0.22s ease;
+  box-shadow:
+    0 0 8px 2px rgba(255, 255, 255, 0.08),
+    0 0 18px 6px rgba(255, 255, 255, 0.05),
+    0 0 32px 12px rgba(255, 255, 255, 0.03);
+  transition: box-shadow 0.22s ease;
 }
 
 .ui-btn--secondary .ui-btn__frost {
@@ -681,8 +633,7 @@ select option {
 }
 
 .ui-btn--secondary:hover {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, #ffffff 32%, transparent);
+  transform: translateY(-2px);
   background: linear-gradient(
     155deg,
     rgba(255, 255, 255, 0.14) 0%,
@@ -692,14 +643,7 @@ select option {
     rgba(26, 0, 51, 0.16) 100%
   );
   box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset -1px -1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 6px 10px -9px rgba(255, 255, 255, 0.14),
-    0 0 24px 6px rgba(255, 255, 255, 0.14),
-    0 0 48px 14px rgba(255, 255, 255, 0.08),
-    0 0 18px 5px rgba(255, 255, 255, 0.1),
-    0 -3px 18px 3px rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
     0 10px 28px rgba(0, 0, 0, 0.32),
     0 22px 56px rgba(0, 0, 0, 0.36),
     0 36px 76px rgba(0, 0, 0, 0.42);
@@ -710,15 +654,15 @@ select option {
 }
 
 .ui-btn--secondary:hover::after {
-  opacity: 0.78;
-  filter: blur(24px);
+  box-shadow:
+    0 0 10px 3px rgba(255, 255, 255, 0.11),
+    0 0 22px 8px rgba(255, 255, 255, 0.07),
+    0 0 38px 14px rgba(255, 255, 255, 0.04);
 }
 
 .ui-btn--secondary:active {
   transform: translateY(0) scale(0.98);
   box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.2),
-    0 0 20px 6px rgba(255, 255, 255, 0.1),
     0 6px 22px rgba(0, 0, 0, 0.34),
     0 14px 36px rgba(0, 0, 0, 0.3);
 }

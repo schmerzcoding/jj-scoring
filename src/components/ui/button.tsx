@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Spinner } from "./spinner";
 
@@ -27,9 +28,9 @@ export function buttonClassName(
         variant === "success",
       "rounded-full text-muted-foreground hover:bg-surface-hover hover:text-foreground":
         variant === "ghost",
-      "px-4 py-1.5 text-sm": size === "sm",
-      "px-5 py-2.5 text-sm": size === "md",
-      "px-7 py-3 text-base": size === "lg",
+      "ui-btn--sm px-4 py-1.5 text-sm": size === "sm",
+      "ui-btn--md px-5 py-2.5 text-sm": size === "md",
+      "ui-btn--lg px-7 py-3 text-base": size === "lg",
     },
     className
   );
@@ -37,6 +38,27 @@ export function buttonClassName(
 
 export function ButtonSecondaryFrost() {
   return <span className="ui-btn__frost" aria-hidden="true" />;
+}
+
+export function ButtonLink({
+  href,
+  variant = "primary",
+  size = "md",
+  className,
+  children,
+}: {
+  href: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link href={href} className={buttonClassName(variant, size, className)}>
+      {variant === "secondary" && <ButtonSecondaryFrost />}
+      <span className="ui-btn__content">{children}</span>
+    </Link>
+  );
 }
 
 export function Button({

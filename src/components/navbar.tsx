@@ -6,7 +6,7 @@ import {
   type MobileNavItem,
 } from "@/components/navbar-mobile-menu";
 import { fetchWaddleCupEvent, waddleCupEventPath } from "@/lib/waddle-cup";
-import { buttonClassName } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { UserMenu, type UserMenuItem } from "./user-menu";
 
 export async function Navbar() {
@@ -97,8 +97,8 @@ export async function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40">
-      <div className="flex h-12 items-center sm:h-[4.75rem] md:h-20 lg:h-[5rem]">
+    <header className="sticky top-0 z-40 overflow-visible">
+      <div className="flex h-12 items-center overflow-visible sm:h-[4.75rem] md:h-20 lg:h-[5rem]">
         <Link
           href="/"
           aria-label="Waddle Social home"
@@ -107,7 +107,7 @@ export async function Navbar() {
           <BrandLogo />
         </Link>
 
-        <nav className="ml-auto hidden items-center gap-6 pr-4 sm:flex sm:pr-6 lg:pr-8">
+        <nav className="ml-auto hidden items-center gap-6 overflow-visible pr-4 sm:flex sm:pr-6 lg:pr-8">
           {waddleCupHref && (
             <Link href={waddleCupHref} className={waddleCupNavClass}>
               The Waddle Cup
@@ -156,9 +156,9 @@ export async function Navbar() {
               <Link href="/login" className={navLinkClass}>
                 Log in
               </Link>
-              <Link href="/signup" className={buttonClassName("primary", "sm")}>
-                <span className="ui-btn__content">Sign up</span>
-              </Link>
+              <ButtonLink href="/signup" size="md" className="shrink-0">
+                Sign up
+              </ButtonLink>
             </div>
           )}
         </nav>
