@@ -5,6 +5,7 @@ import {
   NavbarMobileMenu,
   type MobileNavItem,
 } from "@/components/navbar-mobile-menu";
+import { fetchWaddleCupEvent, waddleCupEventPath } from "@/lib/waddle-cup";
 import { UserMenu, type UserMenuItem } from "./user-menu";
 
 export async function Navbar() {
@@ -24,6 +25,10 @@ export async function Navbar() {
   }
 
   const displayName = profile?.full_name ?? user?.email ?? "User";
+  const waddleCupEvent = await fetchWaddleCupEvent(supabase);
+  const waddleCupHref = waddleCupEvent
+    ? waddleCupEventPath(waddleCupEvent.id)
+    : null;
 
   const userMenuItems: UserMenuItem[] = [];
 
@@ -41,10 +46,20 @@ export async function Navbar() {
 
   const navLinkClass =
     "text-sm font-medium text-white/85 transition-colors hover:text-white";
+  const waddleCupNavClass =
+    "text-sm font-medium text-[color-mix(in_srgb,#ffffff_88%,#b56af0_12%)] transition-colors hover:text-white";
 
-  const mobileNavItems: MobileNavItem[] = [
-    { kind: "link", href: "/competitions", label: "Events" },
-  ];
+  const mobileNavItems: MobileNavItem[] = [];
+
+  if (waddleCupHref) {
+    mobileNavItems.push({
+      kind: "link",
+      href: waddleCupHref,
+      label: "The Waddle Cup",
+    });
+  }
+
+  mobileNavItems.push({ kind: "link", href: "/competitions", label: "Events" });
 
   if (user && profile?.role === "admin") {
     mobileNavItems.push(
@@ -92,6 +107,11 @@ export async function Navbar() {
         </Link>
 
         <nav className="ml-auto hidden items-center gap-6 pr-4 sm:flex sm:pr-6 lg:pr-8">
+          {waddleCupHref && (
+            <Link href={waddleCupHref} className={waddleCupNavClass}>
+              The Waddle Cup
+            </Link>
+          )}
           <Link href="/competitions" className={navLinkClass}>
             Events
           </Link>

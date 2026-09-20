@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { needsProfileSetup, isAdminRole, getPostLoginPath } from "@/lib/auth";
+import { needsProfileSetup, getPostLoginPath } from "@/lib/auth";
 import { profileToFormValues, EMPTY_PROFILE_FORM_VALUES } from "@/lib/profile";
 import { ProfileSetupForm } from "./profile-setup-form";
 
@@ -18,8 +18,7 @@ export default async function ProfileSetupPage() {
     .eq("id", user.id)
     .single();
 
-  if (isAdminRole(profile?.role)) redirect("/admin");
-  if (!needsProfileSetup(profile)) redirect("/profile");
+  if (!needsProfileSetup(profile)) redirect("/");
 
   const initialValues = profile
     ? profileToFormValues(profile)

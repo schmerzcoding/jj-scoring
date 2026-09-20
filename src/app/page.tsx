@@ -3,8 +3,10 @@ import { BRAND_NAME } from "@/lib/brand";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
+import { WaddleCupPromoBanner } from "@/components/waddle-cup-promo-banner";
 import { formatEventDateRange } from "@/lib/utils";
-import { getPostLoginPath, isEmailVerified, needsProfileSetup } from "@/lib/auth";
+import { fetchWaddleCupEvent } from "@/lib/waddle-cup";
+import { isEmailVerified, requireEmailVerification } from "@/lib/auth";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -12,30 +14,23 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: competitions } = await supabase
-    .from("competitions")
-    .select("*")
-    .in("status", ["open", "in_progress"])
-    .order("event_date", { ascending: true })
-    .limit(3);
-
-  if (user) {
-    if (!isEmailVerified(user)) {
-      redirect("/verify-email");
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-    if (needsProfileSetup(profile)) {
-      redirect("/profile/setup");
-    }
-
-    redirect(getPostLoginPath(profile));
+  if (user && requireEmailVerification() && !isEmailVerified(user)) {
+    redirect("/verify-email");
   }
+
+  const [waddleCupEvent, { data: competitions }] = await Promise.all([
+    fetchWaddleCupEvent(supabase),
+    supabase
+      .from("competitions")
+      .select("*")
+      .in("status", ["open", "in_progress"])
+      .order("event_date", { ascending: true })
+      .limit(6),
+  ]);
+
+  const upcomingEvents =
+    competitions?.filter((comp) => comp.id !== waddleCupEvent?.id).slice(0, 3) ??
+    [];
 
   return (
     <div className="space-y-10 pt-10 sm:space-y-12 sm:pt-14">
@@ -65,13 +60,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {competitions && competitions.length > 0 && (
+      {waddleCupEvent && (
+        <section>
+          <WaddleCupPromoBanner event={waddleCupEvent} />
+        </section>
+      )}
+
+      {upcomingEvents.length > 0 && (
         <section>
           <h2 className="mb-4 text-xl font-semibold text-foreground sm:mb-6 sm:text-2xl">
             Upcoming Events
           </h2>
           <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {competitions.map((comp) => (
+            {upcomingEvents.map((comp) => (
               <Link
                 key={comp.id}
                 href={`/competitions/${comp.id}`}

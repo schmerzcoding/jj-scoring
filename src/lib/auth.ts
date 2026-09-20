@@ -47,11 +47,8 @@ export function canPurchaseEventTicket(
 export function getPostLoginPath(
   profile: Pick<Profile, "role" | "profile_completed"> | null
 ): string {
-  if (isAdminRole(profile?.role)) return "/admin";
   if (needsProfileSetup(profile)) return "/profile/setup";
-  if (profile?.role === "judge") return "/judge";
-  if (profile?.role === "organizer") return "/organizer";
-  return "/competitions";
+  return "/";
 }
 
 export function isAllowedDuringProfileSetup(
@@ -59,6 +56,7 @@ export function isAllowedDuringProfileSetup(
   role: UserRole | undefined
 ): boolean {
   if (isAuthPublicPath(pathname)) return true;
+  if (pathname === "/") return true;
   if (pathname === "/profile/setup" || pathname.startsWith("/profile")) return true;
   if (pathname.startsWith("/competitions")) return true;
   if (role === "judge" && pathname.startsWith("/judge")) return true;
