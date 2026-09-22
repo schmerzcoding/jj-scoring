@@ -19,7 +19,12 @@ export function HomeHero({ showSignup }: { showSignup: boolean }) {
 
       <div className="home-hero__top">
         <div className="home-hero__content">
-          <p className="home-hero__eyebrow">{HOME_HERO.eyebrow}</p>
+          <p className="home-hero__eyebrow">
+            <strong className="font-semibold text-white">
+              {HOME_HERO.eyebrowBold}
+            </strong>{" "}
+            {HOME_HERO.eyebrowRest}
+          </p>
 
           <div className="home-hero__title-wrap">
             <Image

@@ -26,7 +26,8 @@ export const BRAND_ASSETS = {
 } as const;
 
 export const HOME_HERO = {
-  eyebrow: "Step into the scene.",
+  eyebrowBold: "Step",
+  eyebrowRest: "into the scene.",
   description:
     "Discover events, sell tickets, and run competitions with our integrated judging system.",
   descriptionHighlight: "Dublin and beyond.",
