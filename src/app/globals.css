@@ -71,16 +71,10 @@ body {
   border-radius: 0.75rem;
 }
 
-/* Page background — designer asset with a dark veil for readable foreground content */
+/* Page background — designer asset, no overlay or blur */
 .app-glow {
   background-color: #000000;
-  background-image:
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.52) 0%,
-      rgba(0, 0, 0, 0.58) 100%
-    ),
-    url("/branding/page-background.png");
+  background-image: url("/branding/page-background.png");
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -876,7 +870,12 @@ select option {
 .home-hero__roles {
   position: relative;
   z-index: 3;
-  margin-top: 1.5rem;
+  margin-top: 2.25rem;
+  font-size: 0.8rem;
+}
+
+.home-hero__roles .home-role-cards {
+  gap: 1.35rem;
 }
 
 .home-role-cards .glass-feature-card__surface {
@@ -954,40 +953,22 @@ select option {
 
 /* Reference-style section separators */
 .home-feature-stack > .home-curved-separator {
-  width: 100vw;
+  width: 104vw;
   max-width: none;
-  margin-left: calc(50% - 50vw);
+  margin-left: calc(47.7% - 50vw);
   margin-right: calc(50% - 50vw);
 }
 
 .home-curved-separator {
   width: 100%;
-  height: 2.75rem;
   margin-top: 1.5rem;
   margin-bottom: 0.25rem;
-  opacity: 0.92;
 }
 
-.home-curved-separator__svg {
+.home-curved-separator__image {
   display: block;
   width: 100%;
-  height: 100%;
-}
-
-.home-curved-separator__line {
-  fill: none;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.home-curved-separator__line--outer {
-  stroke: color-mix(in srgb, #ffffff 48%, transparent);
-  stroke-width: 1.1;
-}
-
-.home-curved-separator__line--inner {
-  stroke: color-mix(in srgb, #ffffff 24%, transparent);
-  stroke-width: 0.75;
+  height: auto;
 }
 
 /* Curved glass section frames */
@@ -1215,34 +1196,56 @@ select option {
   }
 }
 
-/* Upcoming events — only trophy base + shadow tuck behind this panel */
+/* Upcoming events — glass panel; trophy base tucks behind top fade */
 .home-upcoming {
   position: relative;
   z-index: 2;
   margin-top: -3.25rem;
 }
 
-.home-upcoming .home-section-frame__content {
-  position: relative;
-  min-height: 7.5rem;
-  padding: 3.25rem 1.25rem 1.35rem;
-  background: color-mix(in srgb, #000000 88%, #30004e 12%);
+.home-upcoming__shell {
+  border-radius: 1.25rem;
+  cursor: default;
 }
 
-.home-upcoming .home-section-frame__content::before {
+.home-upcoming__shell.glass-feature-card:hover,
+.home-upcoming__shell.glass-feature-card:focus-visible,
+.home-upcoming__shell.glass-feature-card:active {
+  transform: none;
+}
+
+.home-upcoming__surface.glass-feature-card__surface {
+  position: relative;
+  min-height: 7.5rem;
+  padding: 1rem 1.25rem 1.35rem;
+  background: color-mix(in srgb, #030005 90%, transparent);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.home-upcoming__surface.glass-feature-card__surface::before,
+.home-upcoming__surface.glass-feature-card__surface::after {
+  opacity: 0;
+}
+
+.home-upcoming__top-fade {
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3.75rem;
-  transform: none;
   border-radius: inherit;
-  background: color-mix(in srgb, #000000 88%, #30004e 12%);
-  z-index: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: color-mix(in srgb, #030005 70%, transparent);
 }
 
-.home-upcoming .home-section-frame__content > * {
+.home-upcoming__inner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .home-upcoming__empty {
@@ -1288,12 +1291,16 @@ select option {
     margin-top: -5rem;
   }
 
-  .home-upcoming .home-section-frame__content {
-    min-height: 8.5rem;
-    padding: 4.25rem 1.5rem 1.5rem;
+  .home-upcoming__shell {
+    border-radius: 1.35rem;
   }
 
-  .home-upcoming .home-section-frame__content::before {
+  .home-upcoming__surface {
+    min-height: 8.5rem;
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .home-upcoming__top-fade {
     height: 5.25rem;
   }
 
@@ -1313,11 +1320,11 @@ select option {
     margin-top: -7.25rem;
   }
 
-  .home-upcoming .home-section-frame__content {
-    padding-top: 5rem;
+  .home-upcoming__surface {
+    padding-top: 0;
   }
 
-  .home-upcoming .home-section-frame__content::before {
+  .home-upcoming__top-fade {
     height: 6.5rem;
   }
 
@@ -1329,17 +1336,38 @@ select option {
 /* ── Homepage mobile & tablet (1024px+ desktop untouched) ── */
 
 @media (max-width: 639px) {
+  /* Mobile Waddle Cup tuning: trophy-size, trophy-col, copy-col */
+  .home-page {
+    --home-main-pad: 1rem;
+    --home-mobile-waddle-cup-trophy-size: clamp(25rem, 42vw, 15.5rem);
+    --home-mobile-waddle-cup-trophy-col: clamp(25rem, 38vw, 13rem);
+    --home-mobile-waddle-cup-copy-col: clamp(9.5rem, 33vw, 11.25rem);
+    width: calc(100% + (2 * var(--home-main-pad)));
+    max-width: none;
+    margin-inline: calc(-1 * var(--home-main-pad));
+    overflow-x: clip;
+  }
+
+  .home-feature-stack > .home-curved-separator {
+    width: 105vw;
+    max-width: none;
+    margin-left: calc(47.5% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
+
   .home-hero__content {
     max-width: 100%;
     padding-right: 34vw;
   }
 
   .home-hero__eyebrow {
-    font-size: 0.8125rem;
+    font-size: 0.70rem;
+    padding-bottom: 0.75rem;
+    padding-left: 0.25rem;
   }
 
   .home-hero__title-wrap {
-    width: 100%;
+    width: 120%;
     max-width: 21rem;
   }
 
@@ -1350,61 +1378,86 @@ select option {
 
   .home-hero__description {
     padding-right: 0;
-    max-width: 100%;
-    font-size: 0.875rem;
+    padding-left: 0.25rem;
+    padding-top: 0.75rem;
+    max-width: 80%;
+    font-size: 0.65rem;
     line-height: 1.5;
   }
 
   .home-hero__actions {
-    gap: 0.55rem;
-    margin-top: 1.1rem;
+    flex-wrap: nowrap;
+    gap: 0.45rem;
+    margin-top: 4rem;
+    max-width: 100%;
   }
 
   .home-hero__actions .ui-btn--lg {
-    padding: 0.55rem 1.15rem;
-    font-size: 0.8125rem;
-    --btn-radius: 0.75rem;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.6875rem;
+    --btn-radius: 0.65rem;
+    white-space: nowrap;
+  }
+
+  .home-hero {
+    overflow: visible;
   }
 
   .home-hero__crystal {
     top: 0.05rem;
-    width: min(44vw, 13rem);
-    height: clamp(10rem, 31vmin, 13.5rem);
+    right: 0;
+    width: 52vw;
+    max-width: none;
+    height: clamp(11rem, 34vmin, 15rem);
+    overflow: visible;
   }
 
   .home-hero__crystal-image {
-    right: -40%;
-    height: clamp(15rem, 36vmin, 15rem);
-    transform: translateY(-56%);
+    right: 0;
+    height: clamp(25rem, 44vmin, 19rem);
+    transform-origin: right center;
+    transform: translateY(-40%) translateX(48%);
   }
 
   .home-waddle-cup {
     margin-top: 0;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+    margin-inline: -0.25rem;
+    overflow: visible;
   }
 
   .home-waddle-cup__link {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-    gap: 0 0.25rem;
+    grid-template-columns:
+      minmax(0, var(--home-mobile-waddle-cup-trophy-col))
+      minmax(0, var(--home-mobile-waddle-cup-copy-col));
+    gap: 0 0.2rem;
     align-items: start;
     min-height: 0;
+    max-width: 100%;
   }
 
   .home-waddle-cup__trophy {
-    margin-bottom: -1.75rem;
+    margin-bottom: -3.75rem;
+    min-width: 0;
   }
 
   .home-waddle-cup__trophy-image {
-    width: min(112%, 16.75rem);
-    transform: rotate(-16deg) translate(-2%, -2%);
+    width: min(190%, var(--home-mobile-waddle-cup-trophy-size));
+    max-width: none;
+    transform: rotate(-16deg) translate(-20%, -20%);
   }
 
   .home-waddle-cup__copy {
     width: 100%;
-    max-width: 10.5rem;
-    gap: 0.4rem;
-    padding-top: 0.1rem;
+    min-width: 0;
+    max-width: 100%;
+    gap: 0.9rem;
+    padding-top: 0.7rem;
     transform: none;
+    overflow: visible;
+    transform: translateX(-0.1rem);
   }
 
   .home-waddle-cup__eyebrow {
@@ -1412,36 +1465,68 @@ select option {
   }
 
   .home-waddle-cup__title-wrap {
-    width: 100%;
+    width: 150%;
+    overflow: visible;
   }
 
   .home-waddle-cup__title-image {
-    margin-right: -1.25rem;
-    max-width: calc(100% + 1.25rem);
-    transform: translateX(1.75rem);
+    width: 110%;
+    max-width: 110%;
+    margin-right: 0;
+    transform: translateX(2rem);
   }
 
   .home-waddle-cup__details {
     max-width: 100%;
+    width: 100%;
   }
 
   .home-waddle-cup__details-line {
     font-size: 0.6875rem;
     line-height: 1.35;
+    transform: translateX(-0.70rem);
+  }
+
+  .home-waddle-cup__details-line--tagline {
+    white-space: nowrap;
+    overflow: visible;
+    font-size: clamp(0.5625rem, 2.55vw, 0.6875rem);
+    letter-spacing: -0.025em;
   }
 
   .home-upcoming {
-    margin-top: -2.5rem;
+    margin-top: -7.7rem;
   }
 
-  .home-upcoming .home-section-frame__content {
+  .home-upcoming__shell {
+    border-radius: 1.5rem;
+  }
+
+  .home-hero__roles {
+    margin-top: 2.75rem;
+  }
+
+  .home-hero__roles .home-role-cards {
+    gap: 1.5rem;
+  }
+
+  .home-upcoming__surface {
     min-height: 0;
-    padding: 2rem 1rem 1.25rem;
+    padding: 0 0.85rem 0.95rem;
   }
 
-  .home-upcoming .home-section-frame__content::before {
-    display: block;
-    height: 2.25rem;
+  .home-upcoming__top-fade {
+    height: 1.75rem;
+  }
+
+  .home-upcoming__heading {
+    margin-bottom: 0.55rem;
+    font-size: 1.0625rem;
+  }
+
+  .home-upcoming__empty {
+    font-size: 0.8125rem;
+    line-height: 1.45;
   }
 }
 
@@ -1504,11 +1589,11 @@ select option {
     margin-top: -6rem;
   }
 
-  .home-upcoming .home-section-frame__content {
-    padding-top: 3.75rem;
+  .home-upcoming__surface {
+    padding-top: 0;
   }
 
-  .home-upcoming .home-section-frame__content::before {
+  .home-upcoming__top-fade {
     height: 4.5rem;
   }
 }

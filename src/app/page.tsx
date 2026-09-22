@@ -45,7 +45,7 @@ export default async function HomePage() {
           <div className="home-feature-row">
             <HomeWaddleCupFeature event={waddleCupEvent} />
 
-            <HomeSectionFrame className="home-upcoming">
+            <HomeSectionFrame className="home-upcoming" glass>
               <section aria-labelledby="home-upcoming-heading">
                 <h2 id="home-upcoming-heading" className="home-upcoming__heading">
                   Upcoming Events

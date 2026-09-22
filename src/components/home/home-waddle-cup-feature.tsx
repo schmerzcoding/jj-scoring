@@ -39,7 +39,7 @@ export function HomeWaddleCupFeature({ event }: { event: Competition }) {
             />
           </div>
           <div className="home-waddle-cup__details">
-            <p className="home-waddle-cup__details-line">
+            <p className="home-waddle-cup__details-line home-waddle-cup__details-line--tagline">
               <strong className="font-semibold text-white">
                 {HOME_FEATURE_EVENT.tagline}
               </strong>

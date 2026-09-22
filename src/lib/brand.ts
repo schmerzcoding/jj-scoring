@@ -22,6 +22,7 @@ export const BRAND_ASSETS = {
   homeCrystalIcon: "/branding/icono cristal.png",
   homeTrophyShadow: "/branding/copa con sombra.png",
   homeWaddleCupTitle: "/branding/the waddle cup.png",
+  homeSeparator: "/branding/separador.png",
 } as const;
 
 export const HOME_HERO = {
