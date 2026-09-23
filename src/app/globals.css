@@ -148,6 +148,10 @@ select option {
 }
 
 .site-navbar {
+  padding-top: constant(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   transition:
     background-color 0.25s ease,
     border-color 0.25s ease,
@@ -158,6 +162,11 @@ select option {
   background: color-mix(in srgb, #30004e 100%, transparent);
   border-bottom: 1px solid color-mix(in srgb, #8115d7 18%, transparent);
   box-shadow: 0 4px 20px color-mix(in srgb, #30004e 90%, transparent);
+}
+
+.site-footer {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Homepage role cards — border-anchored flares with inner + outer bloom */
