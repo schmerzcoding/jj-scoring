@@ -34,60 +34,66 @@ export default async function HomePage() {
     competitions?.filter((comp) => comp.id !== waddleCupEvent?.id).slice(0, 3) ??
     [];
 
+  const upcomingClassName = waddleCupEvent
+    ? "home-upcoming"
+    : "home-upcoming home-upcoming--solo";
+
   return (
     <div className="home-page">
       <HomeHero showSignup={!user} />
 
-      {waddleCupEvent && (
-        <div className="home-feature-stack">
-          <HomeCurvedSeparator />
+      <div className="home-feature-stack">
+        <HomeCurvedSeparator />
 
+        {waddleCupEvent && (
           <div className="home-feature-row">
             <HomeWaddleCupFeature event={waddleCupEvent} />
-
-            <HomeSectionFrame className="home-upcoming" glass>
-              <section aria-labelledby="home-upcoming-heading">
-                <h2 id="home-upcoming-heading" className="home-upcoming__heading">
-                  Upcoming Events
-                </h2>
-                {upcomingEvents.length > 0 ? (
-                  <div className="stagger-children home-upcoming__grid">
-                    {upcomingEvents.map((comp) => (
-                      <Link
-                        key={comp.id}
-                        href={`/competitions/${comp.id}`}
-                        className="home-upcoming__card"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <h3 className="font-semibold text-foreground">
-                            {comp.name}
-                          </h3>
-                          <StatusBadge status={comp.status} />
-                        </div>
-                        {comp.location && (
-                          <p className="mt-2 text-sm text-muted">
-                            {comp.location}
-                          </p>
-                        )}
-                        <p className="mt-1 text-sm text-muted">
-                          {formatEventDateRange(
-                            comp.event_date,
-                            comp.event_end_date
-                          )}
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="home-upcoming__empty">
-                    New events from organizers will show up here soon.
-                  </p>
-                )}
-              </section>
-            </HomeSectionFrame>
           </div>
+        )}
+
+        <div className="home-feature-row">
+          <HomeSectionFrame className={upcomingClassName} glass>
+            <section aria-labelledby="home-upcoming-heading">
+              <h2 id="home-upcoming-heading" className="home-upcoming__heading">
+                Upcoming Events
+              </h2>
+              {upcomingEvents.length > 0 ? (
+                <div className="stagger-children home-upcoming__grid">
+                  {upcomingEvents.map((comp) => (
+                    <Link
+                      key={comp.id}
+                      href={`/competitions/${comp.id}`}
+                      className="home-upcoming__card"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <h3 className="font-semibold text-foreground">
+                          {comp.name}
+                        </h3>
+                        <StatusBadge status={comp.status} />
+                      </div>
+                      {comp.location && (
+                        <p className="mt-2 text-sm text-muted">
+                          {comp.location}
+                        </p>
+                      )}
+                      <p className="mt-1 text-sm text-muted">
+                        {formatEventDateRange(
+                          comp.event_date,
+                          comp.event_end_date
+                        )}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="home-upcoming__empty">
+                  New events from organizers will show up here soon.
+                </p>
+              )}
+            </section>
+          </HomeSectionFrame>
         </div>
-      )}
+      </div>
     </div>
   );
 }

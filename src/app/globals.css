@@ -147,6 +147,19 @@ select option {
   transform-origin: top right;
 }
 
+.site-navbar {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.site-navbar--scrolled {
+  background: color-mix(in srgb, #30004e 100%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, #8115d7 18%, transparent);
+  box-shadow: 0 4px 20px color-mix(in srgb, #30004e 90%, transparent);
+}
+
 /* Homepage role cards — border-anchored flares with inner + outer bloom */
 .glass-feature-card {
   --glass-accent-cyan: #00dbff;
@@ -737,6 +750,44 @@ select option {
   opacity: 1;
 }
 
+.ui-btn--secondary.ui-btn--cancel {
+  border-color: color-mix(in srgb, #f87171 22%, #450a0a 78%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #ef4444 14%, transparent),
+    0 0 10px color-mix(in srgb, #ef4444 8%, transparent),
+    0 0 20px color-mix(in srgb, #7f1d1d 10%, transparent),
+    0 6px 20px rgba(0, 0, 0, 0.28),
+    0 16px 44px rgba(0, 0, 0, 0.32);
+}
+
+.ui-btn--secondary.ui-btn--cancel::after {
+  background: conic-gradient(
+    from 210deg at 50% 50%,
+    color-mix(in srgb, #fca5a5 62%, #ffffff 38%) 0deg,
+    color-mix(in srgb, #f87171 70%, #fecaca 30%) 42deg,
+    color-mix(in srgb, #ef4444 55%, #fca5a5 45%) 98deg,
+    color-mix(in srgb, #fca5a5 50%, #ffffff 50%) 158deg,
+    color-mix(in srgb, #dc2626 45%, #991b1b 55%) 212deg,
+    color-mix(in srgb, #f87171 65%, #fecaca 35%) 284deg,
+    color-mix(in srgb, #fca5a5 58%, #ffffff 42%) 332deg,
+    color-mix(in srgb, #fca5a5 62%, #ffffff 38%) 360deg
+  );
+}
+
+.ui-btn--secondary.ui-btn--cancel:hover {
+  border-color: color-mix(in srgb, #f87171 32%, #7f1d1d 68%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #ef4444 18%, transparent),
+    0 0 14px color-mix(in srgb, #ef4444 10%, transparent),
+    0 0 24px color-mix(in srgb, #991b1b 12%, transparent),
+    0 10px 28px rgba(0, 0, 0, 0.32),
+    0 22px 56px rgba(0, 0, 0, 0.36);
+}
+
+.ui-btn--secondary.ui-btn--cancel:active {
+  border-color: color-mix(in srgb, #f87171 38%, #991b1b 62%);
+}
+
 .ui-btn__content {
   position: relative;
   z-index: 1;
@@ -795,6 +846,7 @@ select option {
   padding-inline: var(--home-gutter);
   padding-top: 0.25rem;
   overflow: visible;
+  gap: 0.75rem;
 }
 
 .home-hero__top {
@@ -809,7 +861,7 @@ select option {
 }
 
 .home-hero__eyebrow {
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
   font-weight: 500;
   letter-spacing: 0.02em;
   color: color-mix(in srgb, #ffffff 88%, #8115d7 12%);
@@ -819,7 +871,6 @@ select option {
   position: relative;
   z-index: 3;
   width: min(100%, 48rem);
-  margin-top: 0.35rem;
 }
 
 .home-hero__title-image {
@@ -831,7 +882,6 @@ select option {
 }
 
 .home-hero__description {
-  margin-top: 1rem;
   max-width: 40rem;
   font-size: 1.0625rem;
   line-height: 1.55;
@@ -841,8 +891,8 @@ select option {
 .home-hero__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.35rem;
+  gap: 2rem;
+  margin-top: 1.75rem;
 }
 
 /* Large crystal penguin — aligned with title block, cropped at viewport right */
@@ -870,7 +920,7 @@ select option {
 .home-hero__roles {
   position: relative;
   z-index: 3;
-  margin-top: 2.25rem;
+  margin-top: 4rem;
   font-size: 0.8rem;
 }
 
@@ -884,11 +934,12 @@ select option {
 
 @media (min-width: 640px) {
   .home-hero {
-    padding-top: 0.5rem;
+    padding-top: 2rem;
+    gap: 0.75rem;
   }
 
   .home-hero__eyebrow {
-    font-size: 1rem;
+    font-size: 1.125rem;
   }
 
   .home-hero__description {
@@ -905,7 +956,7 @@ select option {
   }
 
   .home-hero__roles {
-    margin-top: 2rem;
+    margin-top: 2.75rem;
   }
 
   .home-hero__crystal {
@@ -943,11 +994,15 @@ select option {
   .home-hero__crystal-image {
     right: -20%;
     height: clamp(38rem, 66vmin, 54rem);
-    transform: translateY(calc(-50% - 0.55rem));
+    transform: translateY(calc(-45% - 0.55rem));
   }
 
   .home-hero__actions {
-    margin-top: 1.75rem;
+    margin-top: 4rem;
+  }
+
+  .home-hero__roles {
+    margin-top: 7rem;
   }
 }
 
@@ -1203,6 +1258,14 @@ select option {
   margin-top: -3.25rem;
 }
 
+.home-upcoming--solo {
+  margin-top: 1.75rem;
+}
+
+.home-upcoming--solo .home-upcoming__top-fade {
+  display: none;
+}
+
 .home-upcoming__shell {
   border-radius: 1.25rem;
   cursor: default;
@@ -1291,6 +1354,10 @@ select option {
     margin-top: -5rem;
   }
 
+  .home-upcoming--solo {
+    margin-top: 2rem;
+  }
+
   .home-upcoming__shell {
     border-radius: 1.35rem;
   }
@@ -1318,6 +1385,10 @@ select option {
 @media (min-width: 1024px) {
   .home-upcoming {
     margin-top: -7.25rem;
+  }
+
+  .home-upcoming--solo {
+    margin-top: 2.25rem;
   }
 
   .home-upcoming__surface {
@@ -1361,8 +1432,9 @@ select option {
   }
 
   .home-hero__eyebrow {
-    font-size: 0.70rem;
-    padding-bottom: 0.75rem;
+    padding-top: 1.5rem;
+    font-size: 0.65rem;
+    padding-bottom: 0.9rem;
     padding-left: 0.25rem;
   }
 
@@ -1379,7 +1451,7 @@ select option {
   .home-hero__description {
     padding-right: 0;
     padding-left: 0.25rem;
-    padding-top: 0.75rem;
+    padding-top: 0.9rem;
     max-width: 80%;
     font-size: 0.65rem;
     line-height: 1.5;
@@ -1388,7 +1460,7 @@ select option {
   .home-hero__actions {
     flex-wrap: nowrap;
     gap: 0.45rem;
-    margin-top: 4rem;
+    margin-top: 3rem;
     max-width: 100%;
   }
 
@@ -1418,7 +1490,7 @@ select option {
     right: 0;
     height: clamp(25rem, 44vmin, 19rem);
     transform-origin: right center;
-    transform: translateY(-40%) translateX(48%);
+    transform: translateY(-37%) translateX(48%);
   }
 
   .home-waddle-cup {
@@ -1498,12 +1570,16 @@ select option {
     margin-top: -7.7rem;
   }
 
+  .home-upcoming--solo {
+    margin-top: 1.5rem;
+  }
+
   .home-upcoming__shell {
     border-radius: 1.5rem;
   }
 
   .home-hero__roles {
-    margin-top: 2.75rem;
+    margin-top: 4rem;
   }
 
   .home-hero__roles .home-role-cards {

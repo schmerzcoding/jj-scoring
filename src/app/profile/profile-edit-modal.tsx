@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { AvatarUpload } from "@/components/avatar-upload";
 import { ProfileForm, saveProfileValues } from "@/components/profile-form";
-import { Button } from "@/components/ui/button";
 import { profileToFormValues } from "@/lib/profile";
 import type { Profile } from "@/types/database";
 
@@ -22,33 +22,42 @@ export function ProfileEditModal({
   const router = useRouter();
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
   const [displayName, setDisplayName] = useState(profile.full_name);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
     }
 
+    const previousOverflow = document.body.style.overflow;
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
+
     return () => {
       document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
   }, [onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] overflow-y-auto overscroll-y-contain bg-black/70 px-4 py-6 backdrop-blur-sm sm:px-6 sm:py-10"
       onClick={onClose}
     >
       <div
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-surface-overlay shadow-2xl shadow-black/50"
+        className="mx-auto w-full max-w-lg rounded-2xl border border-border bg-surface-overlay shadow-2xl shadow-black/50"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-edit-title"
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border bg-surface-overlay px-6 py-4">
+        <div className="flex items-start justify-between border-b border-border px-6 py-4">
           <div>
             <h2 id="profile-edit-title" className="text-lg font-semibold text-foreground">
               Edit profile
@@ -83,6 +92,7 @@ export function ProfileEditModal({
           <ProfileForm
             initialValues={profileToFormValues(profile)}
             submitLabel="Save changes"
+            onCancel={onClose}
             onSubmit={async (values) => {
               setDisplayName(values.fullName);
               const result = await saveProfileValues(userId, values, true);
@@ -94,13 +104,8 @@ export function ProfileEditModal({
             }}
           />
         </div>
-
-        <div className="border-t border-border px-6 py-4">
-          <Button type="button" variant="ghost" onClick={onClose} className="w-full sm:w-auto">
-            Cancel
-          </Button>
-        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

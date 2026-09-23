@@ -32,11 +32,13 @@ export function ProfileForm({
   submitLabel,
   onSubmit,
   onFullNameChange,
+  onCancel,
 }: {
   initialValues: ProfileFormValues;
   submitLabel: string;
   onSubmit: (values: ProfileFormValues) => Promise<{ error?: string }>;
   onFullNameChange?: (name: string) => void;
+  onCancel?: () => void;
 }) {
   const [values, setValues] = useState(initialValues);
   const [error, setError] = useState("");
@@ -147,9 +149,26 @@ export function ProfileForm({
         <p className="text-sm text-emerald-400">Profile saved successfully.</p>
       )}
 
-      <Button type="submit" className="w-full" loading={loading}>
-        {loading ? "Saving..." : submitLabel}
-      </Button>
+      {onCancel ? (
+        <div className="flex gap-3 pt-1">
+          <Button type="submit" className="min-w-0 flex-1" loading={loading}>
+            {loading ? "Saving..." : submitLabel}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            className="ui-btn--cancel min-w-0 flex-1"
+            onClick={onCancel}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button type="submit" className="w-full" loading={loading}>
+          {loading ? "Saving..." : submitLabel}
+        </Button>
+      )}
     </form>
   );
 }

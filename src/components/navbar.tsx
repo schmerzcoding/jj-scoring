@@ -7,6 +7,7 @@ import {
 } from "@/components/navbar-mobile-menu";
 import { fetchWaddleCupEvent, waddleCupEventPath } from "@/lib/waddle-cup";
 import { ButtonLink } from "@/components/ui/button";
+import { NavbarShell } from "@/components/navbar-shell";
 import { UserMenu, type UserMenuItem } from "./user-menu";
 
 export async function Navbar() {
@@ -97,7 +98,7 @@ export async function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 overflow-visible">
+    <NavbarShell>
       <div className="flex h-12 items-center overflow-visible sm:h-[4.75rem] md:h-20 lg:h-[5rem]">
         <Link
           href="/"
@@ -167,6 +168,6 @@ export async function Navbar() {
           <NavbarMobileMenu items={mobileNavItems} />
         </div>
       </div>
-    </header>
+    </NavbarShell>
   );
 }
