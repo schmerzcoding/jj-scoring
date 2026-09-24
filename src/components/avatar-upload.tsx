@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { AvatarCropModal } from "@/components/avatar-crop-modal";
+
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
@@ -58,8 +61,33 @@ export function AvatarUpload({
   avatarUrl?: string | null;
   onUploaded?: (url: string | null) => void;
 }) {
-  async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const cropImageSrcRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    cropImageSrcRef.current = cropImageSrc;
+  }, [cropImageSrc]);
+
+  useEffect(() => {
+    return () => {
+      if (cropImageSrcRef.current) {
+        URL.revokeObjectURL(cropImageSrcRef.current);
+      }
+    };
+  }, []);
+
+  function clearCropImage() {
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc);
+    }
+    setCropImageSrc(null);
+  }
+
+  function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
     if (!file) return;
 
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -72,17 +100,28 @@ export function AvatarUpload({
       return;
     }
 
+    clearCropImage();
+    setCropImageSrc(URL.createObjectURL(file));
+  }
+
+  async function uploadAvatarBlob(blob: Blob) {
+    if (blob.size > MAX_AVATAR_BYTES) {
+      alert("Cropped image must be 2 MB or smaller. Try zooming out a little.");
+      return;
+    }
+
+    setUploading(true);
+
     const { createClient, fromTable } = await import("@/lib/supabase/client");
     const supabase = createClient();
-
-    const extension = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const filePath = `${userId}/avatar.${extension}`;
+    const filePath = `${userId}/avatar.jpg`;
 
     const { error: uploadError } = await supabase.storage
       .from("avatars")
-      .upload(filePath, file, { upsert: true, contentType: file.type });
+      .upload(filePath, blob, { upsert: true, contentType: "image/jpeg" });
 
     if (uploadError) {
+      setUploading(false);
       alert(`Upload failed: ${uploadError.message}`);
       return;
     }
@@ -97,13 +136,15 @@ export function AvatarUpload({
       .update({ avatar_url: cacheBustedUrl })
       .eq("id", userId);
 
+    setUploading(false);
+
     if (profileError) {
       alert(`Could not save profile photo: ${profileError.message}`);
       return;
     }
 
+    clearCropImage();
     onUploaded?.(cacheBustedUrl);
-    e.target.value = "";
   }
 
   async function handleRemove() {
@@ -128,29 +169,43 @@ export function AvatarUpload({
   }
 
   return (
-    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-      <UserAvatar name={name} avatarUrl={avatarUrl} size="lg" />
-      <div className="space-y-2">
-        <label className="inline-flex cursor-pointer rounded-xl border border-border bg-surface-overlay px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand-700/50 hover:bg-surface-hover">
-          Upload photo
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            className="hidden"
-            onChange={handleChange}
-          />
-        </label>
-        {avatarUrl && (
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="block text-sm text-red-400 hover:text-red-300 hover:underline"
-          >
-            Remove photo
-          </button>
-        )}
-        <p className="text-xs text-muted">JPEG, PNG, WebP or GIF. Max 2 MB.</p>
+    <>
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+        <UserAvatar name={name} avatarUrl={avatarUrl} size="lg" />
+        <div className="space-y-2">
+          <label className="inline-flex cursor-pointer rounded-xl border border-border bg-surface-overlay px-3 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand-700/50 hover:bg-surface-hover">
+            {uploading ? "Uploading..." : "Upload photo"}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="hidden"
+              disabled={uploading}
+              onChange={handleFileSelect}
+            />
+          </label>
+          {avatarUrl && (
+            <button
+              type="button"
+              onClick={handleRemove}
+              disabled={uploading}
+              className="block text-sm text-red-400 hover:text-red-300 hover:underline disabled:opacity-50"
+            >
+              Remove photo
+            </button>
+          )}
+          <p className="text-xs text-muted">
+            JPEG, PNG, WebP or GIF. Max 2 MB. You can reposition before saving.
+          </p>
+        </div>
       </div>
-    </div>
+
+      {cropImageSrc && (
+        <AvatarCropModal
+          imageSrc={cropImageSrc}
+          onCancel={clearCropImage}
+          onConfirm={uploadAvatarBlob}
+        />
+      )}
+    </>
   );
 }
