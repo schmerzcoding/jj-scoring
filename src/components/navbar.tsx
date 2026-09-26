@@ -5,7 +5,7 @@ import {
   NavbarMobileMenu,
   type MobileNavItem,
 } from "@/components/navbar-mobile-menu";
-import { fetchWaddleCupEvent, waddleCupEventPath } from "@/lib/waddle-cup";
+import { isWaddleCupPromoVisible, waddleCupLandingPath } from "@/lib/waddle-cup";
 import { ButtonLink } from "@/components/ui/button";
 import { NavbarShell } from "@/components/navbar-shell";
 import { UserMenu, type UserMenuItem } from "./user-menu";
@@ -27,10 +27,7 @@ export async function Navbar() {
   }
 
   const displayName = profile?.full_name ?? user?.email ?? "User";
-  const waddleCupEvent = await fetchWaddleCupEvent(supabase);
-  const waddleCupHref = waddleCupEvent
-    ? waddleCupEventPath(waddleCupEvent.id)
-    : null;
+  const waddleCupHref = isWaddleCupPromoVisible() ? waddleCupLandingPath() : null;
 
   const userMenuItems: UserMenuItem[] = [];
 

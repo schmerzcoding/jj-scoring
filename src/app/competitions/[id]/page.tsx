@@ -314,6 +314,23 @@ export default async function CompetitionDetailPage({
         </div>
       )}
 
+      {isCompetition && competition.registration_open && !user && !hasPaidTickets && (
+        <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+          <h2 className="font-semibold text-foreground">Register for this competition</h2>
+          <p className="mt-2 text-sm text-muted">
+            Log in or create an account to sign up as a leader or follower.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <Link href="/login">
+              <Button>Log in</Button>
+            </Link>
+            <Link href="/signup">
+              <Button variant="secondary">Sign up</Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {isCompetition && competition.registration_open &&
         user &&
         !hasPaidTickets &&

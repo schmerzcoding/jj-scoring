@@ -33,12 +33,14 @@ export function ProfileForm({
   onSubmit,
   onFullNameChange,
   onCancel,
+  fullNamePlaceholder = "Your full name",
 }: {
   initialValues: ProfileFormValues;
   submitLabel: string;
   onSubmit: (values: ProfileFormValues) => Promise<{ error?: string }>;
   onFullNameChange?: (name: string) => void;
   onCancel?: () => void;
+  fullNamePlaceholder?: string;
 }) {
   const [values, setValues] = useState(initialValues);
   const [error, setError] = useState("");
@@ -87,6 +89,8 @@ export function ProfileForm({
           setValues({ ...values, fullName: e.target.value });
           onFullNameChange?.(e.target.value);
         }}
+        placeholder={fullNamePlaceholder}
+        autoComplete="name"
         required
       />
 

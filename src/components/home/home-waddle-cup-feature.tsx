@@ -4,14 +4,13 @@ import {
   BRAND_ASSETS,
   HOME_FEATURE_EVENT,
 } from "@/lib/brand";
-import { waddleCupEventPath } from "@/lib/waddle-cup";
-import type { Competition } from "@/types/database";
+import { waddleCupLandingPath } from "@/lib/waddle-cup";
 
-export function HomeWaddleCupFeature({ event }: { event: Competition }) {
+export function HomeWaddleCupFeature() {
   return (
     <section className="home-waddle-cup" aria-labelledby="home-waddle-cup-heading">
       <Link
-        href={waddleCupEventPath(event.id)}
+        href={waddleCupLandingPath()}
         className="home-waddle-cup__link group"
       >
         <div className="home-waddle-cup__trophy" aria-hidden>

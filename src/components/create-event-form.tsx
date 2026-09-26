@@ -191,7 +191,7 @@ export function CreateEventForm({
             ? masterclassTopic.trim()
             : null,
         status,
-        registration_open: registrationOpen || hasPaidTickets,
+        registration_open: registrationOpen,
         ticket_price_cents: ticketPriceCents,
         leader_price_cents: leaderPriceCents,
         follower_price_cents: followerPriceCents,
@@ -367,11 +367,7 @@ export function CreateEventForm({
             label="Status"
             value={status}
             onChange={(e) => {
-              const nextStatus = e.target.value as CompetitionStatus;
-              setStatus(nextStatus);
-              if (nextStatus === "open") {
-                setRegistrationOpen(true);
-              }
+              setStatus(e.target.value as CompetitionStatus)
             }}
             options={[
               { value: "draft", label: "Draft" },
@@ -391,8 +387,7 @@ export function CreateEventForm({
             <span className="text-sm text-foreground">Registration open</span>
           </label>
           <p className="text-xs text-muted">
-            Ticket sales require both a price and registration open. Setting status to Open
-            or adding a price enables registration automatically.
+            Ticket sales and competition sign-ups require registration to be open.
           </p>
 
           <div className="space-y-3 rounded-xl border border-border bg-surface-raised/60 p-4">

@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { isCompetitionEvent, supportsMultiTicketTypes } from "@/lib/events";
 import {
-  eventHasPaidTickets,
   formatCentsToEuroInput,
   parseEuroInputToCents,
 } from "@/lib/ticket-pricing";
@@ -17,10 +16,8 @@ import type { Competition, CompetitionStatus } from "@/types/database";
 
 export function CompetitionSettings({
   competition,
-  hasPaidTicketCatalog = false,
 }: {
   competition: Competition;
-  hasPaidTicketCatalog?: boolean;
 }) {
   const router = useRouter();
   const isCompetition = isCompetitionEvent(competition.event_type);
@@ -61,15 +58,6 @@ export function CompetitionSettings({
         ? parseEuroInputToCents(followerPriceEuro)
         : null;
 
-    const hasPaidTickets = usesTicketTypeCatalog
-      ? hasPaidTicketCatalog
-      : eventHasPaidTickets({
-          event_type: competition.event_type,
-          ticket_price_cents: ticketPriceCents,
-          leader_price_cents: leaderPriceCents,
-          follower_price_cents: followerPriceCents,
-        });
-
     const supabase = createClient();
     const updatePayload: {
       status: CompetitionStatus;
@@ -79,7 +67,7 @@ export function CompetitionSettings({
       follower_price_cents?: number | null;
     } = {
       status,
-      registration_open: registrationOpen || hasPaidTickets,
+      registration_open: registrationOpen,
     };
 
     if (!usesTicketTypeCatalog) {
@@ -98,10 +86,6 @@ export function CompetitionSettings({
       return;
     }
 
-    if (hasPaidTickets && !registrationOpen) {
-      setRegistrationOpen(true);
-    }
-
     setLoading(false);
     router.refresh();
   }
@@ -113,13 +97,7 @@ export function CompetitionSettings({
           <Select
             label="Status"
             value={status}
-            onChange={(e) => {
-              const nextStatus = e.target.value as CompetitionStatus;
-              setStatus(nextStatus);
-              if (nextStatus === "open") {
-                setRegistrationOpen(true);
-              }
-            }}
+            onChange={(e) => setStatus(e.target.value as CompetitionStatus)}
             options={[
               { value: "draft", label: "Draft" },
               { value: "open", label: "Open" },
@@ -138,6 +116,9 @@ export function CompetitionSettings({
             <span className="text-sm text-foreground">Registration open</span>
           </label>
         </div>
+        <p className="text-xs text-muted">
+          Controls ticket sales and competition sign-ups independently from event status.
+        </p>
 
         {!usesTicketTypeCatalog && (
           <div className="space-y-3 rounded-xl border border-border bg-surface-raised/60 p-4">

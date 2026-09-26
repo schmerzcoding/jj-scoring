@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getPostLoginPath } from "@/lib/auth";
+import { getPostLoginPath, isDuplicateSignUp } from "@/lib/auth";
 import { authCallbackUrl } from "@/lib/auth-redirect";
 import { validatePasswordPair } from "@/lib/password-validation";
 
@@ -17,11 +17,13 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [duplicateAccount, setDuplicateAccount] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setDuplicateAccount(false);
     const validationError = validatePasswordPair(password, confirmPassword);
     if (validationError) {
       setError(validationError);
@@ -41,6 +43,12 @@ export default function SignupPage() {
         data: { role: "participant" },
       },
     });
+
+    if (isDuplicateSignUp(data, authError)) {
+      setDuplicateAccount(true);
+      setLoading(false);
+      return;
+    }
 
     if (authError) {
       const message =
@@ -108,6 +116,25 @@ export default function SignupPage() {
             minLength={6}
             required
           />
+          {duplicateAccount && (
+            <p className="text-sm text-red-400">
+              This email is already registered.{" "}
+              <Link
+                href="/login"
+                className="font-medium text-brand-400 hover:text-brand-300 hover:underline"
+              >
+                Log in
+              </Link>{" "}
+              or{" "}
+              <Link
+                href={`/forgot-password?email=${encodeURIComponent(email.trim())}`}
+                className="font-medium text-brand-400 hover:text-brand-300 hover:underline"
+              >
+                reset your password
+              </Link>
+              .
+            </p>
+          )}
           {error && <p className="text-sm text-red-400">{error}</p>}
           <Button type="submit" className="w-full" loading={loading}>
             {loading ? "Creating account..." : "Sign up"}

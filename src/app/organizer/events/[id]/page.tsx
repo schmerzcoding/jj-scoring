@@ -168,10 +168,7 @@ export default async function OrganizerEventPage({
       )}
 
       <CompetitionScheduleSettings competition={competition} />
-      <CompetitionSettings
-        competition={competition}
-        hasPaidTicketCatalog={eventHasTicketTypes(ticketTypes)}
-      />
+      <CompetitionSettings competition={competition} />
       {supportsMultiTicketTypes(competition.event_type) && (
         <TicketTypesPanel
           competitionId={id}

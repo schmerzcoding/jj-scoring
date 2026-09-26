@@ -35,3 +35,13 @@ export function profileToFormValues(profile: {
     countryCode: profile.country_code ?? "",
   };
 }
+
+/** Initial values for first-time profile setup — name is entered by the user. */
+export function profileSetupFormValues(
+  profile: Parameters<typeof profileToFormValues>[0]
+): ProfileFormValues {
+  return {
+    ...profileToFormValues(profile),
+    fullName: "",
+  };
+}

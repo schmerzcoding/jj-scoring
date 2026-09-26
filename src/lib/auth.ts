@@ -1,5 +1,23 @@
 import type { Profile, UserRole } from "@/types/database";
-import type { User } from "@supabase/supabase-js";
+import type { AuthError, User } from "@supabase/supabase-js";
+
+/** Supabase may return success with empty identities when the email already exists. */
+export function isDuplicateSignUp(
+  data: { user: User | null },
+  authError: AuthError | null
+): boolean {
+  if (authError) {
+    const message = authError.message.toLowerCase();
+    return (
+      message.includes("already registered") ||
+      message.includes("already been registered") ||
+      message.includes("user already exists") ||
+      message.includes("email address is already")
+    );
+  }
+
+  return Boolean(data.user && data.user.identities?.length === 0);
+}
 
 /** Set to "true" when Brevo + domain + Supabase Confirm email are configured. */
 export function requireEmailVerification(): boolean {

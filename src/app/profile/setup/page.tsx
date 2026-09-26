@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { needsProfileSetup, getPostLoginPath } from "@/lib/auth";
-import { profileToFormValues, EMPTY_PROFILE_FORM_VALUES } from "@/lib/profile";
+import { profileSetupFormValues, EMPTY_PROFILE_FORM_VALUES } from "@/lib/profile";
 import { ProfileSetupForm } from "./profile-setup-form";
 
 export default async function ProfileSetupPage() {
@@ -21,7 +21,7 @@ export default async function ProfileSetupPage() {
   if (!needsProfileSetup(profile)) redirect("/");
 
   const initialValues = profile
-    ? profileToFormValues(profile)
+    ? profileSetupFormValues(profile)
     : EMPTY_PROFILE_FORM_VALUES;
 
   const redirectPath = getPostLoginPath(

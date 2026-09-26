@@ -2,6 +2,16 @@ import type { AppSupabaseClient } from "@/lib/supabase/client";
 import type { Competition } from "@/types/database";
 
 export const WADDLE_CUP_EVENT_NAME = "The Waddle Cup";
+export const WADDLE_CUP_LANDING_PATH = "/waddle-cup";
+
+export function waddleCupLandingPath(): string {
+  return WADDLE_CUP_LANDING_PATH;
+}
+
+/** Promo block + navbar link — independent of auth and event RLS. */
+export function isWaddleCupPromoVisible(): boolean {
+  return process.env.NEXT_PUBLIC_WADDLE_CUP_PROMO_VISIBLE !== "false";
+}
 
 export function waddleCupEventPath(eventId: string): string {
   return `/competitions/${eventId}`;

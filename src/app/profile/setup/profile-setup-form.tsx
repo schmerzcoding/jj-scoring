@@ -20,7 +20,7 @@ export function ProfileSetupForm({
   redirectPath?: string;
 }) {
   const router = useRouter();
-  const [displayName, setDisplayName] = useState(initialValues.fullName);
+  const [displayName, setDisplayName] = useState("");
 
   async function handleSubmit(values: ProfileFormValues) {
     const result = await saveProfileValues(userId, values, true);

@@ -7,7 +7,7 @@ import { HomeHero } from "@/components/home/home-hero";
 import { HomeSectionFrame } from "@/components/home/home-section-frame";
 import { HomeWaddleCupFeature } from "@/components/home/home-waddle-cup-feature";
 import { formatEventDateRange } from "@/lib/utils";
-import { fetchWaddleCupEvent } from "@/lib/waddle-cup";
+import { fetchWaddleCupEvent, isWaddleCupPromoVisible } from "@/lib/waddle-cup";
 import { isEmailVerified, requireEmailVerification } from "@/lib/auth";
 
 export default async function HomePage() {
@@ -34,9 +34,11 @@ export default async function HomePage() {
     competitions?.filter((comp) => comp.id !== waddleCupEvent?.id).slice(0, 3) ??
     [];
 
-  const upcomingClassName = waddleCupEvent
-    ? "home-upcoming"
-    : "home-upcoming home-upcoming--solo";
+  const showWaddleCupPromo = isWaddleCupPromoVisible();
+  const upcomingClassName =
+    showWaddleCupPromo && waddleCupEvent
+      ? "home-upcoming"
+      : "home-upcoming home-upcoming--solo";
 
   return (
     <div className="home-page">
@@ -45,9 +47,9 @@ export default async function HomePage() {
       <div className="home-feature-stack">
         <HomeCurvedSeparator />
 
-        {waddleCupEvent && (
+        {showWaddleCupPromo && (
           <div className="home-feature-row">
-            <HomeWaddleCupFeature event={waddleCupEvent} />
+            <HomeWaddleCupFeature />
           </div>
         )}
 
