@@ -425,7 +425,7 @@ export default async function CompetitionDetailPage({
           )}
           {registrationConfirmed && (
             <p className="mt-2 text-sm text-emerald-400">
-              Your registration is confirmed. You're all set to compete.
+              Your registration is confirmed. You&apos;re all set to compete.
             </p>
           )}
           {existingRegistration.status === "rejected" && (

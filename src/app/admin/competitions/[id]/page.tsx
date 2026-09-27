@@ -12,7 +12,7 @@ import {
   paidUserIdsForCompetition,
   competitionUsesApplyBeforePay,
 } from "@/lib/competition-registration";
-import { eventHasAnyPaidTickets, eventHasTicketTypes, fetchAllTicketTypes } from "@/lib/ticket-types";
+import { eventHasAnyPaidTickets, fetchAllTicketTypes } from "@/lib/ticket-types";
 import { TicketTypesPanel } from "@/components/ticket-types-panel";
 import { CompetitionScheduleSettings } from "@/components/competition-schedule-settings";
 import { RegistrationsPanel } from "./registrations-panel";

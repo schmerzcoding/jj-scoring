@@ -165,7 +165,6 @@ export function TicketCheckInScanner({
     return () => {
       void stopScanner();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -22,7 +22,6 @@ import {
   supportsMultiTicketTypes,
 } from "@/lib/events";
 import {
-  eventHasPaidTickets,
   formatPriceLabelWithBuyerFee,
   parseEuroInputToCents,
 } from "@/lib/ticket-pricing";
@@ -30,7 +29,6 @@ import { PassFeesToBuyerField } from "@/components/pass-fees-to-buyer-field";
 import {
   createEmptyTicketTypeDraft,
   defaultPassTypeForEvent,
-  hasPaidTicketDrafts,
   insertCompetitionTicketTypes,
   insertSingleTicketType,
   insertTicketTypesFromDrafts,
@@ -165,15 +163,6 @@ export function CreateEventForm({
     const followerPriceCents = isCompetitionEvent(eventType)
       ? parseEuroInputToCents(followerPriceEuro)
       : null;
-    const hasPaidTickets =
-      (supportsMultiTicketTypes(eventType) && hasPaidTicketDrafts(ticketTypeDrafts)) ||
-      eventHasPaidTickets({
-        event_type: eventType,
-        ticket_price_cents: ticketPriceCents,
-        leader_price_cents: leaderPriceCents,
-        follower_price_cents: followerPriceCents,
-      });
-
     const { data, error: insertError } = await fromTable(supabase, "competitions")
       .insert({
         name,
