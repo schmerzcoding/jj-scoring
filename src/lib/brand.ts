@@ -44,6 +44,9 @@ export const HOME_FEATURE_EVENT = {
 
 export const WADDLE_CUP_LANDING = {
   eyebrow: "Workshops · Competition · Social",
+  heroDate: "November 28th, 2026",
+  heroLocationHighlight: "Dublin",
+  heroLocationSuffix: ", Ireland",
   intro:
     "The Waddle Cup is Waddle Social’s flagship Jack & Jill — a full day of learning, competing, and dancing together in Dublin.",
   pillars: [
@@ -88,4 +91,8 @@ export const WADDLE_CUP_LANDING = {
   ],
   ctaPrimary: "View event & register",
   ctaSecondary: "Browse all events",
+  ctaEventCopy:
+    "Head to the event page to grab your pass or register for the Jack & Jill.",
+  ctaNoEventCopy:
+    "The event page will go live here soon. In the meantime, browse everything happening on Waddle Social.",
 } as const;

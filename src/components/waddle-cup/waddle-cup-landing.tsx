@@ -1,33 +1,14 @@
 import Image from "next/image";
-import { BRAND_ASSETS, HOME_FEATURE_EVENT, WADDLE_CUP_LANDING } from "@/lib/brand";
+import { BRAND_ASSETS, WADDLE_CUP_LANDING } from "@/lib/brand";
 import { ButtonLink } from "@/components/ui/button";
 import { waddleCupEventPath } from "@/lib/waddle-cup";
-import { formatEventDateRange, formatEventSchedule } from "@/lib/utils";
 import type { Competition } from "@/types/database";
 
-function eventScheduleLabel(event: Competition): string | null {
-  const schedule =
-    event.start_time || event.end_time
-      ? formatEventSchedule(
-          event.event_date,
-          event.start_time,
-          event.event_end_date,
-          event.end_time
-        )
-      : formatEventDateRange(event.event_date, event.event_end_date);
-
-  return schedule === "TBD" ? null : schedule;
-}
-
 export function WaddleCupLanding({ event }: { event: Competition | null }) {
-  const scheduleLabel = event ? eventScheduleLabel(event) : null;
-  const location = event?.location ?? `${HOME_FEATURE_EVENT.dateLocationHighlight}, Ireland`;
-
   return (
     <div className="waddle-cup-page">
       <section className="waddle-cup-page__hero" aria-labelledby="waddle-cup-title">
         <div className="waddle-cup-page__hero-copy">
-          <p className="waddle-cup-page__eyebrow">{WADDLE_CUP_LANDING.eyebrow}</p>
           <div className="waddle-cup-page__title-wrap">
             <Image
               src={BRAND_ASSETS.homeWaddleCupTitle}
@@ -39,20 +20,16 @@ export function WaddleCupLanding({ event }: { event: Competition | null }) {
               priority
             />
           </div>
+          <p className="waddle-cup-page__eyebrow">{WADDLE_CUP_LANDING.eyebrow}</p>
           <p className="waddle-cup-page__intro">{WADDLE_CUP_LANDING.intro}</p>
           <div className="waddle-cup-page__meta">
-            {scheduleLabel ? (
-              <p className="waddle-cup-page__meta-line">{scheduleLabel}</p>
-            ) : (
-              <p className="waddle-cup-page__meta-line">
-                {HOME_FEATURE_EVENT.dateLocationPrefix}
-                <strong className="font-semibold text-white">
-                  {HOME_FEATURE_EVENT.dateLocationHighlight}
-                </strong>
-                {HOME_FEATURE_EVENT.dateLocationSuffix}
-              </p>
-            )}
-            {location && <p className="waddle-cup-page__meta-line">{location}</p>}
+            <p className="waddle-cup-page__meta-line">{WADDLE_CUP_LANDING.heroDate}</p>
+            <p className="waddle-cup-page__meta-line">
+              <strong className="font-semibold text-white">
+                {WADDLE_CUP_LANDING.heroLocationHighlight}
+              </strong>
+              {WADDLE_CUP_LANDING.heroLocationSuffix}
+            </p>
           </div>
           <div className="waddle-cup-page__hero-actions">
             {event ? (
@@ -120,9 +97,7 @@ export function WaddleCupLanding({ event }: { event: Competition | null }) {
         <div className="waddle-cup-page__cta-card">
           <h2 className="waddle-cup-page__cta-title">Ready to join?</h2>
           <p className="waddle-cup-page__cta-copy">
-            {event
-              ? "Head to the event page to grab your pass, register for the Jack & Jill, and see the full schedule."
-              : "The event page will go live here soon. In the meantime, browse everything happening on Waddle Social."}
+            {event ? WADDLE_CUP_LANDING.ctaEventCopy : WADDLE_CUP_LANDING.ctaNoEventCopy}
           </p>
           <div className="waddle-cup-page__cta-actions">
             {event ? (

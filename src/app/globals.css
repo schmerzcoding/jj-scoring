@@ -1761,7 +1761,8 @@ select option {
 }
 
 .waddle-cup-page__eyebrow {
-  font-size: 0.9375rem;
+  margin-top: 0.85rem;
+  font-size: 0.960rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1769,7 +1770,6 @@ select option {
 }
 
 .waddle-cup-page__title-wrap {
-  margin-top: 0.5rem;
   overflow: visible;
   margin-left: var(--waddle-cup-title-offset-x, 0);
 }
@@ -1820,10 +1820,10 @@ select option {
 }
 
 .waddle-cup-page__trophy-image {
-  width: min(100%, var(--waddle-cup-trophy-size, 30rem));
+  width: min(100%, var(--waddle-cup-trophy-size, 36rem));
   height: auto;
   transform: translateX(var(--waddle-cup-trophy-translate-x, 0));
-  filter: drop-shadow(0 28px 56px rgba(129, 21, 215, 0.35));
+  filter: drop-shadow(0 32px 64px rgba(129, 21, 215, 0.42));
 }
 
 .waddle-cup-page__section-title {
@@ -1949,7 +1949,7 @@ select option {
   .waddle-cup-page {
     --waddle-cup-title-offset-x: 0;
     --waddle-cup-title-translate-x: 0;
-    --waddle-cup-trophy-size: 30rem;
+    --waddle-cup-trophy-size: 38rem;
     --waddle-cup-trophy-translate-x: 0;
   }
 
@@ -1960,6 +1960,7 @@ select option {
   }
 
   .waddle-cup-page__eyebrow {
+    margin-top: 0.65rem;
     text-align: center;
     align-self: center;
     width: 100%;
@@ -1993,7 +1994,7 @@ select option {
     gap: 4rem;
     --waddle-cup-title-offset-x: -0.75rem;
     --waddle-cup-title-translate-x: 0;
-    --waddle-cup-trophy-size: 38rem;
+    --waddle-cup-trophy-size: 46rem;
     --waddle-cup-trophy-translate-x: 0;
   }
 
@@ -2001,7 +2002,7 @@ select option {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 0 1.5rem;
     align-items: center;
-    min-height: 22rem;
+    min-height: 24rem;
   }
 
   .waddle-cup-page__title-image {
@@ -2036,15 +2037,15 @@ select option {
     gap: 4rem;
     --waddle-cup-title-offset-x: -1.5rem;
     --waddle-cup-title-translate-x: -6.5rem;
-    --waddle-cup-trophy-size: 44rem;
+    --waddle-cup-trophy-size: 54rem;
     --waddle-cup-trophy-translate-x: 4rem;
   }
 
   .waddle-cup-page__hero {
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    gap: 0 1rem;
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    gap: 0 0.5rem;
     align-items: center;
-    min-height: 26rem;
+    min-height: 30rem;
   }
 
   .waddle-cup-page__title-image {
