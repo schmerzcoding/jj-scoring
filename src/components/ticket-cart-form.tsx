@@ -3,7 +3,11 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { formatPrice } from "@/lib/ticket-pricing";
+import {
+  formatPrice,
+  resolveCheckoutPriceCents,
+  TICKET_VAT_NOTICE,
+} from "@/lib/ticket-pricing";
 import { formatPassTypeLabel } from "@/lib/ticket-pass";
 import type { TicketType } from "@/types/database";
 
@@ -12,11 +16,13 @@ export function TicketCartForm({
   eventName,
   ticketTypes,
   ownedTypeIds,
+  passFeesToBuyer = false,
 }: {
   eventId: string;
   eventName: string;
   ticketTypes: TicketType[];
   ownedTypeIds: string[];
+  passFeesToBuyer?: boolean;
 }) {
   const availableTypes = ticketTypes.filter(
     (type) => type.is_active && type.price_cents > 0 && !ownedTypeIds.includes(type.id)
@@ -36,8 +42,12 @@ export function TicketCartForm({
       .filter((line) => line.quantity > 0);
   }, [availableTypes, quantities]);
 
+  function buyerPriceCents(baseCents: number): number {
+    return resolveCheckoutPriceCents(baseCents, passFeesToBuyer);
+  }
+
   const totalCents = cartLines.reduce(
-    (sum, line) => sum + line.type.price_cents * line.quantity,
+    (sum, line) => sum + buyerPriceCents(line.type.price_cents) * line.quantity,
     0
   );
 
@@ -108,7 +118,7 @@ export function TicketCartForm({
                   <p className="font-medium text-foreground">{type.name}</p>
                   <p className="mt-1 text-sm text-muted">
                     {formatPassTypeLabel(type.pass_type, type.role)} ·{" "}
-                    {formatPrice(type.price_cents)}
+                    {formatPrice(buyerPriceCents(type.price_cents))}
                   </p>
                   {type.description && (
                     <p className="mt-2 text-sm text-muted-foreground">
@@ -147,14 +157,44 @@ export function TicketCartForm({
           ))}
         </div>
 
-        {totalCents > 0 && (
+        {cartLines.length > 0 && (
           <div className="rounded-xl border border-border bg-surface-overlay px-4 py-3">
-            <p className="text-sm text-muted">
-              Cart total:{" "}
-              <span className="font-semibold text-foreground">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Your selection
+            </p>
+            <ul className="mt-2 space-y-2">
+              {cartLines.map((line) => {
+                const unitCents = buyerPriceCents(line.type.price_cents);
+                const lineTotalCents = unitCents * line.quantity;
+                return (
+                  <li
+                    key={line.ticketTypeId}
+                    className="flex items-start justify-between gap-3 text-sm"
+                  >
+                    <span className="text-foreground">
+                      {line.quantity}× {line.type.name}
+                      <span className="block text-xs text-muted">
+                        {formatPassTypeLabel(line.type.pass_type, line.type.role)}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-right font-medium text-foreground">
+                      {formatPrice(lineTotalCents)}
+                      {line.quantity > 1 && (
+                        <span className="block text-xs font-normal text-muted">
+                          {formatPrice(unitCents)} each
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+              <span className="text-sm text-muted">Cart total</span>
+              <span className="text-sm font-semibold text-foreground">
                 {formatPrice(totalCents)}
               </span>
-            </p>
+            </div>
           </div>
         )}
 
@@ -169,6 +209,7 @@ export function TicketCartForm({
           {loading ? "Redirecting..." : "Proceed to checkout"}
         </Button>
 
+        <p className="text-xs text-muted">{TICKET_VAT_NOTICE}</p>
         <p className="text-xs text-muted">
           Secure payment via Stripe. You can buy multiple different passes in one
           checkout.

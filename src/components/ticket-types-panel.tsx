@@ -28,10 +28,12 @@ export function TicketTypesPanel({
   competitionId,
   eventType,
   initialTypes,
+  passFeesToBuyer = false,
 }: {
   competitionId: string;
   eventType: EventType;
   initialTypes: TicketType[];
+  passFeesToBuyer?: boolean;
 }) {
   const router = useRouter();
   const [drafts, setDrafts] = useState<TicketTypeDraft[]>(
@@ -137,6 +139,7 @@ export function TicketTypesPanel({
         drafts={drafts}
         onChange={setDrafts}
         defaultPassType={defaultPassTypeForEvent(eventType)}
+        passFeesToBuyer={passFeesToBuyer}
       />
       {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
       <div className="mt-4">

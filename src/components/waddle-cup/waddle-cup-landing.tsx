@@ -1,10 +1,11 @@
 import Image from "next/image";
 import { BRAND_ASSETS, WADDLE_CUP_LANDING } from "@/lib/brand";
 import { ButtonLink } from "@/components/ui/button";
-import { waddleCupEventPath } from "@/lib/waddle-cup";
-import type { Competition } from "@/types/database";
+import { WaddleCupCtaActions } from "@/components/waddle-cup/waddle-cup-cta-actions";
+import type { WaddleCupEvents } from "@/lib/waddle-cup";
 
-export function WaddleCupLanding({ event }: { event: Competition | null }) {
+export function WaddleCupLanding({ events }: { events: WaddleCupEvents }) {
+  const hasAnyEvent = Boolean(events.congress || events.competition);
   return (
     <div className="waddle-cup-page">
       <section className="waddle-cup-page__hero" aria-labelledby="waddle-cup-title">
@@ -32,9 +33,9 @@ export function WaddleCupLanding({ event }: { event: Competition | null }) {
             </p>
           </div>
           <div className="waddle-cup-page__hero-actions">
-            {event ? (
+            {hasAnyEvent ? (
               <>
-                <ButtonLink href={waddleCupEventPath(event.id)} size="lg">
+                <ButtonLink href="#ready-to-join" size="lg">
                   {WADDLE_CUP_LANDING.ctaPrimary}
                 </ButtonLink>
                 <ButtonLink href="/competitions" size="lg" variant="secondary">
@@ -93,23 +94,21 @@ export function WaddleCupLanding({ event }: { event: Competition | null }) {
         </div>
       </section>
 
-      <section className="waddle-cup-page__cta">
+      <section
+        id="ready-to-join"
+        className="waddle-cup-page__cta"
+        aria-labelledby="waddle-cup-cta-heading"
+      >
         <div className="waddle-cup-page__cta-card">
-          <h2 className="waddle-cup-page__cta-title">Ready to join?</h2>
+          <h2 id="waddle-cup-cta-heading" className="waddle-cup-page__cta-title">
+            Ready to join?
+          </h2>
           <p className="waddle-cup-page__cta-copy">
-            {event ? WADDLE_CUP_LANDING.ctaEventCopy : WADDLE_CUP_LANDING.ctaNoEventCopy}
+            {hasAnyEvent
+              ? WADDLE_CUP_LANDING.ctaEventCopy
+              : WADDLE_CUP_LANDING.ctaNoEventCopy}
           </p>
-          <div className="waddle-cup-page__cta-actions">
-            {event ? (
-              <ButtonLink href={waddleCupEventPath(event.id)} size="lg">
-                {WADDLE_CUP_LANDING.ctaPrimary}
-              </ButtonLink>
-            ) : (
-              <ButtonLink href="/competitions" size="lg">
-                {WADDLE_CUP_LANDING.ctaSecondary}
-              </ButtonLink>
-            )}
-          </div>
+          <WaddleCupCtaActions events={events} />
         </div>
       </section>
     </div>

@@ -118,6 +118,7 @@ export async function fetchProfileCompetitionData(
 
   const isActiveEnrollment = (registration: RegistrationWithCompetition) =>
     registration.status !== "rejected" &&
+    registration.status !== "withdrawn" &&
     ACTIVE_COMPETITION_STATUSES.includes(registration.competition.status);
 
   const isHistory = (registration: RegistrationWithCompetition) =>
@@ -184,6 +185,7 @@ export function registrationStatusLabel(status: RegistrationStatus): string {
     pending: "Pending approval",
     approved: "Approved",
     rejected: "Rejected",
+    withdrawn: "Removed",
   };
   return labels[status];
 }

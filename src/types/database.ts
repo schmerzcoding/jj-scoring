@@ -77,6 +77,7 @@ export type Database = {
           ticket_price_cents: number | null;
           leader_price_cents: number | null;
           follower_price_cents: number | null;
+          pass_fees_to_buyer: boolean;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -103,6 +104,7 @@ export type Database = {
           ticket_price_cents?: number | null;
           leader_price_cents?: number | null;
           follower_price_cents?: number | null;
+          pass_fees_to_buyer?: boolean;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -129,6 +131,7 @@ export type Database = {
           ticket_price_cents?: number | null;
           leader_price_cents?: number | null;
           follower_price_cents?: number | null;
+          pass_fees_to_buyer?: boolean;
           created_by?: string;
           created_at?: string;
           updated_at?: string;
@@ -487,7 +490,7 @@ export type Database = {
         | "in_progress"
         | "completed";
       registration_role: "leader" | "follower";
-      registration_status: "pending" | "approved" | "rejected";
+      registration_status: "pending" | "approved" | "rejected" | "withdrawn";
       round_role_type: "leader" | "follower" | "both";
       round_status: "pending" | "active" | "completed";
       round_scoring_format: "numeric" | "vote_coefficient";

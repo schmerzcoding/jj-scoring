@@ -8,16 +8,19 @@ import {
   PASS_TYPE_OPTIONS,
   type TicketTypeDraft,
 } from "@/lib/ticket-types";
+import { formatPriceLabelWithBuyerFee } from "@/lib/ticket-pricing";
 import type { TicketPassType } from "@/types/database";
 
 export function TicketTypesEditor({
   drafts,
   onChange,
   defaultPassType = "standard",
+  passFeesToBuyer = false,
 }: {
   drafts: TicketTypeDraft[];
   onChange: (drafts: TicketTypeDraft[]) => void;
   defaultPassType?: TicketPassType;
+  passFeesToBuyer?: boolean;
 }) {
   function updateDraft(key: string, patch: Partial<TicketTypeDraft>) {
     onChange(
@@ -77,7 +80,11 @@ export function TicketTypesEditor({
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <Input
-              label="Price (€)"
+              label={formatPriceLabelWithBuyerFee(
+                "Price (€)",
+                draft.priceEuro,
+                passFeesToBuyer
+              )}
               type="number"
               min="0"
               step="0.01"

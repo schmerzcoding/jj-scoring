@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { WaddleCupLanding } from "@/components/waddle-cup/waddle-cup-landing";
 import { createClient } from "@/lib/supabase/server";
-import { fetchWaddleCupEvent } from "@/lib/waddle-cup";
+import { fetchWaddleCupEvents } from "@/lib/waddle-cup";
 
 export const metadata: Metadata = {
   title: "The Waddle Cup",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function WaddleCupPage() {
   const supabase = await createClient();
-  const event = await fetchWaddleCupEvent(supabase);
+  const events = await fetchWaddleCupEvents(supabase);
 
-  return <WaddleCupLanding event={event} />;
+  return <WaddleCupLanding events={events} />;
 }

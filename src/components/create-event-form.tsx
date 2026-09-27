@@ -21,7 +21,12 @@ import {
   isCompetitionEvent,
   supportsMultiTicketTypes,
 } from "@/lib/events";
-import { eventHasPaidTickets, parseEuroInputToCents } from "@/lib/ticket-pricing";
+import {
+  eventHasPaidTickets,
+  formatPriceLabelWithBuyerFee,
+  parseEuroInputToCents,
+} from "@/lib/ticket-pricing";
+import { PassFeesToBuyerField } from "@/components/pass-fees-to-buyer-field";
 import {
   createEmptyTicketTypeDraft,
   defaultPassTypeForEvent,
@@ -74,6 +79,7 @@ export function CreateEventForm({
   const [masterclassTopic, setMasterclassTopic] = useState("");
   const [status, setStatus] = useState<CompetitionStatus>("draft");
   const [registrationOpen, setRegistrationOpen] = useState(false);
+  const [passFeesToBuyer, setPassFeesToBuyer] = useState(false);
   const [ticketPriceEuro, setTicketPriceEuro] = useState("");
   const [leaderPriceEuro, setLeaderPriceEuro] = useState("");
   const [followerPriceEuro, setFollowerPriceEuro] = useState("");
@@ -192,6 +198,7 @@ export function CreateEventForm({
             : null,
         status,
         registration_open: registrationOpen,
+        pass_fees_to_buyer: passFeesToBuyer,
         ticket_price_cents: ticketPriceCents,
         leader_price_cents: leaderPriceCents,
         follower_price_cents: followerPriceCents,
@@ -395,16 +402,25 @@ export function CreateEventForm({
             <p className="text-xs text-muted">
               Leave blank for free events. Paid events use Stripe Checkout.
             </p>
+            <PassFeesToBuyerField
+              checked={passFeesToBuyer}
+              onChange={setPassFeesToBuyer}
+            />
             {supportsMultiTicketTypes(eventType) ? (
               <TicketTypesEditor
                 drafts={ticketTypeDrafts}
                 onChange={setTicketTypeDrafts}
                 defaultPassType={defaultPassTypeForEvent(eventType)}
+                passFeesToBuyer={passFeesToBuyer}
               />
             ) : isCompetitionEvent(eventType) ? (
               <div className="grid gap-3 sm:grid-cols-2">
                 <Input
-                  label="Leader pass (€)"
+                  label={formatPriceLabelWithBuyerFee(
+                    "Leader pass (€)",
+                    leaderPriceEuro,
+                    passFeesToBuyer
+                  )}
                   type="number"
                   min="0"
                   step="0.01"
@@ -413,7 +429,11 @@ export function CreateEventForm({
                   placeholder="25.00"
                 />
                 <Input
-                  label="Follower pass (€)"
+                  label={formatPriceLabelWithBuyerFee(
+                    "Follower pass (€)",
+                    followerPriceEuro,
+                    passFeesToBuyer
+                  )}
                   type="number"
                   min="0"
                   step="0.01"
@@ -424,7 +444,11 @@ export function CreateEventForm({
               </div>
             ) : (
               <Input
-                label="Ticket price (€)"
+                label={formatPriceLabelWithBuyerFee(
+                  "Ticket price (€)",
+                  ticketPriceEuro,
+                  passFeesToBuyer
+                )}
                 type="number"
                 min="0"
                 step="0.01"

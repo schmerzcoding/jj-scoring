@@ -4,7 +4,12 @@ import { useState } from "react";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { formatPrice, resolveTicketPriceCents } from "@/lib/ticket-pricing";
+import {
+  formatPrice,
+  resolveCheckoutPriceCents,
+  resolveTicketPriceCents,
+  TICKET_VAT_NOTICE,
+} from "@/lib/ticket-pricing";
 import { isCompetitionEvent } from "@/lib/events";
 import type { Competition, RegistrationRole } from "@/types/database";
 
@@ -18,7 +23,20 @@ export function TicketPurchaseForm({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const priceCents = resolveTicketPriceCents(event, isCompetition ? role : null);
+  const basePriceCents = resolveTicketPriceCents(event, isCompetition ? role : null);
+  const priceCents =
+    basePriceCents != null
+      ? resolveCheckoutPriceCents(basePriceCents, event.pass_fees_to_buyer ?? false)
+      : null;
+
+  function displayPriceCents(baseCents: number | null | undefined): string {
+    if (baseCents == null) return "";
+    const cents = resolveCheckoutPriceCents(
+      baseCents,
+      event.pass_fees_to_buyer ?? false
+    );
+    return formatPrice(cents);
+  }
 
   async function handleCheckout() {
     setError("");
@@ -62,7 +80,7 @@ export function TicketPurchaseForm({
                 value: "leader",
                 label: `Leader${
                   event.leader_price_cents
-                    ? ` — ${formatPrice(event.leader_price_cents)}`
+                    ? ` — ${displayPriceCents(event.leader_price_cents)}`
                     : ""
                 }`,
               },
@@ -70,7 +88,7 @@ export function TicketPurchaseForm({
                 value: "follower",
                 label: `Follower${
                   event.follower_price_cents
-                    ? ` — ${formatPrice(event.follower_price_cents)}`
+                    ? ` — ${displayPriceCents(event.follower_price_cents)}`
                     : ""
                 }`,
               },
@@ -93,6 +111,7 @@ export function TicketPurchaseForm({
           {loading ? "Redirecting..." : "Pay with Stripe"}
         </Button>
 
+        <p className="text-xs text-muted">{TICKET_VAT_NOTICE}</p>
         <p className="text-xs text-muted">
           Secure payment via Stripe. For competitions, your registration will be
           submitted for organizer approval after payment.

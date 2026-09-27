@@ -8,7 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-export function RegistrationForm({ competitionId }: { competitionId: string }) {
+export function RegistrationForm({
+  competitionId,
+  requiresPaymentAfterApproval = false,
+}: {
+  competitionId: string;
+  requiresPaymentAfterApproval?: boolean;
+}) {
   const router = useRouter();
   const [role, setRole] = useState<"leader" | "follower">("leader");
   const [displayName, setDisplayName] = useState("");
@@ -68,10 +74,16 @@ export function RegistrationForm({ competitionId }: { competitionId: string }) {
         />
         {error && <p className="text-sm text-red-400">{error}</p>}
         <Button type="submit" loading={loading}>
-          {loading ? "Submitting..." : "Submit Registration"}
+          {loading
+            ? "Submitting..."
+            : requiresPaymentAfterApproval
+              ? "Submit application"
+              : "Submit Registration"}
         </Button>
         <p className="text-xs text-muted">
-          Your registration will be reviewed by the event organizer before approval.
+          {requiresPaymentAfterApproval
+            ? "Your application will be reviewed by the organizer. If approved, you'll receive an email with a link to complete payment and confirm your spot."
+            : "Your registration will be reviewed by the event organizer before approval."}
         </p>
       </form>
     </Card>

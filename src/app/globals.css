@@ -1929,7 +1929,7 @@ select option {
 
 .waddle-cup-page__cta-copy {
   margin: 0.75rem auto 0;
-  max-width: 32rem;
+  max-width: 42rem;
   font-size: 0.9375rem;
   line-height: 1.55;
   color: color-mix(in srgb, #ffffff 82%, #000000);
@@ -1941,6 +1941,123 @@ select option {
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.waddle-cup-page__cta-actions--dual {
+  gap: 1rem;
+}
+
+/* J&J CTA — inverted primary (white gloss + purple text) */
+.ui-btn.waddle-cup-page__cta-btn-jj {
+  --btn-radius: 0.875rem;
+  border: 1px solid color-mix(in srgb, #8115d7 38%, #ffffff 62%);
+  background: linear-gradient(
+    118deg,
+    #ffffff 0%,
+    color-mix(in srgb, #ffffff 88%, #b56af0 12%) 28%,
+    color-mix(in srgb, #ffffff 78%, #8115d7 22%) 58%,
+    color-mix(in srgb, #ffffff 92%, #30004e 8%) 100%
+  );
+  color: #30004e;
+  font-weight: 600;
+  text-shadow: none;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #8115d7 16%, transparent),
+    0 0 10px color-mix(in srgb, #b56af0 22%, transparent),
+    0 0 22px color-mix(in srgb, #8115d7 18%, transparent),
+    0 0 10px 3px color-mix(in srgb, #b56af0 16%, transparent),
+    0 5px 18px color-mix(in srgb, #30004e 14%, transparent),
+    0 14px 36px rgba(0, 0, 0, 0.16);
+}
+
+.waddle-cup-page__cta-btn-jj .ui-btn__content {
+  padding-inline: 0.35rem;
+}
+
+.waddle-cup-page__cta-btn-jj::after {
+  background: conic-gradient(
+    from 210deg at 50% 50%,
+    color-mix(in srgb, #8115d7 55%, #ffffff 45%) 0deg,
+    color-mix(in srgb, #b56af0 40%, #ffffff 60%) 38deg,
+    color-mix(in srgb, #8115d7 50%, #ffffff 50%) 72deg,
+    color-mix(in srgb, #30004e 25%, #b56af0 75%) 145deg,
+    color-mix(in srgb, #8115d7 45%, #ffffff 55%) 198deg,
+    color-mix(in srgb, #b56af0 35%, #ffffff 65%) 255deg,
+    color-mix(in srgb, #8115d7 40%, #ffffff 60%) 312deg,
+    color-mix(in srgb, #30004e 20%, #8115d7 80%) 340deg,
+    color-mix(in srgb, #8115d7 55%, #ffffff 45%) 360deg
+  );
+}
+
+.waddle-cup-page__cta-btn-jj::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 20%;
+  left: 0;
+  width: 2px;
+  height: 52%;
+  border-radius: 9999px;
+  transform: translateX(-35%);
+  filter: blur(5px);
+  opacity: 0.55;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, #b56af0 45%, #ffffff 55%) 48%,
+    transparent 100%
+  );
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.waddle-cup-page__cta-btn-jj:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, #8115d7 52%, #ffffff 48%);
+  background: linear-gradient(
+    118deg,
+    #ffffff 0%,
+    color-mix(in srgb, #ffffff 82%, #b56af0 18%) 32%,
+    color-mix(in srgb, #ffffff 72%, #8115d7 28%) 62%,
+    color-mix(in srgb, #ffffff 88%, #30004e 12%) 100%
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #8115d7 22%, transparent),
+    0 0 14px color-mix(in srgb, #b56af0 28%, transparent),
+    0 0 28px color-mix(in srgb, #8115d7 22%, transparent),
+    0 0 12px 4px color-mix(in srgb, #b56af0 20%, transparent),
+    0 8px 24px color-mix(in srgb, #30004e 18%, transparent),
+    0 18px 44px rgba(0, 0, 0, 0.2);
+}
+
+.waddle-cup-page__cta-btn-jj:hover::before {
+  opacity: 0.72;
+}
+
+.waddle-cup-page__cta-btn-jj:hover::after {
+  opacity: 0.95;
+}
+
+.waddle-cup-page__cta-btn-jj:active {
+  transform: translateY(0) scale(0.98);
+  border-color: color-mix(in srgb, #8115d7 45%, #ffffff 55%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #8115d7 24%, transparent),
+    0 0 18px color-mix(in srgb, #b56af0 26%, transparent),
+    0 0 8px 2px color-mix(in srgb, #8115d7 18%, transparent),
+    0 5px 18px color-mix(in srgb, #30004e 16%, transparent),
+    0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+.waddle-cup-page__cta-btn-jj:active::after {
+  opacity: 1;
+}
+
+@media (min-width: 768px) {
+  .waddle-cup-page__cta-copy {
+    white-space: nowrap;
+    font-size: 0.875rem;
+  }
 }
 
 /* ── Waddle Cup mobile (1024px+ desktop in separate block) ── */

@@ -7,7 +7,11 @@ import { HomeHero } from "@/components/home/home-hero";
 import { HomeSectionFrame } from "@/components/home/home-section-frame";
 import { HomeWaddleCupFeature } from "@/components/home/home-waddle-cup-feature";
 import { formatEventDateRange } from "@/lib/utils";
-import { fetchWaddleCupEvent, isWaddleCupPromoVisible } from "@/lib/waddle-cup";
+import {
+  fetchWaddleCupEvents,
+  isWaddleCupPromoVisible,
+  waddleCupEventIds,
+} from "@/lib/waddle-cup";
 import { isEmailVerified, requireEmailVerification } from "@/lib/auth";
 
 export default async function HomePage() {
@@ -20,8 +24,8 @@ export default async function HomePage() {
     redirect("/verify-email");
   }
 
-  const [waddleCupEvent, { data: competitions }] = await Promise.all([
-    fetchWaddleCupEvent(supabase),
+  const [waddleCupEvents, { data: competitions }] = await Promise.all([
+    fetchWaddleCupEvents(supabase),
     supabase
       .from("competitions")
       .select("*")
@@ -30,13 +34,15 @@ export default async function HomePage() {
       .limit(6),
   ]);
 
+  const waddleCupIdSet = new Set(waddleCupEventIds(waddleCupEvents));
   const upcomingEvents =
-    competitions?.filter((comp) => comp.id !== waddleCupEvent?.id).slice(0, 3) ??
+    competitions?.filter((comp) => !waddleCupIdSet.has(comp.id)).slice(0, 3) ??
     [];
 
   const showWaddleCupPromo = isWaddleCupPromoVisible();
+  const hasWaddleCupEvents = waddleCupIdSet.size > 0;
   const upcomingClassName =
-    showWaddleCupPromo && waddleCupEvent
+    showWaddleCupPromo && hasWaddleCupEvents
       ? "home-upcoming"
       : "home-upcoming home-upcoming--solo";
 

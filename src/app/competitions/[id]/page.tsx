@@ -15,9 +15,16 @@ import {
   getOwnedTicketTypeIds,
   getTicketTypeLabel,
 } from "@/lib/ticket-types";
+import {
+  competitionUsesApplyBeforePay,
+  filterConfirmedRegistrations,
+  isRegistrationConfirmed,
+  userHasPaidCompetitionPass,
+} from "@/lib/competition-registration";
 import { RegistrationForm } from "./registration-form";
 import { TicketPurchaseForm } from "@/components/ticket-purchase-form";
 import { TicketCartForm } from "@/components/ticket-cart-form";
+import { CompetitionPaymentForm } from "@/components/competition-payment-form";
 import { CheckoutSuccessSync } from "@/components/checkout-success-sync";
 import { Leaderboard } from "@/components/leaderboard";
 import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";
@@ -47,6 +54,7 @@ export default async function CompetitionDetailPage({
   const isCompetition = isCompetitionEvent(competition.event_type);
   const ticketTypes = await fetchActiveTicketTypes(supabase, id);
   const hasPaidTickets = eventHasAnyPaidTickets(competition, ticketTypes);
+  const applyBeforePay = competitionUsesApplyBeforePay(competition, hasPaidTickets);
   const usesTicketTypeCatalog = ticketTypes.some(
     (type) => type.is_active && type.price_cents > 0
   );
@@ -108,20 +116,40 @@ export default async function CompetitionDetailPage({
     .eq("competition_id", id)
     .eq("status", "approved");
 
-  const userIds = [...new Set(approvedRegistrations?.map((r) => r.user_id) ?? [])];
+  const { data: competitionPaidPurchases } = await supabase
+    .from("ticket_purchases")
+    .select("*")
+    .eq("competition_id", id)
+    .eq("status", "paid");
+
+  const confirmedRegistrations = filterConfirmedRegistrations(
+    approvedRegistrations ?? [],
+    competitionPaidPurchases ?? [],
+    applyBeforePay
+  );
+
+  const userIds = [...new Set(confirmedRegistrations.map((r) => r.user_id))];
   const { data: profiles } =
     userIds.length > 0
       ? await supabase.from("profiles").select("id, full_name").in("id", userIds)
       : { data: [] as { id: string; full_name: string }[] };
 
   const profileById = new Map(profiles?.map((p) => [p.id, p]) ?? []);
-  const participants: ParticipantRow[] =
-    approvedRegistrations?.map((registration) => ({
-      id: registration.id,
-      role: registration.role,
-      display_name: registration.display_name,
-      profile: profileById.get(registration.user_id) ?? null,
-    })) ?? [];
+  const participants: ParticipantRow[] = confirmedRegistrations.map((registration) => ({
+    id: registration.id,
+    role: registration.role,
+    display_name: registration.display_name,
+    profile: profileById.get(registration.user_id) ?? null,
+  }));
+
+  const registrationConfirmed =
+    existingRegistration != null &&
+    isRegistrationConfirmed(existingRegistration, paidTicketPurchases, applyBeforePay);
+
+  const awaitingPayment =
+    applyBeforePay &&
+    existingRegistration?.status === "approved" &&
+    !userHasPaidCompetitionPass(paidTicketPurchases, existingRegistration.role);
 
   const publishedLeaderboards = await getPublishedRoundLeaderboards(
     supabase,
@@ -145,7 +173,11 @@ export default async function CompetitionDetailPage({
       {checkout === "success" && (
         <div className="alert-banner">
           Payment received. Your ticket{paidTicketPurchases.length === 1 ? "" : "s"} confirmed
-          {isCompetition ? " and your registration is pending approval." : "."}
+          {isCompetition && applyBeforePay
+            ? " and your registration is now confirmed."
+            : isCompetition
+              ? " and your registration is pending approval."
+              : "."}
         </div>
       )}
       {checkout === "cancelled" && (
@@ -201,6 +233,7 @@ export default async function CompetitionDetailPage({
 
       {competition.registration_open &&
         user &&
+        !isCompetition &&
         hasPaidTickets &&
         canBuyMoreTickets &&
         canPurchaseEventTicket(userProfile, isCompetition) &&
@@ -210,11 +243,13 @@ export default async function CompetitionDetailPage({
             eventName={competition.name}
             ticketTypes={ticketTypes}
             ownedTypeIds={ownedTypeIds}
+            passFeesToBuyer={competition.pass_fees_to_buyer ?? false}
           />
         )}
 
       {competition.registration_open &&
         user &&
+        !isCompetition &&
         hasPaidTickets &&
         canBuyMoreTickets &&
         canPurchaseEventTicket(userProfile, isCompetition) &&
@@ -222,7 +257,8 @@ export default async function CompetitionDetailPage({
           <TicketPurchaseForm event={competition} />
         )}
 
-      {hasPaidTickets &&
+      {!isCompetition &&
+        hasPaidTickets &&
         !competition.registration_open &&
         paidTicketPurchases.length === 0 && (
           <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
@@ -247,6 +283,7 @@ export default async function CompetitionDetailPage({
 
       {competition.registration_open &&
         user &&
+        !isCompetition &&
         hasPaidTickets &&
         canBuyMoreTickets &&
         userProfile &&
@@ -266,10 +303,27 @@ export default async function CompetitionDetailPage({
           </div>
         )}
 
-      {competition.registration_open && !user && hasPaidTickets && (
+      {competition.registration_open && !user && !isCompetition && hasPaidTickets && (
         <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
           <h2 className="font-semibold text-foreground">Tickets available</h2>
           <p className="mt-2 text-sm text-muted">Log in or create an account to buy a ticket.</p>
+          <div className="mt-4 flex gap-3">
+            <Link href="/login">
+              <Button>Log in</Button>
+            </Link>
+            <Link href="/signup">
+              <Button variant="secondary">Sign up</Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {isCompetition && competition.registration_open && !user && (
+        <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
+          <h2 className="font-semibold text-foreground">Register for this competition</h2>
+          <p className="mt-2 text-sm text-muted">
+            Log in or create an account to apply as a leader or follower.
+          </p>
           <div className="mt-4 flex gap-3">
             <Link href="/login">
               <Button>Log in</Button>
@@ -314,37 +368,25 @@ export default async function CompetitionDetailPage({
         </div>
       )}
 
-      {isCompetition && competition.registration_open && !user && !hasPaidTickets && (
-        <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
-          <h2 className="font-semibold text-foreground">Register for this competition</h2>
-          <p className="mt-2 text-sm text-muted">
-            Log in or create an account to sign up as a leader or follower.
-          </p>
-          <div className="mt-4 flex gap-3">
-            <Link href="/login">
-              <Button>Log in</Button>
-            </Link>
-            <Link href="/signup">
-              <Button variant="secondary">Sign up</Button>
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {isCompetition && competition.registration_open &&
+      {isCompetition &&
+        competition.registration_open &&
         user &&
-        !hasPaidTickets &&
         !existingRegistration &&
-        canRegisterForCompetitions(userProfile) && (
-          <RegistrationForm competitionId={id} />
+        canRegisterForCompetitions(userProfile) &&
+        (!hasPaidTickets || applyBeforePay) && (
+          <RegistrationForm
+            competitionId={id}
+            requiresPaymentAfterApproval={applyBeforePay}
+          />
         )}
 
-      {isCompetition && competition.registration_open &&
+      {isCompetition &&
+        competition.registration_open &&
         user &&
-        !hasPaidTickets &&
         !existingRegistration &&
         userProfile &&
-        !canRegisterForCompetitions(userProfile) && (
+        !canRegisterForCompetitions(userProfile) &&
+        (!hasPaidTickets || applyBeforePay) && (
           <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
             <h2 className="font-semibold text-foreground">Register for this competition</h2>
             <p className="mt-2 text-sm text-muted">
@@ -355,6 +397,10 @@ export default async function CompetitionDetailPage({
             </Link>
           </div>
         )}
+
+      {isCompetition && awaitingPayment && competition.registration_open && (
+        <CompetitionPaymentForm event={competition} role={existingRegistration.role} />
+      )}
 
       {isCompetition && existingRegistration && (
         <div className="rounded-2xl border border-border bg-surface-overlay p-6 shadow-lg shadow-black/20">
@@ -367,7 +413,30 @@ export default async function CompetitionDetailPage({
           </div>
           {existingRegistration.status === "pending" && (
             <p className="mt-2 text-sm text-muted">
-              Your registration is pending admin approval.
+              {applyBeforePay
+                ? "Your application is pending organizer review. You'll receive an email if you're approved."
+                : "Your registration is pending admin approval."}
+            </p>
+          )}
+          {existingRegistration.status === "approved" && applyBeforePay && !registrationConfirmed && (
+            <p className="mt-2 text-sm text-muted">
+              Your application was approved. Complete payment below to confirm your spot.
+            </p>
+          )}
+          {registrationConfirmed && (
+            <p className="mt-2 text-sm text-emerald-400">
+              Your registration is confirmed. You're all set to compete.
+            </p>
+          )}
+          {existingRegistration.status === "rejected" && (
+            <p className="mt-2 text-sm text-muted">
+              Your application was not approved for this competition.
+            </p>
+          )}
+          {existingRegistration.status === "withdrawn" && (
+            <p className="mt-2 text-sm text-muted">
+              You are no longer registered for this competition. Contact the organizer if
+              you have questions.
             </p>
           )}
         </div>

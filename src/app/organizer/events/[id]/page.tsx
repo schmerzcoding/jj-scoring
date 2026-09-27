@@ -7,7 +7,12 @@ import { EventTypeBadge } from "@/components/event-type-badge";
 import { EventWorkshopSummary } from "@/components/event-workshop-summary";
 import { formatEventSchedule } from "@/lib/utils";
 import { isCompetitionEvent, supportsMultiTicketTypes } from "@/lib/events";
-import { eventHasTicketTypes, fetchAllTicketTypes } from "@/lib/ticket-types";
+import {
+  filterConfirmedRegistrations,
+  paidUserIdsForCompetition,
+  competitionUsesApplyBeforePay,
+} from "@/lib/competition-registration";
+import { eventHasAnyPaidTickets, eventHasTicketTypes, fetchAllTicketTypes } from "@/lib/ticket-types";
 import { TicketTypesPanel } from "@/components/ticket-types-panel";
 import { CompetitionScheduleSettings } from "@/components/competition-schedule-settings";
 import { isOrganizerRole } from "@/lib/permissions";
@@ -102,15 +107,31 @@ export default async function OrganizerEventPage({
       profile: judgeProfileById.get(assignment.judge_id) ?? null,
     })) ?? [];
 
-  const approvedParticipants =
-    registrationsWithProfiles
-      .filter((registration) => registration.status === "approved")
-      .map(({ id, role, display_name, profile }) => ({
-        id,
-        role,
-        display_name,
-        profile,
-      })) ?? [];
+  const hasPaidTickets = eventHasAnyPaidTickets(competition, ticketTypes);
+  const applyBeforePay = competitionUsesApplyBeforePay(competition, hasPaidTickets);
+
+  const { data: paidPurchases } = await supabase
+    .from("ticket_purchases")
+    .select("*")
+    .eq("competition_id", id)
+    .eq("status", "paid");
+
+  const confirmedRegistrations = filterConfirmedRegistrations(
+    registrationsWithProfiles,
+    paidPurchases ?? [],
+    applyBeforePay
+  );
+
+  const approvedParticipants = confirmedRegistrations.map(
+    ({ id, role, display_name, profile }) => ({
+      id,
+      role,
+      display_name,
+      profile,
+    })
+  );
+
+  const paidUserIds = [...paidUserIdsForCompetition(paidPurchases ?? [])];
 
   const { data: allJudges } = isCompetition
     ? await supabase.from("profiles").select("*").eq("role", "judge")
@@ -174,13 +195,18 @@ export default async function OrganizerEventPage({
           competitionId={id}
           eventType={competition.event_type}
           initialTypes={ticketTypes}
+          passFeesToBuyer={competition.pass_fees_to_buyer ?? false}
         />
       )}
       <CompetitionBranding competition={competition} />
 
       {isCompetition && (
         <>
-          <RegistrationsPanel registrations={registrationsWithProfiles} />
+          <RegistrationsPanel
+            registrations={registrationsWithProfiles}
+            requiresPayment={applyBeforePay}
+            paidUserIds={paidUserIds}
+          />
           <RoundsPanel
             competitionId={id}
             rounds={rounds ?? []}

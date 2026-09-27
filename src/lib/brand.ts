@@ -91,8 +91,10 @@ export const WADDLE_CUP_LANDING = {
   ],
   ctaPrimary: "View event & register",
   ctaSecondary: "Browse all events",
+  ctaPass: "Grab your pass",
+  ctaCompetition: "Sign up for the J&J",
   ctaEventCopy:
-    "Head to the event page to grab your pass or register for the Jack & Jill.",
+    "Grab your pass for the full day, or sign up for the Jack & Jill.",
   ctaNoEventCopy:
     "The event page will go live here soon. In the meantime, browse everything happening on Waddle Social.",
 } as const;

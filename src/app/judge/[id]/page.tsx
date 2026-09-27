@@ -9,6 +9,11 @@ import {
   getAdvancedIdsForRound,
   getLeaderboardForRoundServer,
 } from "@/lib/leaderboard-server";
+import {
+  competitionUsesApplyBeforePay,
+  filterConfirmedRegistrations,
+} from "@/lib/competition-registration";
+import { eventHasAnyPaidTickets, fetchActiveTicketTypes } from "@/lib/ticket-types";
 import { getEligibleParticipants } from "@/lib/leaderboard";
 import type { ParticipantRow } from "@/lib/leaderboard";
 
@@ -40,13 +45,29 @@ export default async function JudgeCompetitionPage({
 
   const activeRound = rounds?.find((r) => r.status === "active");
 
+  const ticketTypes = await fetchActiveTicketTypes(supabase, id);
+  const hasPaidTickets = eventHasAnyPaidTickets(competition, ticketTypes);
+  const applyBeforePay = competitionUsesApplyBeforePay(competition, hasPaidTickets);
+
   const { data: registrations } = await supabase
     .from("registrations")
     .select("*")
     .eq("competition_id", id)
     .eq("status", "approved");
 
-  const participantIds = [...new Set(registrations?.map((r) => r.user_id) ?? [])];
+  const { data: paidPurchases } = await supabase
+    .from("ticket_purchases")
+    .select("*")
+    .eq("competition_id", id)
+    .eq("status", "paid");
+
+  const confirmedRegistrations = filterConfirmedRegistrations(
+    registrations ?? [],
+    paidPurchases ?? [],
+    applyBeforePay
+  );
+
+  const participantIds = [...new Set(confirmedRegistrations.map((r) => r.user_id))];
   const { data: participantProfiles } =
     participantIds.length > 0
       ? await supabase.from("profiles").select("id, full_name").in("id", participantIds)
@@ -55,13 +76,12 @@ export default async function JudgeCompetitionPage({
   const participantProfileById = new Map(
     participantProfiles?.map((p) => [p.id, p]) ?? []
   );
-  const participants: ParticipantRow[] =
-    registrations?.map((registration) => ({
-      id: registration.id,
-      role: registration.role,
-      display_name: registration.display_name,
-      profile: participantProfileById.get(registration.user_id) ?? null,
-    })) ?? [];
+  const participants: ParticipantRow[] = confirmedRegistrations.map((registration) => ({
+    id: registration.id,
+    role: registration.role,
+    display_name: registration.display_name,
+    profile: participantProfileById.get(registration.user_id) ?? null,
+  }));
 
   let filteredRegistrations = participants;
   if (activeRound) {

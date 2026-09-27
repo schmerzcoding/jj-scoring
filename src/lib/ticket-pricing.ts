@@ -1,6 +1,47 @@
 import { isCompetitionEvent } from "@/lib/events";
 import type { Competition, RegistrationRole } from "@/types/database";
 
+/** Fixed fee (€0.25) and rate (1.5%) passed to buyers when enabled. */
+export const BUYER_FEE_FIXED_CENTS = 25;
+export const BUYER_FEE_RATE = 0.015;
+
+export const TICKET_VAT_NOTICE =
+  "Ticket prices include VAT as required by Irish regulatory authorities.";
+
+/** Final buyer price: (base + €0.25) / (1 - 1.5%). */
+export function applyBuyerFeeCents(basePriceCents: number): number {
+  if (basePriceCents <= 0) return basePriceCents;
+  return Math.round(
+    (basePriceCents + BUYER_FEE_FIXED_CENTS) / (1 - BUYER_FEE_RATE)
+  );
+}
+
+export function resolveCheckoutPriceCents(
+  basePriceCents: number,
+  passFeesToBuyer: boolean
+): number {
+  if (basePriceCents <= 0) return basePriceCents;
+  return passFeesToBuyer
+    ? applyBuyerFeeCents(basePriceCents)
+    : basePriceCents;
+}
+
+export function formatBuyerFeePreview(euroInput: string): string | null {
+  const cents = parseEuroInputToCents(euroInput);
+  if (cents == null || cents <= 0) return null;
+  return formatPrice(applyBuyerFeeCents(cents));
+}
+
+export function formatPriceLabelWithBuyerFee(
+  baseLabel: string,
+  euroInput: string,
+  passFeesToBuyer: boolean
+): string {
+  if (!passFeesToBuyer) return baseLabel;
+  const preview = formatBuyerFeePreview(euroInput);
+  return preview ? `${baseLabel} (${preview})` : baseLabel;
+}
+
 export function resolveTicketPriceCents(
   event: Pick<
     Competition,

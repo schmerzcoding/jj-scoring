@@ -2,8 +2,13 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSiteUrl, getStripe } from "@/lib/stripe";
+import { competitionUsesApplyBeforePay } from "@/lib/competition-registration";
 import { isCompetitionEvent } from "@/lib/events";
-import { resolveTicketPriceCents } from "@/lib/ticket-pricing";
+import { eventHasAnyPaidTickets } from "@/lib/ticket-types";
+import {
+  resolveCheckoutPriceCents,
+  resolveTicketPriceCents,
+} from "@/lib/ticket-pricing";
 import type {
   Competition,
   EventType,
@@ -109,9 +114,10 @@ async function handleCartCheckout({
   request: Request;
   supabase: Awaited<ReturnType<typeof createClient>>;
   user: { id: string; email?: string | null };
-  competition: { id: string; name: string };
+  competition: Pick<Competition, "id" | "name" | "pass_fees_to_buyer">;
   cartItems: CartItem[];
 }) {
+  const passFeesToBuyer = competition.pass_fees_to_buyer ?? false;
   const typeIds = cartItems.map((item) => item.ticketTypeId);
   const { data: ticketTypes, error: typesError } = await supabase
     .from("ticket_types")
@@ -158,10 +164,15 @@ async function handleCartCheckout({
 
   const lineItems = cartItems.map((item) => {
     const ticketType = typeById.get(item.ticketTypeId)!;
+    const unitCents = resolveCheckoutPriceCents(
+      ticketType.price_cents,
+      passFeesToBuyer
+    );
     return {
       ticketType,
       quantity: item.quantity,
-      subtotalCents: ticketType.price_cents * item.quantity,
+      unitCents,
+      subtotalCents: unitCents * item.quantity,
     };
   });
 
@@ -197,7 +208,7 @@ async function handleCartCheckout({
       checkout_session_id: checkoutSession.id,
       role: line.ticketType.role,
       pass_type: line.ticketType.pass_type,
-      amount_cents: line.ticketType.price_cents,
+      amount_cents: line.unitCents,
       currency: "EUR",
       status: "pending" as const,
     }))
@@ -225,7 +236,7 @@ async function handleCartCheckout({
       quantity: line.quantity,
       price_data: {
         currency: "eur",
-        unit_amount: line.ticketType.price_cents,
+        unit_amount: line.unitCents,
         product_data: {
           name: `${competition.name} — ${line.ticketType.name}`,
           description: line.ticketType.description ?? "Waddle Social event ticket",
@@ -280,9 +291,11 @@ async function handleLegacyCheckout({
     | "ticket_price_cents"
     | "leader_price_cents"
     | "follower_price_cents"
+    | "pass_fees_to_buyer"
   >;
   role?: RegistrationRole;
 }) {
+  const passFeesToBuyer = competition.pass_fees_to_buyer ?? false;
   const isCompetition = isCompetitionEvent(competition.event_type as EventType);
   const selectedRole = isCompetition ? role : null;
 
@@ -299,6 +312,33 @@ async function handleLegacyCheckout({
     .eq("competition_id", competition.id)
     .eq("is_active", true);
 
+  const hasPaidTickets = eventHasAnyPaidTickets(competition, ticketTypes ?? []);
+  const requiresApprovedRegistration =
+    isCompetition && competitionUsesApplyBeforePay(competition, hasPaidTickets);
+
+  if (requiresApprovedRegistration) {
+    const { data: registration } = await supabase
+      .from("registrations")
+      .select("status, role")
+      .eq("competition_id", competition.id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!registration || registration.status !== "approved") {
+      return NextResponse.json(
+        { error: "Your registration must be approved before you can pay." },
+        { status: 403 }
+      );
+    }
+
+    if (registration.role !== selectedRole) {
+      return NextResponse.json(
+        { error: "The selected pass must match your approved role." },
+        { status: 400 }
+      );
+    }
+  }
+
   let ticketType: TicketType | undefined;
   if (ticketTypes?.length) {
     if (isCompetition && selectedRole) {
@@ -308,11 +348,11 @@ async function handleLegacyCheckout({
     }
   }
 
-  const amountCents =
+  const baseAmountCents =
     ticketType?.price_cents ??
     resolveTicketPriceCents(competition, selectedRole);
 
-  if (amountCents == null || amountCents <= 0) {
+  if (baseAmountCents == null || baseAmountCents <= 0) {
     return NextResponse.json(
       { error: "This event does not have paid tickets configured." },
       { status: 400 }
@@ -352,6 +392,8 @@ async function handleLegacyCheckout({
     }
   }
 
+  const amountCents = resolveCheckoutPriceCents(baseAmountCents, passFeesToBuyer);
+
   const admin = createAdminClient();
   const { data: purchase, error: purchaseError } = await admin
     .from("ticket_purchases")
@@ -384,6 +426,10 @@ async function handleLegacyCheckout({
         ? "Follower pass"
         : ticketType?.name ?? "Ticket";
 
+  const productDescription = requiresApprovedRegistration
+    ? "Competitor pass — includes social pass for the day"
+    : "Waddle Social event ticket";
+
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     customer_email: user.email ?? undefined,
@@ -395,7 +441,7 @@ async function handleLegacyCheckout({
           unit_amount: amountCents,
           product_data: {
             name: `${competition.name} — ${roleLabel}`,
-            description: "Waddle Social event ticket",
+            description: productDescription,
           },
         },
       },

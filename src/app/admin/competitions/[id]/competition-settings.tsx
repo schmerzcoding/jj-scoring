@@ -10,8 +10,10 @@ import { Button } from "@/components/ui/button";
 import { isCompetitionEvent, supportsMultiTicketTypes } from "@/lib/events";
 import {
   formatCentsToEuroInput,
+  formatPriceLabelWithBuyerFee,
   parseEuroInputToCents,
 } from "@/lib/ticket-pricing";
+import { PassFeesToBuyerField } from "@/components/pass-fees-to-buyer-field";
 import type { Competition, CompetitionStatus } from "@/types/database";
 
 export function CompetitionSettings({
@@ -25,6 +27,9 @@ export function CompetitionSettings({
   const [status, setStatus] = useState<CompetitionStatus>(competition.status);
   const [registrationOpen, setRegistrationOpen] = useState(
     competition.registration_open
+  );
+  const [passFeesToBuyer, setPassFeesToBuyer] = useState(
+    competition.pass_fees_to_buyer ?? false
   );
   const [ticketPriceEuro, setTicketPriceEuro] = useState(
     formatCentsToEuroInput(competition.ticket_price_cents)
@@ -62,12 +67,14 @@ export function CompetitionSettings({
     const updatePayload: {
       status: CompetitionStatus;
       registration_open: boolean;
+      pass_fees_to_buyer: boolean;
       ticket_price_cents?: number | null;
       leader_price_cents?: number | null;
       follower_price_cents?: number | null;
     } = {
       status,
       registration_open: registrationOpen,
+      pass_fees_to_buyer: passFeesToBuyer,
     };
 
     if (!usesTicketTypeCatalog) {
@@ -120,46 +127,69 @@ export function CompetitionSettings({
           Controls ticket sales and competition sign-ups independently from event status.
         </p>
 
-        {!usesTicketTypeCatalog && (
-          <div className="space-y-3 rounded-xl border border-border bg-surface-raised/60 p-4">
-            <p className="text-sm font-medium text-foreground">Ticket prices (EUR)</p>
+        <div className="space-y-3 rounded-xl border border-border bg-surface-raised/60 p-4">
+          <p className="text-sm font-medium text-foreground">Ticket pricing</p>
+          <PassFeesToBuyerField
+            checked={passFeesToBuyer}
+            onChange={setPassFeesToBuyer}
+          />
+          {!usesTicketTypeCatalog && (
+            <>
+              <p className="text-xs text-muted">
+                Set a price to enable Stripe ticket sales on the public event page.
+              </p>
+              {isCompetition ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Input
+                    label={formatPriceLabelWithBuyerFee(
+                      "Leader pass (€)",
+                      leaderPriceEuro,
+                      passFeesToBuyer
+                    )}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={leaderPriceEuro}
+                    onChange={(e) => setLeaderPriceEuro(e.target.value)}
+                    placeholder="25.00"
+                  />
+                  <Input
+                    label={formatPriceLabelWithBuyerFee(
+                      "Follower pass (€)",
+                      followerPriceEuro,
+                      passFeesToBuyer
+                    )}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={followerPriceEuro}
+                    onChange={(e) => setFollowerPriceEuro(e.target.value)}
+                    placeholder="25.00"
+                  />
+                </div>
+              ) : (
+                <Input
+                  label={formatPriceLabelWithBuyerFee(
+                    "Ticket price (€)",
+                    ticketPriceEuro,
+                    passFeesToBuyer
+                  )}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={ticketPriceEuro}
+                  onChange={(e) => setTicketPriceEuro(e.target.value)}
+                  placeholder="15.00"
+                />
+              )}
+            </>
+          )}
+          {usesTicketTypeCatalog && (
             <p className="text-xs text-muted">
-              Set a price to enable Stripe ticket sales on the public event page.
+              Applies to all passes configured in the ticket passes panel.
             </p>
-            {isCompetition ? (
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  label="Leader pass (€)"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={leaderPriceEuro}
-                  onChange={(e) => setLeaderPriceEuro(e.target.value)}
-                  placeholder="25.00"
-                />
-                <Input
-                  label="Follower pass (€)"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={followerPriceEuro}
-                  onChange={(e) => setFollowerPriceEuro(e.target.value)}
-                  placeholder="25.00"
-                />
-              </div>
-            ) : (
-              <Input
-                label="Ticket price (€)"
-                type="number"
-                min="0"
-                step="0.01"
-                value={ticketPriceEuro}
-                onChange={(e) => setTicketPriceEuro(e.target.value)}
-                placeholder="15.00"
-              />
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
         {error && <p className="text-sm text-red-400">{error}</p>}
 

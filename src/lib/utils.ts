@@ -119,6 +119,7 @@ export function getStatusColor(status: string): string {
     pending: "bg-amber-950/80 text-amber-300 ring-1 ring-amber-800/50",
     approved: "bg-emerald-950/80 text-emerald-300 ring-1 ring-emerald-800/50",
     rejected: "bg-red-950/80 text-red-300 ring-1 ring-red-800/50",
+    withdrawn: "bg-zinc-800 text-zinc-400 ring-1 ring-zinc-700",
     active: "bg-sky-950/80 text-sky-300 ring-1 ring-sky-800/50",
     organizer: "bg-violet-950/80 text-violet-300 ring-1 ring-violet-800/50",
     social: "bg-fuchsia-950/80 text-fuchsia-300 ring-1 ring-fuchsia-800/50",
