@@ -142,6 +142,8 @@ export async function POST(request: Request) {
               registration.display_name ?? participantProfile?.full_name ?? "",
             competitionName: competition.name,
             competitionUrl: `${siteUrl}/competitions/${competition.id}`,
+            subjectTemplate: competition.registration_approval_email_subject,
+            bodyTemplate: competition.registration_approval_email_body,
           });
 
           if (!emailResult.ok) {
@@ -174,6 +176,8 @@ export async function POST(request: Request) {
           competitionName: competition.name,
           competitionUrl: `${siteUrl}/competitions/${competition.id}`,
           reason: rejectionReason,
+          subjectTemplate: competition.registration_rejection_email_subject,
+          bodyTemplate: competition.registration_rejection_email_body,
         });
 
         if (!emailResult.ok) {

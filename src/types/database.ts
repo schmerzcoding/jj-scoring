@@ -78,6 +78,10 @@ export type Database = {
           leader_price_cents: number | null;
           follower_price_cents: number | null;
           pass_fees_to_buyer: boolean;
+          registration_approval_email_subject: string | null;
+          registration_approval_email_body: string | null;
+          registration_rejection_email_subject: string | null;
+          registration_rejection_email_body: string | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -105,6 +109,10 @@ export type Database = {
           leader_price_cents?: number | null;
           follower_price_cents?: number | null;
           pass_fees_to_buyer?: boolean;
+          registration_approval_email_subject?: string | null;
+          registration_approval_email_body?: string | null;
+          registration_rejection_email_subject?: string | null;
+          registration_rejection_email_body?: string | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -132,6 +140,10 @@ export type Database = {
           leader_price_cents?: number | null;
           follower_price_cents?: number | null;
           pass_fees_to_buyer?: boolean;
+          registration_approval_email_subject?: string | null;
+          registration_approval_email_body?: string | null;
+          registration_rejection_email_subject?: string | null;
+          registration_rejection_email_body?: string | null;
           created_by?: string;
           created_at?: string;
           updated_at?: string;

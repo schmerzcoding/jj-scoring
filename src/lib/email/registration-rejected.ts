@@ -1,4 +1,14 @@
 import { sendBrevoEmail, type SendEmailResult } from "@/lib/email/brevo";
+import {
+  DEFAULT_REJECTION_EMAIL_BODY,
+  DEFAULT_REJECTION_EMAIL_SUBJECT,
+  emailBodyToHtmlParagraphs,
+  escapeHtml,
+  eventPageButtonHtml,
+  resolveRegistrationEmailBody,
+  resolveRegistrationEmailSubject,
+  type RegistrationEmailTemplateVars,
+} from "@/lib/email/registration-email-templates";
 
 export async function sendRegistrationRejectedEmail({
   to,
@@ -6,42 +16,49 @@ export async function sendRegistrationRejectedEmail({
   competitionName,
   competitionUrl,
   reason,
+  subjectTemplate,
+  bodyTemplate,
 }: {
   to: string;
   recipientName: string;
   competitionName: string;
   competitionUrl: string;
   reason: string;
+  subjectTemplate?: string | null;
+  bodyTemplate?: string | null;
 }): Promise<SendEmailResult> {
-  const subject = `Update on your Jack & Jill application — ${competitionName}`;
   const greeting = recipientName.trim() || "there";
   const trimmedReason = reason.trim();
+  const vars: RegistrationEmailTemplateVars = {
+    name: greeting,
+    competitionName,
+    competitionUrl,
+  };
+
+  const subject = resolveRegistrationEmailSubject(
+    subjectTemplate,
+    DEFAULT_REJECTION_EMAIL_SUBJECT,
+    vars
+  );
+  const body = resolveRegistrationEmailBody(
+    bodyTemplate,
+    DEFAULT_REJECTION_EMAIL_BODY,
+    vars
+  );
+
+  const reasonHtml = trimmedReason
+    ? `<p style="margin: 20px 0; padding: 16px; background: #f5f5f5; border-radius: 8px;">
+        <strong>Message from the organizer:</strong><br />
+        ${escapeHtml(trimmedReason).replaceAll("\n", "<br />")}
+      </p>`
+    : "";
 
   const html = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 560px;">
       <p>Hi ${escapeHtml(greeting)},</p>
-      <p>
-        Thank you for applying to <strong>${escapeHtml(competitionName)}</strong>.
-        After reviewing your application, we are unable to approve your registration
-        for this Jack &amp; Jill at this time.
-      </p>
-      ${
-        trimmedReason
-          ? `<p style="margin: 20px 0; padding: 16px; background: #f5f5f5; border-radius: 8px;">
-        <strong>Message from the organizer:</strong><br />
-        ${escapeHtml(trimmedReason).replaceAll("\n", "<br />")}
-      </p>`
-          : ""
-      }
-      <p>
-        If you have questions, you can reply to this email or visit the event page.
-      </p>
-      <p style="margin: 28px 0;">
-        <a href="${competitionUrl}"
-           style="display: inline-block; background: #8115d7; color: #ffffff; text-decoration: none; padding: 12px 22px; border-radius: 10px; font-weight: 600;">
-          View event page
-        </a>
-      </p>
+      ${emailBodyToHtmlParagraphs(body)}
+      ${reasonHtml}
+      ${eventPageButtonHtml(competitionUrl)}
       <p style="font-size: 14px; color: #555;">Waddle Social</p>
     </div>
   `.trim();
@@ -49,7 +66,7 @@ export async function sendRegistrationRejectedEmail({
   const text = [
     `Hi ${greeting},`,
     "",
-    `Thank you for applying to ${competitionName}. After reviewing your application, we are unable to approve your registration for this Jack & Jill at this time.`,
+    body,
     "",
     trimmedReason ? `Message from the organizer:\n${trimmedReason}` : "",
     "",
@@ -61,13 +78,4 @@ export async function sendRegistrationRejectedEmail({
     .join("\n");
 
   return sendBrevoEmail({ to, subject, html, text });
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
 }
