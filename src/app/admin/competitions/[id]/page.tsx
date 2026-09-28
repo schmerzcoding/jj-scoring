@@ -196,6 +196,7 @@ export default async function AdminCompetitionPage({
             registrations={registrationsWithProfiles}
             requiresPayment={applyBeforePay}
             paidUserIds={paidUserIds}
+            showAdminTools
           />
           <RoundsPanel
             competitionId={id}

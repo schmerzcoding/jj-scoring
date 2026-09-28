@@ -429,9 +429,19 @@ export default async function CompetitionDetailPage({
             </p>
           )}
           {existingRegistration.status === "rejected" && (
-            <p className="mt-2 text-sm text-muted">
-              Your application was not approved for this competition.
-            </p>
+            <div className="mt-2 space-y-2 text-sm text-muted">
+              <p>Your application was not approved for this competition.</p>
+              {existingRegistration.rejection_reason && (
+                <div className="rounded-xl border border-border bg-surface-raised/60 p-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                    Message from the organizer
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap text-foreground">
+                    {existingRegistration.rejection_reason}
+                  </p>
+                </div>
+              )}
+            </div>
           )}
           {existingRegistration.status === "withdrawn" && (
             <p className="mt-2 text-sm text-muted">

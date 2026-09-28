@@ -1,4 +1,4 @@
-import { sendBrevoEmail } from "@/lib/email/brevo";
+import { sendBrevoEmail, type SendEmailResult } from "@/lib/email/brevo";
 
 export async function sendRegistrationApprovedEmail({
   to,
@@ -10,7 +10,7 @@ export async function sendRegistrationApprovedEmail({
   recipientName: string;
   competitionName: string;
   competitionUrl: string;
-}): Promise<{ ok: true } | { ok: false; error: string }> {
+}): Promise<SendEmailResult> {
   const subject = `Your Jack & Jill registration was approved — ${competitionName}`;
   const greeting = recipientName.trim() || "there";
 

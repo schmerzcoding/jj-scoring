@@ -99,6 +99,46 @@ Los enlaces usarán automáticamente tu Site URL y las Redirect URLs.
 
 ---
 
+## Parte 2.5 — Emails transaccionales de la app (aprobación J&J)
+
+Los correos de **confirmación de cuenta** van por **SMTP de Supabase**.  
+Los correos de **“tu inscripción al J&J fue aprobada, completa el pago”** los envía **la app** con la **API REST de Brevo**.
+
+Son credenciales **distintas**:
+
+| Uso | Dónde se configura |
+|-----|-------------------|
+| Signup / reset password | Supabase → SMTP (SMTP key) |
+| Aprobación J&J + link de pago | Vercel → `BREVO_API_KEY` (API key v3) |
+
+### Crear la API key
+
+1. Brevo → **Settings → SMTP & API → API Keys**
+2. **Generate a new API key** (v3)
+3. Cópiala (solo se muestra una vez)
+
+### Variables en Vercel
+
+En **Settings → Environment Variables** (Production):
+
+```
+BREVO_API_KEY=xkeysib-...
+BREVO_SENDER_EMAIL=noreply@waddlesocial.com
+BREVO_SENDER_NAME=Waddle Social
+```
+
+4. **Redeploy** después de guardar.
+
+El remitente debe estar **verificado** en Brevo (mismo `noreply@waddlesocial.com` del dominio autenticado).
+
+### Probar
+
+1. Aprueba una inscripción pendiente al J&J en admin/organizer.
+2. Si falla, el aviso indicará si falta `BREVO_API_KEY`, la key es inválida o el sender no está verificado.
+3. Revisa **Brevo → Transactional → Email logs**.
+
+---
+
 ## Parte 3 — Vercel (activar verificación en la app)
 
 1. Vercel → proyecto **jj-scoring** → **Settings → Environment Variables**
@@ -147,6 +187,8 @@ Sin esta variable, la app no bloqueará usuarios sin email verificado aunque Sup
 | No llega el email | Dominio no autenticado en Brevo; revisa spam; SMTP key incorrecta |
 | Link abre login con error | Falta `https://www.waddlesocial.com/**` en Redirect URLs |
 | Reset password no funciona | Misma Redirect URL; plantilla Reset password activa en Supabase |
+| Aprobación J&J sin email | Falta `BREVO_API_KEY` en Vercel, o usaste la SMTP key en lugar de la API key |
+| Brevo rechaza el envío J&J | Verifica `noreply@waddlesocial.com` en Brevo Senders; redeploy tras cambiar env vars |
 | DKIM no verifica | Añade registros en **Vercel DNS**, no GoDaddy |
 
 ---
@@ -161,3 +203,5 @@ Sin esta variable, la app no bloqueará usuarios sin email verificado aunque Sup
 - [ ] `NEXT_PUBLIC_REQUIRE_EMAIL_VERIFICATION=true` en Vercel + redeploy
 - [ ] Prueba signup con email nuevo
 - [ ] Prueba forgot password
+- [ ] `BREVO_API_KEY` + sender en Vercel + redeploy
+- [ ] Prueba aprobar inscripción J&J y recibir email de pago

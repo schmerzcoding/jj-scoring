@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { competitionUsesApplyBeforePay } from "@/lib/competition-registration";
+import { getBrevoEmailFailureMessage } from "@/lib/email/brevo";
 import { sendRegistrationApprovedEmail } from "@/lib/email/registration-approved";
+import { sendRegistrationRejectedEmail } from "@/lib/email/registration-rejected";
 import { eventHasAnyPaidTickets } from "@/lib/ticket-types";
 import { canManageEvent } from "@/lib/permissions";
 import { getSiteUrl } from "@/lib/stripe";
@@ -21,6 +23,7 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       registrationId?: string;
       status?: "approved" | "rejected" | "withdrawn";
+      rejectionReason?: string;
     };
 
     const registrationId = body.registrationId;
@@ -84,12 +87,21 @@ export async function POST(request: Request) {
       );
     }
 
+    const rejectionReason = body.rejectionReason?.trim() ?? "";
+    if (status === "rejected" && !rejectionReason) {
+      return NextResponse.json(
+        { error: "Please provide a reason for the rejection." },
+        { status: 400 }
+      );
+    }
+
     const { error: updateError } = await supabase
       .from("registrations")
       .update({
         status,
         reviewed_at: new Date().toISOString(),
         reviewed_by: user.id,
+        rejection_reason: status === "rejected" ? rejectionReason : null,
       })
       .eq("id", registrationId);
 
@@ -133,9 +145,39 @@ export async function POST(request: Request) {
           });
 
           if (!emailResult.ok) {
-            emailWarning =
-              "Registration approved, but the approval email could not be sent. Ask the participant to check the event page.";
+            emailWarning = `Registration approved, but the approval email could not be sent. ${getBrevoEmailFailureMessage(emailResult)}`;
           }
+        }
+      }
+    }
+
+    if (status === "rejected") {
+      const admin = createAdminClient();
+      const { data: authUser, error: authError } =
+        await admin.auth.admin.getUserById(registration.user_id);
+
+      const recipientEmail = authUser?.user?.email;
+      const { data: participantProfile } = await admin
+        .from("profiles")
+        .select("full_name")
+        .eq("id", registration.user_id)
+        .single();
+
+      if (authError || !recipientEmail) {
+        emailWarning = "Registration rejected, but the participant email could not be found.";
+      } else {
+        const siteUrl = getSiteUrl(request);
+        const emailResult = await sendRegistrationRejectedEmail({
+          to: recipientEmail,
+          recipientName:
+            registration.display_name ?? participantProfile?.full_name ?? "",
+          competitionName: competition.name,
+          competitionUrl: `${siteUrl}/competitions/${competition.id}`,
+          reason: rejectionReason,
+        });
+
+        if (!emailResult.ok) {
+          emailWarning = `Registration rejected, but the notification email could not be sent. ${getBrevoEmailFailureMessage(emailResult)}`;
         }
       }
     }

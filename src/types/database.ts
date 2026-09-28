@@ -239,6 +239,7 @@ export type Database = {
           role: Database["public"]["Enums"]["registration_role"];
           status: Database["public"]["Enums"]["registration_status"];
           display_name: string | null;
+          rejection_reason: string | null;
           created_at: string;
           reviewed_at: string | null;
           reviewed_by: string | null;
@@ -250,6 +251,7 @@ export type Database = {
           role: Database["public"]["Enums"]["registration_role"];
           status?: Database["public"]["Enums"]["registration_status"];
           display_name?: string | null;
+          rejection_reason?: string | null;
           created_at?: string;
           reviewed_at?: string | null;
           reviewed_by?: string | null;
@@ -261,6 +263,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["registration_role"];
           status?: Database["public"]["Enums"]["registration_status"];
           display_name?: string | null;
+          rejection_reason?: string | null;
           created_at?: string;
           reviewed_at?: string | null;
           reviewed_by?: string | null;
