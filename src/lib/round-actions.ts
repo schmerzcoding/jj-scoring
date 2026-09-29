@@ -5,14 +5,16 @@ import {
   type LeaderboardEntry,
   type ParticipantRow,
 } from "@/lib/leaderboard";
+import { normalizeScoringFormat } from "@/lib/scoring-formats";
 import { createClient, fromTable, type AppSupabaseClient } from "@/lib/supabase/client";
-import type { Round, RoundStanding } from "@/types/database";
+import type { RegistrationRole, Round, RoundStanding } from "@/types/database";
 
 export function standingsToLeaderboard(
   standings: RoundStanding[],
   nameByRegistrationId?: Map<string, string>,
-  scoringFormat: Round["scoring_format"] = "numeric"
+  scoringFormat: Round["scoring_format"] = "placement"
 ): LeaderboardEntry[] {
+  const normalized = normalizeScoringFormat(scoringFormat);
   return standings
     .map((standing) => ({
       registrationId: standing.registration_id,
@@ -26,7 +28,7 @@ export function standingsToLeaderboard(
       judgeCount: standing.judge_count,
       rankInRole: standing.rank_in_role,
       advanced: standing.advanced,
-      scoringFormat: scoringFormat ?? "numeric",
+      scoringFormat: normalized,
       yesVotes: standing.yes_votes ?? 0,
       coefficientTotal: Number(standing.coefficient_total ?? 0),
     }))
@@ -34,6 +36,20 @@ export function standingsToLeaderboard(
       if (a.role !== b.role) return a.role.localeCompare(b.role);
       return a.rankInRole - b.rankInRole;
     });
+}
+
+export async function fetchJudgeRoles(
+  supabase: AppSupabaseClient,
+  competitionId: string
+): Promise<Map<string, RegistrationRole>> {
+  const { data } = await supabase
+    .from("competition_judges")
+    .select("judge_id, judge_role")
+    .eq("competition_id", competitionId);
+
+  return new Map(
+    data?.map((row) => [row.judge_id, row.judge_role as RegistrationRole]) ?? []
+  );
 }
 
 export async function fetchAdvancedIds(
@@ -55,6 +71,8 @@ export async function fetchLeaderboardForRound(
   allRounds: Round[],
   participants: ParticipantRow[]
 ): Promise<LeaderboardEntry[]> {
+  const scoringFormat = normalizeScoringFormat(round.scoring_format);
+
   if (round.status === "completed") {
     const { data: standings } = await supabase
       .from("round_standings")
@@ -66,7 +84,7 @@ export async function fetchLeaderboardForRound(
       const nameById = new Map(
         participants.map((p) => [p.id, p.display_name ?? p.profile?.full_name ?? "Unknown"])
       );
-      return standingsToLeaderboard(standings, nameById, round.scoring_format ?? "numeric");
+      return standingsToLeaderboard(standings, nameById, scoringFormat);
     }
   }
 
@@ -82,9 +100,11 @@ export async function fetchLeaderboardForRound(
     advancedIds
   );
 
+  const judgeRoles = await fetchJudgeRoles(supabase, round.competition_id);
+
   const { data: scores } = await supabase
     .from("scores")
-    .select("registration_id, score, advance_vote")
+    .select("registration_id, score, advance_vote, judge_id")
     .eq("round_id", round.id);
 
   return buildLeaderboard(
@@ -92,7 +112,8 @@ export async function fetchLeaderboardForRound(
     scores ?? [],
     round.max_advance_leaders,
     round.max_advance_followers,
-    round.scoring_format ?? "numeric"
+    scoringFormat,
+    judgeRoles
   );
 }
 
@@ -102,6 +123,7 @@ export async function completeRound(
   participants: ParticipantRow[]
 ): Promise<{ error?: string; advancedCount?: number }> {
   const supabase = createClient();
+  const scoringFormat = normalizeScoringFormat(round.scoring_format);
 
   const previousRound = getPreviousRound(allRounds, round);
   const advancedIds = previousRound
@@ -115,16 +137,20 @@ export async function completeRound(
     advancedIds
   );
 
+  const judgeRoles = await fetchJudgeRoles(supabase, round.competition_id);
+
   const { data: scores } = await supabase
     .from("scores")
-    .select("registration_id, score")
+    .select("registration_id, score, judge_id")
     .eq("round_id", round.id);
 
   const leaderboard = buildLeaderboard(
     eligible,
     scores ?? [],
     round.max_advance_leaders,
-    round.max_advance_followers
+    round.max_advance_followers,
+    scoringFormat,
+    judgeRoles
   );
 
   await fromTable(supabase, "round_standings").delete().eq("round_id", round.id);

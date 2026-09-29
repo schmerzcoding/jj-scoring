@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
 import { Leaderboard } from "@/components/leaderboard";
 import { completeRound, fetchLeaderboardForRound } from "@/lib/round-actions";
-import { scoringFormatLabel } from "@/lib/leaderboard";
+import { scoringFormatLabel } from "@/lib/scoring-formats";
 import type { LeaderboardEntry, ParticipantRow } from "@/lib/leaderboard";
 import type { Round, RoundScoringFormat } from "@/types/database";
 
@@ -27,7 +27,7 @@ export function RoundsPanel({
   const [name, setName] = useState("");
   const [roleType, setRoleType] = useState<"leader" | "follower" | "both">("both");
   const [scoringFormat, setScoringFormat] =
-    useState<RoundScoringFormat>("numeric");
+    useState<RoundScoringFormat>("placement");
   const [loading, setLoading] = useState(false);
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>({});
   const [loadingBoard, setLoadingBoard] = useState<string | null>(null);
@@ -169,7 +169,11 @@ export function RoundsPanel({
             setScoringFormat(e.target.value as RoundScoringFormat)
           }
           options={[
-            { value: "numeric", label: "Numeric (0–10)" },
+            { value: "placement", label: "Placement (1st, 2nd, 3rd…)" },
+            {
+              value: "crossed_placement",
+              label: "Crossed placement (judges score both roles)",
+            },
             {
               value: "vote_coefficient",
               label: "Yes/No + coefficient (tiebreak)",
@@ -221,7 +225,7 @@ function RoundRow({
             ({round.role_type})
           </span>
           <span className="ml-2 text-xs text-muted-foreground">
-            {scoringFormatLabel(round.scoring_format ?? "numeric")}
+            {scoringFormatLabel(round.scoring_format ?? "placement")}
           </span>
           {round.leaderboard_published && (
             <span className="ml-2 text-xs font-medium text-emerald-400">
@@ -292,7 +296,7 @@ function RoundRow({
             title={`${round.name} — Leaderboard`}
             entries={entries}
             showAdvanced={round.status === "completed"}
-            scoringFormat={round.scoring_format ?? "numeric"}
+            scoringFormat={round.scoring_format ?? "placement"}
           />
         </div>
       )}

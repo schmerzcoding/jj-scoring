@@ -46,7 +46,7 @@ function buildAchievement(
   round: Round,
   competition: Competition
 ): Achievement {
-  const scoringFormat = round.scoring_format ?? "numeric";
+  const scoringFormat = round.scoring_format ?? "placement";
   let kind: Achievement["kind"] = "participated";
   let label = `Competed in ${round.name}`;
 

@@ -6,6 +6,13 @@ import { competitionUsesApplyBeforePay } from "@/lib/competition-registration";
 import { isCompetitionEvent } from "@/lib/events";
 import { eventHasAnyPaidTickets } from "@/lib/ticket-types";
 import {
+  applySocialPassCredit,
+  canPurchasePassType,
+  getSocialPassCreditCents,
+  getUserPassEntitlementsForBundle,
+  resolvePassTypeForCheckout,
+} from "@/lib/pass-bundle";
+import {
   resolveCheckoutPriceCents,
   resolveTicketPriceCents,
 } from "@/lib/ticket-pricing";
@@ -162,16 +169,30 @@ async function handleCartCheckout({
     }
   }
 
+  const { entitlements } = await getUserPassEntitlementsForBundle(
+    supabase,
+    user.id,
+    competition.id
+  );
+
+  for (const item of cartItems) {
+    const ticketType = typeById.get(item.ticketTypeId)!;
+    const eligibility = canPurchasePassType(ticketType.pass_type, entitlements);
+    if (!eligibility.allowed) {
+      return NextResponse.json({ error: eligibility.reason }, { status: 400 });
+    }
+  }
+
   const lineItems = cartItems.map((item) => {
     const ticketType = typeById.get(item.ticketTypeId)!;
-    const unitCents = resolveCheckoutPriceCents(
-      ticketType.price_cents,
-      passFeesToBuyer
-    );
+    const creditCents = getSocialPassCreditCents(ticketType.pass_type, entitlements);
+    const discountedBaseCents = applySocialPassCredit(ticketType.price_cents, creditCents);
+    const unitCents = resolveCheckoutPriceCents(discountedBaseCents, passFeesToBuyer);
     return {
       ticketType,
       quantity: item.quantity,
       unitCents,
+      creditCents,
       subtotalCents: unitCents * item.quantity,
     };
   });
@@ -239,7 +260,10 @@ async function handleCartCheckout({
         unit_amount: line.unitCents,
         product_data: {
           name: `${competition.name} — ${line.ticketType.name}`,
-          description: line.ticketType.description ?? "Waddle Social event ticket",
+          description:
+            line.creditCents > 0
+              ? `${line.ticketType.description ?? "Waddle Social event ticket"} (includes €${(line.creditCents / 100).toFixed(0)} social pass credit)`
+              : line.ticketType.description ?? "Waddle Social event ticket",
         },
       },
     })),
@@ -392,7 +416,21 @@ async function handleLegacyCheckout({
     }
   }
 
-  const amountCents = resolveCheckoutPriceCents(baseAmountCents, passFeesToBuyer);
+  const { entitlements } = await getUserPassEntitlementsForBundle(
+    supabase,
+    user.id,
+    competition.id
+  );
+
+  const checkoutPassType = resolvePassTypeForCheckout(ticketType, isCompetition);
+  const eligibility = canPurchasePassType(checkoutPassType, entitlements);
+  if (!eligibility.allowed) {
+    return NextResponse.json({ error: eligibility.reason }, { status: 400 });
+  }
+
+  const creditCents = getSocialPassCreditCents(checkoutPassType, entitlements);
+  const discountedBaseCents = applySocialPassCredit(baseAmountCents, creditCents);
+  const amountCents = resolveCheckoutPriceCents(discountedBaseCents, passFeesToBuyer);
 
   const admin = createAdminClient();
   const { data: purchase, error: purchaseError } = await admin
@@ -427,8 +465,12 @@ async function handleLegacyCheckout({
         : ticketType?.name ?? "Ticket";
 
   const productDescription = requiresApprovedRegistration
-    ? "Competitor pass — includes social pass for the day"
-    : "Waddle Social event ticket";
+    ? creditCents > 0
+      ? `Competitor pass — includes social pass for the day (€${(creditCents / 100).toFixed(0)} social credit applied)`
+      : "Competitor pass — includes social pass for the day"
+    : creditCents > 0
+      ? `Waddle Social event ticket (€${(creditCents / 100).toFixed(0)} social pass credit applied)`
+      : "Waddle Social event ticket";
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",

@@ -1,5 +1,10 @@
 import { formatScore } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+  isPlacementFormat,
+  normalizeScoringFormat,
+  placementOrdinal,
+} from "@/lib/scoring-formats";
 import type { LeaderboardEntry } from "@/lib/leaderboard";
 import type { RoundScoringFormat } from "@/types/database";
 
@@ -20,7 +25,10 @@ export function Leaderboard({
 }: LeaderboardProps) {
   const leaders = entries.filter((e) => e.role === "leader");
   const followers = entries.filter((e) => e.role === "follower");
-  const format = scoringFormat ?? entries[0]?.scoringFormat ?? "numeric";
+  const format = normalizeScoringFormat(
+    scoringFormat ?? entries[0]?.scoringFormat ?? "placement"
+  );
+  const isPlacement = isPlacementFormat(format);
 
   if (entries.length === 0) {
     return (
@@ -40,12 +48,14 @@ export function Leaderboard({
           entries={leaders}
           showAdvanced={showAdvanced}
           scoringFormat={format}
+          isPlacement={isPlacement}
         />
         <LeaderboardColumn
           label="Followers"
           entries={followers}
           showAdvanced={showAdvanced}
           scoringFormat={format}
+          isPlacement={isPlacement}
         />
       </div>
     </div>
@@ -57,11 +67,13 @@ function LeaderboardColumn({
   entries,
   showAdvanced,
   scoringFormat,
+  isPlacement,
 }: {
   label: string;
   entries: LeaderboardEntry[];
   showAdvanced: boolean;
   scoringFormat: RoundScoringFormat;
+  isPlacement: boolean;
 }) {
   return (
     <div>
@@ -99,6 +111,18 @@ function LeaderboardColumn({
                     <div className="text-xs">
                       coef {formatScore(entry.coefficientTotal)} (
                       {entry.judgeCount} judges)
+                    </div>
+                  </>
+                ) : isPlacement ? (
+                  <>
+                    <div className="font-semibold text-foreground">
+                      avg {formatScore(entry.averageScore)}
+                    </div>
+                    <div className="text-xs">
+                      {entry.judgeCount} judges · sum {formatScore(entry.totalScore)}
+                      {entry.averageScore > 0 && entry.averageScore <= 20 && (
+                        <> (~{placementOrdinal(Math.round(entry.averageScore))})</>
+                      )}
                     </div>
                   </>
                 ) : (

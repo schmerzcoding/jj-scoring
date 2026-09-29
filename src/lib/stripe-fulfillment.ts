@@ -2,16 +2,21 @@ import type Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isCompetitionEvent } from "@/lib/events";
 import { resolvePassTypeForPurchase } from "@/lib/ticket-pass";
+import { ensureTicketPassCode } from "@/lib/ticket-pass-code";
+import { notifyTicketPurchaseConfirmations } from "@/lib/ticket-purchase-notify";
 import { ensureTicketQrToken, generateQrToken } from "@/lib/ticket-qr";
 import type { RegistrationRole, TicketPurchase } from "@/types/database";
 
+type FulfillmentResult = { ok: boolean; error?: string };
+
 export async function fulfillCheckoutSession(
-  session: Stripe.Checkout.Session
-): Promise<{ ok: boolean; error?: string }> {
+  session: Stripe.Checkout.Session,
+  request?: Request
+): Promise<FulfillmentResult> {
   const checkoutSessionId = session.metadata?.checkout_session_id;
 
   if (checkoutSessionId) {
-    return fulfillCartCheckoutSession(session, checkoutSessionId);
+    return fulfillCartCheckoutSession(session, checkoutSessionId, request);
   }
 
   const purchaseId = session.metadata?.purchase_id;
@@ -19,13 +24,14 @@ export async function fulfillCheckoutSession(
     return { ok: false, error: "Checkout session missing purchase metadata." };
   }
 
-  return fulfillSinglePurchase(session, purchaseId);
+  return fulfillSinglePurchase(session, purchaseId, request);
 }
 
 async function fulfillCartCheckoutSession(
   session: Stripe.Checkout.Session,
-  checkoutSessionId: string
-): Promise<{ ok: boolean; error?: string }> {
+  checkoutSessionId: string,
+  request?: Request
+): Promise<FulfillmentResult> {
   const admin = createAdminClient();
 
   const { data: purchases, error: purchasesError } = await admin
@@ -45,9 +51,12 @@ async function fulfillCartCheckoutSession(
       ? session.payment_intent
       : session.payment_intent?.id ?? null;
 
+  const newlyPaidPurchaseIds: string[] = [];
+
   for (const purchase of purchases) {
     if (purchase.status === "paid") {
       await ensureTicketQrToken(admin, purchase.id);
+      await ensureTicketPassCode(admin, purchase.id);
       continue;
     }
 
@@ -70,7 +79,9 @@ async function fulfillCartCheckoutSession(
     }
 
     await ensureTicketQrToken(admin, purchase.id);
+    await ensureTicketPassCode(admin, purchase.id);
     await maybeCreateCompetitionRegistration(admin, purchase);
+    newlyPaidPurchaseIds.push(purchase.id);
   }
 
   await admin
@@ -82,13 +93,16 @@ async function fulfillCartCheckoutSession(
     })
     .eq("id", checkoutSessionId);
 
+  await notifyTicketPurchaseConfirmations(newlyPaidPurchaseIds, request);
+
   return { ok: true };
 }
 
 async function fulfillSinglePurchase(
   session: Stripe.Checkout.Session,
-  purchaseId: string
-): Promise<{ ok: boolean; error?: string }> {
+  purchaseId: string,
+  request?: Request
+): Promise<FulfillmentResult> {
   const admin = createAdminClient();
   const { data: purchase, error: purchaseError } = await admin
     .from("ticket_purchases")
@@ -105,6 +119,7 @@ async function fulfillSinglePurchase(
 
   if (purchase.status === "paid") {
     await ensureTicketQrToken(admin, purchase.id);
+    await ensureTicketPassCode(admin, purchase.id);
     return { ok: true };
   }
 
@@ -132,7 +147,9 @@ async function fulfillSinglePurchase(
   }
 
   await ensureTicketQrToken(admin, purchase.id);
+  await ensureTicketPassCode(admin, purchase.id);
   await maybeCreateCompetitionRegistration(admin, purchase);
+  await notifyTicketPurchaseConfirmations([purchase.id], request);
 
   return { ok: true };
 }
@@ -215,8 +232,9 @@ async function maybeCreateCompetitionRegistration(
 }
 
 export async function confirmCheckoutSessionById(
-  sessionId: string
-): Promise<{ ok: boolean; error?: string }> {
+  sessionId: string,
+  request?: Request
+): Promise<FulfillmentResult> {
   const { getStripe } = await import("@/lib/stripe");
   const session = await getStripe().checkout.sessions.retrieve(sessionId);
 
@@ -224,5 +242,5 @@ export async function confirmCheckoutSessionById(
     return { ok: false, error: "Payment not completed yet." };
   }
 
-  return fulfillCheckoutSession(session);
+  return fulfillCheckoutSession(session, request);
 }

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     if (session.payment_status === "paid") {
-      const result = await fulfillCheckoutSession(session);
+      const result = await fulfillCheckoutSession(session, request);
       if (!result.ok) {
         console.error("Stripe webhook fulfillment failed:", result.error);
         return NextResponse.json({ error: result.error }, { status: 500 });

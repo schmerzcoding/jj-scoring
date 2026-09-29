@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await confirmCheckoutSessionById(body.sessionId);
+    const result = await confirmCheckoutSessionById(body.sessionId, request);
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }

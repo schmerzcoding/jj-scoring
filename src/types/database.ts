@@ -287,18 +287,21 @@ export type Database = {
           id: string;
           competition_id: string;
           judge_id: string;
+          judge_role: Database["public"]["Enums"]["registration_role"];
           assigned_at: string;
         };
         Insert: {
           id?: string;
           competition_id: string;
           judge_id: string;
+          judge_role?: Database["public"]["Enums"]["registration_role"];
           assigned_at?: string;
         };
         Update: {
           id?: string;
           competition_id?: string;
           judge_id?: string;
+          judge_role?: Database["public"]["Enums"]["registration_role"];
           assigned_at?: string;
         };
         Relationships: [];
@@ -432,6 +435,8 @@ export type Database = {
           stripe_checkout_session_id: string | null;
           stripe_payment_intent_id: string | null;
           qr_token: string | null;
+          pass_code: string | null;
+          purchase_confirmation_sent_at: string | null;
           checked_in_at: string | null;
           checked_in_by: string | null;
           purchased_at: string;
@@ -451,6 +456,8 @@ export type Database = {
           stripe_checkout_session_id?: string | null;
           stripe_payment_intent_id?: string | null;
           qr_token?: string | null;
+          pass_code?: string | null;
+          purchase_confirmation_sent_at?: string | null;
           checked_in_at?: string | null;
           checked_in_by?: string | null;
           purchased_at?: string;
@@ -470,6 +477,8 @@ export type Database = {
           stripe_checkout_session_id?: string | null;
           stripe_payment_intent_id?: string | null;
           qr_token?: string | null;
+          pass_code?: string | null;
+          purchase_confirmation_sent_at?: string | null;
           checked_in_at?: string | null;
           checked_in_by?: string | null;
           purchased_at?: string;
@@ -508,7 +517,11 @@ export type Database = {
       registration_status: "pending" | "approved" | "rejected" | "withdrawn";
       round_role_type: "leader" | "follower" | "both";
       round_status: "pending" | "active" | "completed";
-      round_scoring_format: "numeric" | "vote_coefficient";
+      round_scoring_format:
+        | "numeric"
+        | "vote_coefficient"
+        | "placement"
+        | "crossed_placement";
       profile_gender:
         | "male"
         | "female"

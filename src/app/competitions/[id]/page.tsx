@@ -21,6 +21,11 @@ import {
   isRegistrationConfirmed,
   userHasPaidCompetitionPass,
 } from "@/lib/competition-registration";
+import {
+  filterAvailableTicketTypes,
+  getUserPassEntitlementsForBundle,
+  type PassEntitlements,
+} from "@/lib/pass-bundle";
 import { RegistrationForm } from "./registration-form";
 import { TicketPurchaseForm } from "@/components/ticket-purchase-form";
 import { TicketCartForm } from "@/components/ticket-cart-form";
@@ -98,8 +103,17 @@ export default async function CompetitionDetailPage({
   }
 
   const ownedTypeIds = getOwnedTicketTypeIds(paidTicketPurchases);
-  const availableTicketTypes = ticketTypes.filter(
-    (type) => type.is_active && type.price_cents > 0 && !ownedTypeIds.includes(type.id)
+  let passEntitlements: PassEntitlements | null = null;
+
+  if (user) {
+    const bundle = await getUserPassEntitlementsForBundle(supabase, user.id, id);
+    passEntitlements = bundle.entitlements;
+  }
+
+  const availableTicketTypes = filterAvailableTicketTypes(
+    ticketTypes,
+    ownedTypeIds,
+    passEntitlements
   );
   const canBuyMoreTickets = availableTicketTypes.length > 0;
   const typeNameById = new Map(ticketTypes.map((type) => [type.id, type.name]));
@@ -244,6 +258,7 @@ export default async function CompetitionDetailPage({
             ticketTypes={ticketTypes}
             ownedTypeIds={ownedTypeIds}
             passFeesToBuyer={competition.pass_fees_to_buyer ?? false}
+            passEntitlements={passEntitlements}
           />
         )}
 
@@ -399,7 +414,11 @@ export default async function CompetitionDetailPage({
         )}
 
       {isCompetition && awaitingPayment && competition.registration_open && (
-        <CompetitionPaymentForm event={competition} role={existingRegistration.role} />
+        <CompetitionPaymentForm
+          event={competition}
+          role={existingRegistration.role}
+          passEntitlements={passEntitlements}
+        />
       )}
 
       {isCompetition && existingRegistration && (
@@ -496,7 +515,7 @@ export default async function CompetitionDetailPage({
                 title={round.name}
                 entries={entries}
                 showAdvanced={false}
-                scoringFormat={round.scoring_format ?? "numeric"}
+                scoringFormat={round.scoring_format ?? "placement"}
               />
             ))
           )}

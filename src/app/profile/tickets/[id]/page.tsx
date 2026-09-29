@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect, notFound } from "next/navigation";
 import { isAdminRole } from "@/lib/auth";
+import { ensureTicketPassCode } from "@/lib/ticket-pass-code";
 import { ensureTicketQrToken } from "@/lib/ticket-qr";
 import { formatPassTypeLabel } from "@/lib/ticket-pass";
 import { getTicketTypeLabel } from "@/lib/ticket-types";
@@ -48,8 +49,9 @@ export default async function ProfileTicketPage({
 
   const admin = createAdminClient();
   const qrToken = (await ensureTicketQrToken(admin, ticket.id)) ?? ticket.qr_token;
+  const passCode = (await ensureTicketPassCode(admin, ticket.id)) ?? ticket.pass_code;
 
-  if (!qrToken) notFound();
+  if (!qrToken || !passCode) notFound();
 
   const { data: competition } = await supabase
     .from("competitions")
@@ -108,6 +110,12 @@ export default async function ProfileTicketPage({
           <div className="flex justify-between gap-4">
             <dt className="text-muted">Pass type</dt>
             <dd className="font-medium text-foreground">{passLabel}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Pass ID</dt>
+            <dd className="font-mono text-sm font-medium tracking-wide text-foreground">
+              {passCode}
+            </dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-muted">Date</dt>

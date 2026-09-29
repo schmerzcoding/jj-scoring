@@ -105,6 +105,14 @@ function TicketRow({
               formatPassTypeLabel(ticket.pass_type, ticket.role)
             )}
           </span>
+          {ticket.pass_code && (
+            <>
+              <span>·</span>
+              <span className="font-mono text-xs tracking-wide text-muted-foreground">
+                {ticket.pass_code}
+              </span>
+            </>
+          )}
           <span>·</span>
           <span>
             {formatEventDateRange(

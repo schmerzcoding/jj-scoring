@@ -8,6 +8,13 @@ import {
   resolveCheckoutPriceCents,
   TICKET_VAT_NOTICE,
 } from "@/lib/ticket-pricing";
+import {
+  applySocialPassCredit,
+  filterAvailableTicketTypes,
+  getSocialPassCreditCents,
+  getSocialPassCreditLabel,
+  type PassEntitlements,
+} from "@/lib/pass-bundle";
 import { formatPassTypeLabel } from "@/lib/ticket-pass";
 import type { TicketType } from "@/types/database";
 
@@ -17,15 +24,19 @@ export function TicketCartForm({
   ticketTypes,
   ownedTypeIds,
   passFeesToBuyer = false,
+  passEntitlements = null,
 }: {
   eventId: string;
   eventName: string;
   ticketTypes: TicketType[];
   ownedTypeIds: string[];
   passFeesToBuyer?: boolean;
+  passEntitlements?: PassEntitlements | null;
 }) {
-  const availableTypes = ticketTypes.filter(
-    (type) => type.is_active && type.price_cents > 0 && !ownedTypeIds.includes(type.id)
+  const availableTypes = filterAvailableTicketTypes(
+    ticketTypes,
+    ownedTypeIds,
+    passEntitlements
   );
 
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -42,12 +53,16 @@ export function TicketCartForm({
       .filter((line) => line.quantity > 0);
   }, [availableTypes, quantities]);
 
-  function buyerPriceCents(baseCents: number): number {
-    return resolveCheckoutPriceCents(baseCents, passFeesToBuyer);
+  function buyerPriceCents(type: TicketType): number {
+    const creditCents = passEntitlements
+      ? getSocialPassCreditCents(type.pass_type, passEntitlements)
+      : 0;
+    const discountedBase = applySocialPassCredit(type.price_cents, creditCents);
+    return resolveCheckoutPriceCents(discountedBase, passFeesToBuyer);
   }
 
   const totalCents = cartLines.reduce(
-    (sum, line) => sum + buyerPriceCents(line.type.price_cents) * line.quantity,
+    (sum, line) => sum + buyerPriceCents(line.type) * line.quantity,
     0
   );
 
@@ -108,7 +123,16 @@ export function TicketCartForm({
         </p>
 
         <div className="space-y-3">
-          {availableTypes.map((type) => (
+          {availableTypes.map((type) => {
+            const creditCents = passEntitlements
+              ? getSocialPassCreditCents(type.pass_type, passEntitlements)
+              : 0;
+            const creditLabel = passEntitlements
+              ? getSocialPassCreditLabel(type.pass_type, passEntitlements)
+              : null;
+            const displayPriceCents = buyerPriceCents(type);
+
+            return (
             <div
               key={type.id}
               className="rounded-xl border border-border bg-surface-raised/60 p-4"
@@ -118,8 +142,20 @@ export function TicketCartForm({
                   <p className="font-medium text-foreground">{type.name}</p>
                   <p className="mt-1 text-sm text-muted">
                     {formatPassTypeLabel(type.pass_type, type.role)} ·{" "}
-                    {formatPrice(buyerPriceCents(type.price_cents))}
+                    {creditCents > 0 && (
+                      <span className="mr-2 text-muted line-through">
+                        {formatPrice(
+                          resolveCheckoutPriceCents(type.price_cents, passFeesToBuyer)
+                        )}
+                      </span>
+                    )}
+                    <span className="font-medium text-foreground">
+                      {formatPrice(displayPriceCents)}
+                    </span>
                   </p>
+                  {creditLabel && (
+                    <p className="mt-1 text-xs font-medium text-emerald-400">{creditLabel}</p>
+                  )}
                   {type.description && (
                     <p className="mt-2 text-sm text-muted-foreground">
                       {type.description}
@@ -154,7 +190,8 @@ export function TicketCartForm({
                 </div>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
 
         {cartLines.length > 0 && (
@@ -164,7 +201,7 @@ export function TicketCartForm({
             </p>
             <ul className="mt-2 space-y-2">
               {cartLines.map((line) => {
-                const unitCents = buyerPriceCents(line.type.price_cents);
+                const unitCents = buyerPriceCents(line.type);
                 const lineTotalCents = unitCents * line.quantity;
                 return (
                   <li

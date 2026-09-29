@@ -1,4 +1,11 @@
 import type { RegistrationRole, Round, RoundScoringFormat } from "@/types/database";
+import {
+  normalizeScoringFormat,
+  scoreCountsForParticipant,
+  scoringFormatLabel,
+} from "@/lib/scoring-formats";
+
+export { scoringFormatLabel };
 
 export interface LeaderboardEntry {
   registrationId: string;
@@ -18,6 +25,7 @@ export interface ScoreRow {
   registration_id: string;
   score: number;
   advance_vote?: boolean | null;
+  judge_id?: string;
 }
 
 export interface ParticipantRow {
@@ -54,20 +62,40 @@ function rankEntries(
   rankGroup("follower");
 }
 
-function buildNumericLeaderboard(
+function buildPlacementLeaderboard(
   participants: ParticipantRow[],
   scores: ScoreRow[],
   maxAdvanceLeaders: number | null,
-  maxAdvanceFollowers: number | null
+  maxAdvanceFollowers: number | null,
+  scoringFormat: RoundScoringFormat,
+  judgeRoles: Map<string, RegistrationRole>
 ): LeaderboardEntry[] {
   const totals = new Map<string, { sum: number; count: number }>();
 
   for (const score of scores) {
+    if (!score.judge_id) continue;
+
+    const participant = participants.find((p) => p.id === score.registration_id);
+    if (!participant) continue;
+
+    if (
+      !scoreCountsForParticipant(
+        scoringFormat,
+        participant.role,
+        score.judge_id,
+        judgeRoles
+      )
+    ) {
+      continue;
+    }
+
     const current = totals.get(score.registration_id) ?? { sum: 0, count: 0 };
     current.sum += Number(score.score);
     current.count += 1;
     totals.set(score.registration_id, current);
   }
+
+  const normalizedFormat = normalizeScoringFormat(scoringFormat);
 
   const entries: LeaderboardEntry[] = participants.map((participant) => {
     const stats = totals.get(participant.id) ?? { sum: 0, count: 0 };
@@ -80,15 +108,15 @@ function buildNumericLeaderboard(
       judgeCount: stats.count,
       rankInRole: 0,
       advanced: false,
-      scoringFormat: "numeric",
+      scoringFormat: normalizedFormat,
       yesVotes: 0,
       coefficientTotal: 0,
     };
   });
 
   rankEntries(entries, maxAdvanceLeaders, maxAdvanceFollowers, (a, b) => {
-    if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
-    if (b.averageScore !== a.averageScore) return b.averageScore - a.averageScore;
+    if (a.averageScore !== b.averageScore) return a.averageScore - b.averageScore;
+    if (a.totalScore !== b.totalScore) return a.totalScore - b.totalScore;
     return a.displayName.localeCompare(b.displayName);
   });
 
@@ -163,9 +191,12 @@ export function buildLeaderboard(
   scores: ScoreRow[],
   maxAdvanceLeaders: number | null,
   maxAdvanceFollowers: number | null,
-  scoringFormat: RoundScoringFormat = "numeric"
+  scoringFormat: RoundScoringFormat = "placement",
+  judgeRoles: Map<string, RegistrationRole> = new Map()
 ): LeaderboardEntry[] {
-  if (scoringFormat === "vote_coefficient") {
+  const normalized = normalizeScoringFormat(scoringFormat);
+
+  if (normalized === "vote_coefficient") {
     return buildVoteLeaderboard(
       participants,
       scores,
@@ -174,11 +205,13 @@ export function buildLeaderboard(
     );
   }
 
-  return buildNumericLeaderboard(
+  return buildPlacementLeaderboard(
     participants,
     scores,
     maxAdvanceLeaders,
-    maxAdvanceFollowers
+    maxAdvanceFollowers,
+    normalized,
+    judgeRoles
   );
 }
 
@@ -205,11 +238,4 @@ export function getPreviousRound(allRounds: Round[], round: Round): Round | null
       .filter((r) => r.order_index < round.order_index)
       .sort((a, b) => b.order_index - a.order_index)[0] ?? null
   );
-}
-
-export function scoringFormatLabel(format: RoundScoringFormat): string {
-  if (format === "vote_coefficient") {
-    return "Yes/No + coefficient";
-  }
-  return "Numeric (0–10)";
 }

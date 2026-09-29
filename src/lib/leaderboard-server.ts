@@ -5,7 +5,8 @@ import {
   type LeaderboardEntry,
   type ParticipantRow,
 } from "@/lib/leaderboard";
-import { standingsToLeaderboard } from "@/lib/round-actions";
+import { fetchJudgeRoles, standingsToLeaderboard } from "@/lib/round-actions";
+import { normalizeScoringFormat } from "@/lib/scoring-formats";
 import type { AppSupabaseClient } from "@/lib/supabase/client";
 import type { Round } from "@/types/database";
 
@@ -32,6 +33,8 @@ export async function getLeaderboardForRoundServer(
   allRounds: Round[],
   participants: ParticipantRow[] = []
 ): Promise<LeaderboardEntry[]> {
+  const scoringFormat = normalizeScoringFormat(round.scoring_format);
+
   const { data: standings } = await supabase
     .from("round_standings")
     .select("*")
@@ -48,11 +51,7 @@ export async function getLeaderboardForRoundServer(
             ])
           )
         : undefined;
-    return standingsToLeaderboard(
-      standings,
-      nameById,
-      round.scoring_format ?? "numeric"
-    );
+    return standingsToLeaderboard(standings, nameById, scoringFormat);
   }
 
   if (round.status !== "completed") {
@@ -64,9 +63,11 @@ export async function getLeaderboardForRoundServer(
       advancedIds
     );
 
+    const judgeRoles = await fetchJudgeRoles(supabase, round.competition_id);
+
     const { data: scores } = await supabase
       .from("scores")
-      .select("registration_id, score, advance_vote")
+      .select("registration_id, score, advance_vote, judge_id")
       .eq("round_id", round.id);
 
     return buildLeaderboard(
@@ -74,7 +75,8 @@ export async function getLeaderboardForRoundServer(
       scores ?? [],
       round.max_advance_leaders,
       round.max_advance_followers,
-      round.scoring_format ?? "numeric"
+      scoringFormat,
+      judgeRoles
     );
   }
 

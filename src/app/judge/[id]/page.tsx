@@ -15,6 +15,7 @@ import {
 } from "@/lib/competition-registration";
 import { eventHasAnyPaidTickets, fetchActiveTicketTypes } from "@/lib/ticket-types";
 import { getEligibleParticipants } from "@/lib/leaderboard";
+import { participantsForJudge } from "@/lib/scoring-formats";
 import type { ParticipantRow } from "@/lib/leaderboard";
 
 export default async function JudgeCompetitionPage({
@@ -36,6 +37,13 @@ export default async function JudgeCompetitionPage({
     .eq("id", id)
     .single();
   if (!competition) notFound();
+
+  const { data: judgeAssignment } = await supabase
+    .from("competition_judges")
+    .select("judge_role")
+    .eq("competition_id", id)
+    .eq("judge_id", user.id)
+    .maybeSingle();
 
   const { data: rounds } = await supabase
     .from("rounds")
@@ -95,6 +103,11 @@ export default async function JudgeCompetitionPage({
       rounds ?? [],
       participants,
       advancedIds
+    );
+    filteredRegistrations = participantsForJudge(
+      filteredRegistrations,
+      activeRound.scoring_format,
+      judgeAssignment?.judge_role ?? null
     );
   }
 
@@ -169,7 +182,7 @@ export default async function JudgeCompetitionPage({
           roundName={activeRound.name}
           judgeId={user.id}
           participants={filteredRegistrations}
-          scoringFormat={activeRound.scoring_format ?? "numeric"}
+          scoringFormat={activeRound.scoring_format ?? "placement"}
           existingScores={existingScores}
         />
       ) : (
@@ -190,7 +203,7 @@ export default async function JudgeCompetitionPage({
               title={round.name}
               entries={entries}
               showAdvanced={round.status === "completed"}
-              scoringFormat={round.scoring_format ?? "numeric"}
+              scoringFormat={round.scoring_format ?? "placement"}
             />
           ))}
         </div>
