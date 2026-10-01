@@ -18,10 +18,12 @@ export function RoundsPanel({
   competitionId,
   rounds,
   participants,
+  readOnly = false,
 }: {
   competitionId: string;
   rounds: Round[];
   participants: ParticipantRow[];
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -138,11 +140,13 @@ export function RoundsPanel({
               onTogglePublish={togglePublish}
               onLoadLeaderboard={() => loadLeaderboard(round)}
               busy={loading}
+              readOnly={readOnly}
             />
           ))}
         </div>
       )}
 
+      {!readOnly && (
       <form onSubmit={addRound} className="flex flex-wrap items-end gap-3 border-t border-border pt-4">
         <Input
           label="Round name"
@@ -184,6 +188,7 @@ export function RoundsPanel({
           Add Round
         </Button>
       </form>
+      )}
     </Card>
   );
 }
@@ -198,6 +203,7 @@ function RoundRow({
   onTogglePublish,
   onLoadLeaderboard,
   busy,
+  readOnly = false,
 }: {
   round: Round;
   entries?: LeaderboardEntry[];
@@ -208,6 +214,7 @@ function RoundRow({
   onTogglePublish: (round: Round, published: boolean) => void;
   onLoadLeaderboard: () => void;
   busy: boolean;
+  readOnly?: boolean;
 }) {
   const [maxLeaders, setMaxLeaders] = useState(
     round.max_advance_leaders?.toString() ?? ""
@@ -235,12 +242,12 @@ function RoundRow({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={round.status} />
-          {round.status === "pending" && (
+          {!readOnly && round.status === "pending" && (
             <Button size="sm" onClick={onActivate}>
               Activate
             </Button>
           )}
-          {round.status === "active" && (
+          {!readOnly && round.status === "active" && (
             <Button size="sm" variant="secondary" onClick={onComplete} disabled={busy}>
               Complete & calculate advancement
             </Button>
@@ -257,6 +264,7 @@ function RoundRow({
           value={maxLeaders}
           onChange={(e) => setMaxLeaders(e.target.value)}
           className="w-36"
+          disabled={readOnly}
         />
         <Input
           label="Followers advancing"
@@ -266,27 +274,38 @@ function RoundRow({
           value={maxFollowers}
           onChange={(e) => setMaxFollowers(e.target.value)}
           className="w-36"
+          disabled={readOnly}
         />
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={() => onSaveAdvance(round, maxLeaders, maxFollowers)}
-        >
-          Save advancement
-        </Button>
+        {!readOnly && (
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => onSaveAdvance(round, maxLeaders, maxFollowers)}
+          >
+            Save advancement
+          </Button>
+        )}
         <Button size="sm" variant="ghost" onClick={onLoadLeaderboard} loading={loadingBoard}>
           {loadingBoard ? "Loading..." : "Show leaderboard"}
         </Button>
         {round.status === "completed" && (
-          <label className="flex items-center gap-2 pb-2 text-sm text-foreground">
-            <input
-              type="checkbox"
-              checked={round.leaderboard_published}
-              onChange={(e) => onTogglePublish(round, e.target.checked)}
-              className="rounded border-border bg-surface-raised text-brand-500 focus:ring-brand-600/30"
-            />
-            Publish leaderboard publicly
-          </label>
+          readOnly ? (
+            <span className="pb-2 text-sm text-muted">
+              {round.leaderboard_published
+                ? "Leaderboard published"
+                : "Leaderboard not published"}
+            </span>
+          ) : (
+            <label className="flex items-center gap-2 pb-2 text-sm text-foreground">
+              <input
+                type="checkbox"
+                checked={round.leaderboard_published}
+                onChange={(e) => onTogglePublish(round, e.target.checked)}
+                className="rounded border-border bg-surface-raised text-brand-500 focus:ring-brand-600/30"
+              />
+              Publish leaderboard publicly
+            </label>
+          )
         )}
       </div>
 

@@ -6,6 +6,9 @@ import { EventTypeBadge } from "@/components/event-type-badge";
 import { formatEventDateRange } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { AdminReadOnlyBanner } from "@/components/admin-read-only-banner";
+import { canPerformAdminWrites } from "@/lib/admin-access";
+import { requireAdminPanelAccess } from "@/lib/admin-page-auth";
 import { ResetCompetitionsButton } from "./reset-competitions-button";
 
 export default async function AdminDashboard() {
@@ -22,7 +25,8 @@ export default async function AdminDashboard() {
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") redirect("/");
+  requireAdminPanelAccess(profile?.role);
+  const readOnly = !canPerformAdminWrites(profile?.role);
 
   const { data: competitions } = await supabase
     .from("competitions")
@@ -57,10 +61,16 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8">
+      {readOnly && <AdminReadOnlyBanner />}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-          <p className="mt-1 text-muted">Manage events, users, and registrations.</p>
+          <p className="mt-1 text-muted">
+            {readOnly
+              ? "View events, registrations, and platform activity."
+              : "Manage events, users, and registrations."}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/admin/sales">
@@ -69,9 +79,11 @@ export default async function AdminDashboard() {
           <Link href="/admin/users">
             <Button variant="secondary">Users</Button>
           </Link>
-          <Link href="/admin/competitions/new">
-            <Button>New Event</Button>
-          </Link>
+          {!readOnly && (
+            <Link href="/admin/competitions/new">
+              <Button>New Event</Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -110,9 +122,11 @@ export default async function AdminDashboard() {
               title="No events yet"
               description="Create your first dance event to get started."
               action={
-                <Link href="/admin/competitions/new">
-                  <Button>New Event</Button>
-                </Link>
+                !readOnly ? (
+                  <Link href="/admin/competitions/new">
+                    <Button>New Event</Button>
+                  </Link>
+                ) : undefined
               }
             />
           )}
@@ -149,7 +163,9 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      <ResetCompetitionsButton competitionCount={competitions?.length ?? 0} />
+      {!readOnly && (
+        <ResetCompetitionsButton competitionCount={competitions?.length ?? 0} />
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { PassPurchasesList } from "@/components/pass-purchases-list";
 import { fetchEventsWithSales } from "@/lib/event-sales-server";
 import { sumSalesStats } from "@/lib/event-sales";
 import { fetchPaidPassPurchases } from "@/lib/pass-purchases-server";
+import { requireAdminPanelAccess } from "@/lib/admin-page-auth";
 
 export default async function AdminSalesPage() {
   const supabase = await createClient();
@@ -22,7 +23,7 @@ export default async function AdminSalesPage() {
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") redirect("/");
+  requireAdminPanelAccess(profile?.role);
 
   const [events, paidPasses] = await Promise.all([
     fetchEventsWithSales(supabase),

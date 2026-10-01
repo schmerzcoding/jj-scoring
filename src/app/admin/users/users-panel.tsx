@@ -20,9 +20,11 @@ import type { UserRole } from "@/types/database";
 export function UsersPanel({
   users: initialUsers,
   currentUserId,
+  readOnly = false,
 }: {
   users: AdminUserRow[];
   currentUserId: string;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [users, setUsers] = useState(initialUsers);
@@ -96,11 +98,16 @@ export function UsersPanel({
 
       <Card
         title={`${users.length} user${users.length === 1 ? "" : "s"}`}
-        description="Assign roles or remove accounts. Admin accounts cannot be deleted from here."
+        description={
+          readOnly
+            ? "View-only access. Role changes and deletions require a full admin."
+            : "Assign roles or remove accounts. Admin accounts cannot be deleted from here."
+        }
       >
         <div className="divide-y divide-border">
           {users.map((user) => {
-            const isAdmin = user.role === "admin";
+            const isProtectedStaff =
+              user.role === "admin" || user.role === "pseudo_admin";
             const busy = pendingRole === user.id || deletingId === user.id;
 
             return (
@@ -131,7 +138,7 @@ export function UsersPanel({
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                  {!isAdmin && (
+                  {!readOnly && !isProtectedStaff && (
                     <Select
                       label="Role"
                       value={user.role}
@@ -147,7 +154,7 @@ export function UsersPanel({
                     />
                   )}
 
-                  {canDeleteUser(user, currentUserId) ? (
+                  {!readOnly && canDeleteUser(user, currentUserId) ? (
                     <Button
                       size="sm"
                       variant="danger"
@@ -159,7 +166,11 @@ export function UsersPanel({
                     </Button>
                   ) : (
                     <span className="text-xs text-muted-foreground sm:mb-2">
-                      {isAdmin ? "Protected admin" : "Cannot delete"}
+                      {isProtectedStaff
+                        ? "Protected staff role"
+                        : readOnly
+                          ? "View only"
+                          : "Cannot delete"}
                     </span>
                   )}
                 </div>

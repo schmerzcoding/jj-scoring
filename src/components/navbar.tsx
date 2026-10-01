@@ -8,6 +8,7 @@ import {
 import { isWaddleCupPromoVisible, waddleCupLandingPath } from "@/lib/waddle-cup";
 import { ButtonLink } from "@/components/ui/button";
 import { NavbarShell } from "@/components/navbar-shell";
+import { hasAdminPanelAccess } from "@/lib/admin-access";
 import { UserMenu, type UserMenuItem } from "./user-menu";
 
 export async function Navbar() {
@@ -31,7 +32,7 @@ export async function Navbar() {
 
   const userMenuItems: UserMenuItem[] = [];
 
-  if (profile && profile.role !== "admin") {
+  if (profile && !hasAdminPanelAccess(profile.role)) {
     userMenuItems.push({
       href: profile.profile_completed ? "/profile" : "/profile/setup",
       label: profile.profile_completed ? "Profile" : "Complete profile",
@@ -60,7 +61,7 @@ export async function Navbar() {
 
   mobileNavItems.push({ kind: "link", href: "/competitions", label: "Events" });
 
-  if (user && profile?.role === "admin") {
+  if (user && hasAdminPanelAccess(profile?.role)) {
     mobileNavItems.push(
       { kind: "link", href: "/admin", label: "Admin" },
       { kind: "link", href: "/admin/sales", label: "Sales" }
@@ -79,7 +80,7 @@ export async function Navbar() {
   }
 
   if (user) {
-    if (profile && profile.role !== "admin") {
+    if (profile && !hasAdminPanelAccess(profile.role)) {
       mobileNavItems.push({
         kind: "link",
         href: profile.profile_completed ? "/profile" : "/profile/setup",
@@ -115,7 +116,7 @@ export async function Navbar() {
             Events
           </Link>
 
-          {user && profile?.role === "admin" && (
+          {user && hasAdminPanelAccess(profile?.role) && (
             <>
               <Link href="/admin" className={navLinkClass}>
                 Admin

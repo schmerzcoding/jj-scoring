@@ -1,3 +1,4 @@
+import { hasAdminPanelAccess } from "@/lib/admin-access";
 import type { Profile, UserRole } from "@/types/database";
 import type { AuthError, User } from "@supabase/supabase-js";
 
@@ -29,8 +30,9 @@ export function isEmailVerified(user: User): boolean {
   return Boolean(user.email_confirmed_at);
 }
 
+/** Admin or Pseudo Admin — staff accounts without a dancer profile. */
 export function isAdminRole(role: UserRole | undefined): boolean {
-  return role === "admin";
+  return hasAdminPanelAccess(role);
 }
 
 /** Non-admin users who can maintain a dancer profile and join competitions. */

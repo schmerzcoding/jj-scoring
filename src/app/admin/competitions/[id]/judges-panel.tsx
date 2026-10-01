@@ -13,10 +13,12 @@ export function JudgesPanel({
   competitionId,
   assignedJudges,
   availableJudges,
+  readOnly = false,
 }: {
   competitionId: string;
   assignedJudges: CompetitionJudgeWithProfile[];
   availableJudges: Profile[];
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const assignedIds = new Set(assignedJudges.map((j) => j.judge_id));
@@ -69,32 +71,40 @@ export function JudgesPanel({
                 {j.profile?.full_name ?? "Unknown"}
               </span>
               <div className="flex flex-wrap items-center gap-2">
-                <Select
-                  label="Scores"
-                  value={j.judge_role ?? "leader"}
-                  onChange={(e) =>
-                    updateJudgeRole(j.id, e.target.value as RegistrationRole)
-                  }
-                  options={[
-                    { value: "leader", label: "Leaders" },
-                    { value: "follower", label: "Followers" },
-                  ]}
-                  className="w-36"
-                />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => removeJudge(j.id)}
-                >
-                  Remove
-                </Button>
+                {readOnly ? (
+                  <span className="text-sm capitalize text-muted">
+                    Scores {j.judge_role ?? "leader"}s
+                  </span>
+                ) : (
+                  <>
+                    <Select
+                      label="Scores"
+                      value={j.judge_role ?? "leader"}
+                      onChange={(e) =>
+                        updateJudgeRole(j.id, e.target.value as RegistrationRole)
+                      }
+                      options={[
+                        { value: "leader", label: "Leaders" },
+                        { value: "follower", label: "Followers" },
+                      ]}
+                      className="w-36"
+                    />
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => removeJudge(j.id)}
+                    >
+                      Remove
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {unassigned.length > 0 ? (
+      {!readOnly && unassigned.length > 0 ? (
         <div className="flex flex-wrap items-end gap-3">
           <Select
             label="Add judge"
@@ -128,7 +138,7 @@ export function JudgesPanel({
             Assign
           </Button>
         </div>
-      ) : (
+      ) : readOnly ? null : (
         <EmptyState
           icon="gavel"
           title={

@@ -12,8 +12,10 @@ import { getCountryName } from "@/lib/countries";
 
 export function CompetitionBranding({
   competition,
+  readOnly = false,
 }: {
   competition: Competition;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [countryCode, setCountryCode] = useState(competition.country_code ?? "");
@@ -45,23 +47,38 @@ export function CompetitionBranding({
         <p className="text-sm text-muted">
           Current country: {getCountryName(competition.country_code) || "Not set"}
         </p>
-        <CountrySelect
-          label="Country"
-          value={countryCode}
-          onChange={setCountryCode}
-          required
-        />
-        <Button size="sm" onClick={saveCountry} loading={loading}>
-          {loading ? "Saving..." : "Save country"}
-        </Button>
-        <CompetitionBannerUpload
-          competitionId={competition.id}
-          bannerUrl={bannerUrl}
-          onUploaded={(url) => {
-            setBannerUrl(url);
-            router.refresh();
-          }}
-        />
+        {!readOnly && (
+          <>
+            <CountrySelect
+              label="Country"
+              value={countryCode}
+              onChange={setCountryCode}
+              required
+            />
+            <Button size="sm" onClick={saveCountry} loading={loading}>
+              {loading ? "Saving..." : "Save country"}
+            </Button>
+          </>
+        )}
+        {!readOnly ? (
+          <CompetitionBannerUpload
+            competitionId={competition.id}
+            bannerUrl={bannerUrl}
+            onUploaded={(url) => {
+              setBannerUrl(url);
+              router.refresh();
+            }}
+          />
+        ) : (
+          bannerUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={bannerUrl}
+              alt="Event banner"
+              className="max-h-48 w-full rounded-xl border border-border object-cover"
+            />
+          )
+        )}
         {message && <p className="text-sm text-emerald-400">{message}</p>}
       </div>
     </Card>

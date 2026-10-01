@@ -16,8 +16,10 @@ import type { Competition } from "@/types/database";
 
 export function CompetitionScheduleSettings({
   competition,
+  readOnly = false,
 }: {
   competition: Competition;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [startDate, setStartDate] = useState(
@@ -73,7 +75,7 @@ export function CompetitionScheduleSettings({
 
   return (
     <Card title="Schedule">
-      <div className="space-y-4">
+      <fieldset disabled={readOnly} className="space-y-4 disabled:opacity-90">
         <EventScheduleFields
           startDate={startDate}
           endDate={endDate}
@@ -87,10 +89,12 @@ export function CompetitionScheduleSettings({
 
         {error && <p className="text-sm text-red-400">{error}</p>}
 
-        <Button onClick={() => void handleSave()} loading={loading} size="sm">
-          {loading ? "Saving..." : "Save schedule"}
-        </Button>
-      </div>
+        {!readOnly && (
+          <Button onClick={() => void handleSave()} loading={loading} size="sm">
+            {loading ? "Saving..." : "Save schedule"}
+          </Button>
+        )}
+      </fieldset>
     </Card>
   );
 }

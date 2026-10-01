@@ -26,8 +26,10 @@ import type { Competition, CompetitionStatus } from "@/types/database";
 
 export function CompetitionSettings({
   competition,
+  readOnly = false,
 }: {
   competition: Competition;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const isCompetition = isCompetitionEvent(competition.event_type);
@@ -148,7 +150,7 @@ export function CompetitionSettings({
 
   return (
     <Card title="Settings">
-      <div className="space-y-4">
+      <fieldset disabled={readOnly} className="space-y-4 disabled:opacity-90">
         <div className="flex flex-wrap items-end gap-4">
           <Select
             label="Status"
@@ -348,10 +350,12 @@ export function CompetitionSettings({
 
         {error && <p className="text-sm text-red-400">{error}</p>}
 
-        <Button onClick={() => void handleSave()} loading={loading} size="sm">
-          {loading ? "Saving..." : "Save"}
-        </Button>
-      </div>
+        {!readOnly && (
+          <Button onClick={() => void handleSave()} loading={loading} size="sm">
+            {loading ? "Saving..." : "Save"}
+          </Button>
+        )}
+      </fieldset>
     </Card>
   );
 }

@@ -12,6 +12,8 @@ import {
   type TicketTypeDraft,
 } from "@/lib/ticket-types";
 import { formatCentsToEuroInput, parseEuroInputToCents } from "@/lib/ticket-pricing";
+import { formatPassTypeLabel } from "@/lib/ticket-pass";
+import { formatEuro } from "@/lib/utils";
 import type { EventType, TicketType } from "@/types/database";
 
 function toDraft(type: TicketType): TicketTypeDraft {
@@ -29,11 +31,13 @@ export function TicketTypesPanel({
   eventType,
   initialTypes,
   passFeesToBuyer = false,
+  readOnly = false,
 }: {
   competitionId: string;
   eventType: EventType;
   initialTypes: TicketType[];
   passFeesToBuyer?: boolean;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [drafts, setDrafts] = useState<TicketTypeDraft[]>(
@@ -128,6 +132,33 @@ export function TicketTypesPanel({
 
     setLoading(false);
     router.refresh();
+  }
+
+  if (readOnly) {
+    return (
+      <Card title="Ticket passes" description="Configured pass types for this event.">
+        {initialTypes.length === 0 ? (
+          <p className="text-sm text-muted">No pass types configured.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {initialTypes.map((type) => (
+              <li key={type.id} className="flex justify-between gap-4 py-3 text-sm">
+                <div>
+                  <p className="font-medium text-foreground">{type.name}</p>
+                  <p className="text-muted">
+                    {formatPassTypeLabel(type.pass_type, type.role)}
+                    {!type.is_active && " · Inactive"}
+                  </p>
+                </div>
+                <span className="font-semibold text-foreground">
+                  {formatEuro(type.price_cents)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    );
   }
 
   return (

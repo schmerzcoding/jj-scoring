@@ -1,3 +1,4 @@
+import { PSEUDO_ADMIN_ROLE_LABEL } from "@/lib/admin-access";
 import type { UserRole } from "@/types/database";
 
 export type AdminUserRow = {
@@ -17,6 +18,7 @@ export const MANAGEABLE_ROLE_OPTIONS: {
   { value: "participant", label: "Participant" },
   { value: "judge", label: "Judge" },
   { value: "organizer", label: "Organizer" },
+  { value: "pseudo_admin", label: PSEUDO_ADMIN_ROLE_LABEL },
 ];
 
 export function roleLabel(role: UserRole): string {
@@ -29,6 +31,7 @@ export function roleLabel(role: UserRole): string {
 
   const labels: Record<UserRole, string> = {
     admin: "Admin",
+    pseudo_admin: PSEUDO_ADMIN_ROLE_LABEL,
     judge: "Judge",
     organizer: "Organizer",
     participant: "Participant",
@@ -67,6 +70,6 @@ export function canDeleteUser(
   currentUserId: string
 ): boolean {
   if (target.id === currentUserId) return false;
-  if (target.role === "admin") return false;
+  if (target.role === "admin" || target.role === "pseudo_admin") return false;
   return true;
 }

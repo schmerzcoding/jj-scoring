@@ -15,11 +15,13 @@ export function RegistrationsPanel({
   requiresPayment = false,
   paidUserIds = [],
   showAdminTools = false,
+  readOnly = false,
 }: {
   registrations: RegistrationWithProfile[];
   requiresPayment?: boolean;
   paidUserIds?: string[];
   showAdminTools?: boolean;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const paidUserIdSet = new Set(paidUserIds);
@@ -220,7 +222,7 @@ export function RegistrationsPanel({
 
                   <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
                     <StatusBadge status={reg.status} className="hidden sm:inline-flex" />
-                    {reg.status === "pending" && (
+                    {!readOnly && reg.status === "pending" && (
                       <>
                         <Button
                           size="sm"
@@ -239,7 +241,7 @@ export function RegistrationsPanel({
                         </Button>
                       </>
                     )}
-                    {reg.status === "approved" && (
+                    {!readOnly && reg.status === "approved" && (
                       <Button
                         size="sm"
                         variant="danger"

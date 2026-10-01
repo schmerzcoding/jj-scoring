@@ -1,3 +1,4 @@
+import { hasAdminPanelAccess } from "@/lib/admin-access";
 import type { Competition, UserRole } from "@/types/database";
 
 const SANDBOX_NAME_PREFIX = "[SANDBOX]";
@@ -14,7 +15,7 @@ export function canViewPublicCompetitionPage(
   role: UserRole | undefined,
   options?: { isAssignedJudge?: boolean; isEventOrganizer?: boolean }
 ): boolean {
-  if (role === "admin") return true;
+  if (hasAdminPanelAccess(role)) return true;
   if (options?.isEventOrganizer) return true;
   if (options?.isAssignedJudge) return true;
 

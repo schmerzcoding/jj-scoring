@@ -19,6 +19,9 @@ import { RegistrationsPanel } from "./registrations-panel";
 import { RoundsPanel } from "./rounds-panel";
 import { JudgesPanel } from "./judges-panel";
 import { CompetitionSettings } from "./competition-settings";
+import { AdminReadOnlyBanner } from "@/components/admin-read-only-banner";
+import { canPerformAdminWrites } from "@/lib/admin-access";
+import { requireAdminPanelAccess } from "@/lib/admin-page-auth";
 import { CompetitionBranding } from "./competition-branding";
 
 export default async function AdminCompetitionPage({
@@ -39,7 +42,8 @@ export default async function AdminCompetitionPage({
     .select("role")
     .eq("id", user.id)
     .single();
-  if (profile?.role !== "admin") redirect("/");
+  requireAdminPanelAccess(profile?.role);
+  const readOnly = !canPerformAdminWrites(profile?.role);
 
   const { data: competition } = await supabase
     .from("competitions")
@@ -161,12 +165,14 @@ export default async function AdminCompetitionPage({
             <StatusBadge status={competition.status} />
             <Link href={`/admin/competitions/${id}/check-in`}>
               <Button size="sm" variant="secondary">
-                Door check-in
+                {readOnly ? "View check-in" : "Door check-in"}
               </Button>
             </Link>
           </div>
         </div>
       </div>
+
+      {readOnly && <AdminReadOnlyBanner />}
 
       {competition.status === "draft" && (
         <div className="rounded-xl border border-amber-800/50 bg-amber-950/40 p-4">
@@ -178,17 +184,18 @@ export default async function AdminCompetitionPage({
         </div>
       )}
 
-      <CompetitionScheduleSettings competition={competition} />
-      <CompetitionSettings competition={competition} />
+      <CompetitionScheduleSettings competition={competition} readOnly={readOnly} />
+      <CompetitionSettings competition={competition} readOnly={readOnly} />
       {supportsMultiTicketTypes(competition.event_type) && (
         <TicketTypesPanel
           competitionId={id}
           eventType={competition.event_type}
           initialTypes={ticketTypes}
           passFeesToBuyer={competition.pass_fees_to_buyer ?? false}
+          readOnly={readOnly}
         />
       )}
-      <CompetitionBranding competition={competition} />
+      <CompetitionBranding competition={competition} readOnly={readOnly} />
 
       {isCompetition && (
         <>
@@ -196,17 +203,20 @@ export default async function AdminCompetitionPage({
             registrations={registrationsWithProfiles}
             requiresPayment={applyBeforePay}
             paidUserIds={paidUserIds}
-            showAdminTools
+            showAdminTools={!readOnly}
+            readOnly={readOnly}
           />
           <RoundsPanel
             competitionId={id}
             rounds={rounds ?? []}
             participants={approvedParticipants}
+            readOnly={readOnly}
           />
           <JudgesPanel
             competitionId={id}
             assignedJudges={judgesWithProfiles}
             availableJudges={allJudges ?? []}
+            readOnly={readOnly}
           />
         </>
       )}

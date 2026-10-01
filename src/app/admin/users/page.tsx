@@ -2,7 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { UsersPanel } from "./users-panel";
+import { AdminReadOnlyBanner } from "@/components/admin-read-only-banner";
+import { canPerformAdminWrites } from "@/lib/admin-access";
 import type { AdminUserRow } from "@/lib/admin-users";
+import { requireAdminPanelAccess } from "@/lib/admin-page-auth";
 
 export default async function AdminUsersPage() {
   const supabase = await createClient();
@@ -18,7 +21,8 @@ export default async function AdminUsersPage() {
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") redirect("/");
+  requireAdminPanelAccess(profile?.role);
+  const readOnly = !canPerformAdminWrites(profile?.role);
 
   const { data: users, error } = await supabase.rpc("admin_list_users");
 
@@ -51,13 +55,18 @@ export default async function AdminUsersPage() {
         </Link>
         <h1 className="mt-2 text-3xl font-bold text-foreground">Users</h1>
         <p className="mt-1 text-muted">
-          Manage registered accounts, roles, and access.
+          {readOnly
+            ? "View registered accounts and roles."
+            : "Manage registered accounts, roles, and access."}
         </p>
       </div>
+
+      {readOnly && <AdminReadOnlyBanner />}
 
       <UsersPanel
         users={(users ?? []) as AdminUserRow[]}
         currentUserId={user.id}
+        readOnly={readOnly}
       />
     </div>
   );

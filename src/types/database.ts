@@ -506,7 +506,12 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      user_role: "admin" | "judge" | "organizer" | "participant";
+      user_role:
+        | "admin"
+        | "pseudo_admin"
+        | "judge"
+        | "organizer"
+        | "participant";
       competition_status:
         | "draft"
         | "open"

@@ -1,3 +1,4 @@
+import { canPerformAdminWrites } from "@/lib/admin-access";
 import type { Competition, UserRole } from "@/types/database";
 
 export function isOrganizerRole(role: UserRole | undefined): boolean {
@@ -9,7 +10,7 @@ export function canManageEvent(
   role: UserRole | undefined,
   event: Pick<Competition, "created_by">
 ): boolean {
-  if (role === "admin") return true;
+  if (canPerformAdminWrites(role)) return true;
   if (role === "organizer" && event.created_by === userId) return true;
   return false;
 }
