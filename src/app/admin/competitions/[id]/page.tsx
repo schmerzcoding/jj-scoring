@@ -60,8 +60,8 @@ export default async function AdminCompetitionPage({
   const userIds = [...new Set(registrations?.map((r) => r.user_id) ?? [])];
   const { data: registrationProfiles } =
     userIds.length > 0
-      ? await supabase.from("profiles").select("id, full_name").in("id", userIds)
-      : { data: [] as { id: string; full_name: string }[] };
+      ? await supabase.from("profiles").select("id, full_name, avatar_url").in("id", userIds)
+      : { data: [] as { id: string; full_name: string; avatar_url: string | null }[] };
 
   const profileById = new Map(
     registrationProfiles?.map((p) => [p.id, p]) ?? []

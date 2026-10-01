@@ -3,8 +3,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { EventSalesGrid } from "@/components/event-sales-grid";
 import { SalesSummaryBar } from "@/components/sales-summary-bar";
+import { PassPurchasesList } from "@/components/pass-purchases-list";
 import { fetchEventsWithSales } from "@/lib/event-sales-server";
 import { sumSalesStats } from "@/lib/event-sales";
+import { fetchPaidPassPurchases } from "@/lib/pass-purchases-server";
 
 export default async function AdminSalesPage() {
   const supabase = await createClient();
@@ -22,7 +24,10 @@ export default async function AdminSalesPage() {
 
   if (profile?.role !== "admin") redirect("/");
 
-  const events = await fetchEventsWithSales(supabase);
+  const [events, paidPasses] = await Promise.all([
+    fetchEventsWithSales(supabase),
+    fetchPaidPassPurchases(supabase),
+  ]);
   const totals = sumSalesStats(events);
 
   return (
@@ -41,6 +46,8 @@ export default async function AdminSalesPage() {
       </div>
 
       <SalesSummaryBar totals={totals} />
+
+      <PassPurchasesList purchases={paidPasses} />
 
       <section>
         <h2 className="mb-4 text-xl font-semibold text-foreground">All events</h2>

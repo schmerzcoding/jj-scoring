@@ -4,8 +4,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { EventSalesGrid } from "@/components/event-sales-grid";
 import { SalesSummaryBar } from "@/components/sales-summary-bar";
+import { PassPurchasesList } from "@/components/pass-purchases-list";
 import { fetchEventsWithSales } from "@/lib/event-sales-server";
 import { sumSalesStats } from "@/lib/event-sales";
+import { fetchPaidPassPurchases } from "@/lib/pass-purchases-server";
 
 export default async function OrganizerSalesPage() {
   const supabase = await createClient();
@@ -23,7 +25,10 @@ export default async function OrganizerSalesPage() {
 
   if (profile?.role !== "organizer" && profile?.role !== "admin") redirect("/");
 
-  const events = await fetchEventsWithSales(supabase, { createdBy: user.id });
+  const [events, paidPasses] = await Promise.all([
+    fetchEventsWithSales(supabase, { createdBy: user.id }),
+    fetchPaidPassPurchases(supabase, { createdBy: user.id }),
+  ]);
   const totals = sumSalesStats(events);
 
   return (
@@ -47,6 +52,8 @@ export default async function OrganizerSalesPage() {
       </div>
 
       <SalesSummaryBar totals={totals} />
+
+      <PassPurchasesList purchases={paidPasses} />
 
       <section>
         <h2 className="mb-4 text-xl font-semibold text-foreground">Your events</h2>

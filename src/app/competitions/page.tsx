@@ -1,14 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { CompetitionList } from "@/components/competition-list";
+import { SANDBOX_COMPETITION_NAME_PREFIX } from "@/lib/competition-access";
 
 export default async function CompetitionsPage() {
   const supabase = await createClient();
 
-  const { data: competitions } = await supabase
+  const { data: rows } = await supabase
     .from("competitions")
     .select("*")
     .in("status", ["open", "closed", "in_progress", "completed"])
     .order("event_date", { ascending: true });
+
+  const competitions =
+    rows?.filter((c) => !c.name.startsWith(SANDBOX_COMPETITION_NAME_PREFIX)) ?? [];
 
   return (
     <div>

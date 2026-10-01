@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AvatarCropModal } from "@/components/avatar-crop-modal";
 
-const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const MAX_AVATAR_BYTES = 4 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 function initials(name: string): string {
@@ -96,7 +96,7 @@ export function AvatarUpload({
     }
 
     if (file.size > MAX_AVATAR_BYTES) {
-      alert("Image must be 2 MB or smaller.");
+      alert("Image must be 4 MB or smaller.");
       return;
     }
 
@@ -106,7 +106,7 @@ export function AvatarUpload({
 
   async function uploadAvatarBlob(blob: Blob) {
     if (blob.size > MAX_AVATAR_BYTES) {
-      alert("Cropped image must be 2 MB or smaller. Try zooming out a little.");
+      alert("Cropped image must be 4 MB or smaller. Try zooming out a little.");
       return;
     }
 
@@ -194,7 +194,7 @@ export function AvatarUpload({
             </button>
           )}
           <p className="text-xs text-muted">
-            JPEG, PNG, WebP or GIF. Max 2 MB. You can reposition before saving.
+            JPEG, PNG, WebP or GIF. Max 4 MB. You can reposition before saving.
           </p>
         </div>
       </div>

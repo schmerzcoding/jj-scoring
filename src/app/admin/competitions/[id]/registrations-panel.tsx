@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { UserAvatar } from "@/components/avatar-upload";
 import { cn } from "@/lib/utils";
 import type { RegistrationWithProfile } from "@/types/database";
 
@@ -192,7 +193,13 @@ export function RegistrationsPanel({
 
               return (
                 <div key={reg.id} className="flex flex-col gap-3 py-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
+                  <div className="flex min-w-0 gap-3">
+                    <UserAvatar
+                      name={displayName}
+                      avatarUrl={reg.profile?.avatar_url}
+                      size="sm"
+                    />
+                    <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <span className="font-medium text-foreground">{displayName}</span>
                       <span className="text-sm capitalize text-muted">({reg.role})</span>
@@ -207,6 +214,7 @@ export function RegistrationsPanel({
                       {isConfirmed && (
                         <span className="text-xs font-medium text-emerald-400">Confirmed</span>
                       )}
+                    </div>
                     </div>
                   </div>
 

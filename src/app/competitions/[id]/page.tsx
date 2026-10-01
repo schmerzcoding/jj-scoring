@@ -33,6 +33,7 @@ import { CompetitionPaymentForm } from "@/components/competition-payment-form";
 import { CheckoutSuccessSync } from "@/components/checkout-success-sync";
 import { Leaderboard } from "@/components/leaderboard";
 import { getPublishedRoundLeaderboards } from "@/lib/leaderboard-server";
+import { canViewPublicCompetitionPage } from "@/lib/competition-access";
 import { isCompetitionEvent } from "@/lib/events";
 import type { ParticipantRow } from "@/lib/leaderboard";
 import type { TicketPurchase } from "@/types/database";
@@ -56,6 +57,42 @@ export default async function CompetitionDetailPage({
 
   if (!competition) notFound();
 
+  const {
+    data: { user: viewer },
+  } = await supabase.auth.getUser();
+
+  let viewerProfile: { role: import("@/types/database").UserRole } | null = null;
+  if (viewer) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", viewer.id)
+      .single();
+    viewerProfile = data;
+  }
+
+  let isAssignedJudge = false;
+  if (viewer && isCompetitionEvent(competition.event_type)) {
+    const { data: judgeRow } = await supabase
+      .from("competition_judges")
+      .select("id")
+      .eq("competition_id", id)
+      .eq("judge_id", viewer.id)
+      .maybeSingle();
+    isAssignedJudge = Boolean(judgeRow);
+  }
+
+  const isEventOrganizer = Boolean(viewer && competition.created_by === viewer.id);
+
+  if (
+    !canViewPublicCompetitionPage(competition, viewerProfile?.role, {
+      isAssignedJudge,
+      isEventOrganizer,
+    })
+  ) {
+    notFound();
+  }
+
   const isCompetition = isCompetitionEvent(competition.event_type);
   const ticketTypes = await fetchActiveTicketTypes(supabase, id);
   const hasPaidTickets = eventHasAnyPaidTickets(competition, ticketTypes);
@@ -64,9 +101,7 @@ export default async function CompetitionDetailPage({
     (type) => type.is_active && type.price_cents > 0
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = viewer;
 
   let userProfile = null;
   if (user) {
