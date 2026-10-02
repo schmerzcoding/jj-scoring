@@ -12,7 +12,7 @@ export function WaddleCupLanding({ events }: { events: WaddleCupEvents }) {
         <div className="waddle-cup-page__hero-copy">
           <div className="waddle-cup-page__title-wrap">
             <Image
-              src={BRAND_ASSETS.homeWaddleCupTitle}
+              src={BRAND_ASSETS.waddleCupImage}
               alt="The Waddle Cup"
               width={1200}
               height={425}

@@ -20,6 +20,8 @@ export const BRAND_ASSETS = {
   /** Homepage — designer exports (Dani) */
   homeTitleWaddle: "/branding/titulo waddle.png",
   homeCrystalIcon: "/branding/icono cristal.png",
+  /** The Waddle Cup logo (public/branding/the waddle cup.png) */
+  waddleCupImage: "/branding/the waddle cup.png",
   homeTrophyShadow: "/branding/copa con sombra.png",
   waddleCupTrophy: "/branding/copa sin sombra.png",
   homeWaddleCupTitle: "/branding/the waddle cup.png",

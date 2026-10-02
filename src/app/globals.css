@@ -1298,11 +1298,12 @@ select option {
   .home-waddle-cup__title-image {
     margin-right: -5.5rem;
     max-width: calc(100% + 5.5rem);
-    transform: translateX(8.5rem);
+    transform: translateX(9rem) translateY(-5rem);
   }
 
   .home-waddle-cup__details {
     max-width: 46rem;
+    transform: translateY(-10rem);
   }
 
   .home-waddle-cup__trophy {
@@ -1589,15 +1590,14 @@ select option {
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    gap: 0.9rem;
-    padding-top: 0.7rem;
     transform: none;
     overflow: visible;
-    transform: translateX(-0.1rem);
+    transform: translateX(-0.15rem);
   }
 
   .home-waddle-cup__eyebrow {
     font-size: 0.6875rem;
+    transform: translatex(-0.2rem);
   }
 
   .home-waddle-cup__title-wrap {
@@ -1609,12 +1609,13 @@ select option {
     width: 110%;
     max-width: 110%;
     margin-right: 0;
-    transform: translateX(2rem);
+    transform: translateX(2rem) translateY(-2rem);
   }
 
   .home-waddle-cup__details {
     max-width: 100%;
     width: 100%;
+    transform: translateY(-3.5rem);
   }
 
   .home-waddle-cup__details-line {
@@ -2084,16 +2085,15 @@ select option {
   }
 
   .waddle-cup-page__title-wrap {
-    margin-top: 0;
     align-self: center;
     width: 118%;
     max-width: 24rem;
   }
 
   .waddle-cup-page__title-image {
-    width: 120%;
-    max-width: 120%;
-    transform: translateX(-2.5rem);
+    width: 125%;
+    max-width: 125%;
+    transform: translateX(-2.75rem) translateY(2rem);
   }
 
   .waddle-cup-page__intro,
@@ -2166,7 +2166,7 @@ select option {
   }
 
   .waddle-cup-page__title-image {
-    width: min(100%, 42rem);
+    width: min(130%, 48rem);
     max-width: none;
   }
 

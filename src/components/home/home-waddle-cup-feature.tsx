@@ -28,7 +28,7 @@ export function HomeWaddleCupFeature() {
           <p className="home-waddle-cup__eyebrow">{HOME_FEATURE_EVENT.eyebrow}</p>
           <div className="home-waddle-cup__title-wrap">
             <Image
-              src={BRAND_ASSETS.homeWaddleCupTitle}
+              src={BRAND_ASSETS.waddleCupImage}
               alt="The Waddle Cup"
               width={1200}
               height={425}
