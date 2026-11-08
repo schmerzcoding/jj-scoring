@@ -27,6 +27,11 @@ export function RegistrationsPanel({
   const paidUserIdSet = new Set(paidUserIds);
   const pending = registrations.filter((registration) => registration.status === "pending");
   const approved = registrations.filter((registration) => registration.status === "approved");
+  const otherRegistrations = registrations.filter(
+    (registration) => registration.status !== "approved"
+  );
+  const approvedLeaders = approved.filter((registration) => registration.role === "leader");
+  const approvedFollowers = approved.filter((registration) => registration.role === "follower");
   const confirmedCount = requiresPayment
     ? approved.filter((registration) => paidUserIdSet.has(registration.user_id)).length
     : approved.length;
@@ -175,8 +180,8 @@ export function RegistrationsPanel({
         title="Registrations"
         description={
           requiresPayment
-            ? `${confirmedCount} confirmed, ${approved.length - confirmedCount} awaiting payment, ${pending.length} pending review`
-            : `${approved.length} approved, ${pending.length} pending`
+            ? `${confirmedCount} confirmed, ${approved.length - confirmedCount} awaiting payment, ${pending.length} pending review · ${approvedLeaders.length} leaders, ${approvedFollowers.length} followers`
+            : `${approved.length} approved (${approvedLeaders.length} leaders, ${approvedFollowers.length} followers), ${pending.length} pending`
         }
       >
         {registrations.length === 0 ? (
@@ -187,85 +192,52 @@ export function RegistrationsPanel({
             compact
           />
         ) : (
-          <div className="divide-y divide-border">
-            {registrations.map((reg) => {
-              const hasPaid = paidUserIdSet.has(reg.user_id);
-              const isConfirmed = reg.status === "approved" && (!requiresPayment || hasPaid);
-              const displayName = reg.display_name ?? reg.profile?.full_name ?? "Unknown";
+          <div className="space-y-8">
+            {otherRegistrations.length > 0 && (
+              <div className="divide-y divide-border">
+                {otherRegistrations.map((reg) => (
+                  <RegistrationRow
+                    key={reg.id}
+                    reg={reg}
+                    requiresPayment={requiresPayment}
+                    hasPaid={paidUserIdSet.has(reg.user_id)}
+                    readOnly={readOnly}
+                    showAdminTools={showAdminTools}
+                    clearingId={clearingId}
+                    onApprove={() => void updateStatus(reg.id, "approved")}
+                    onReject={() => openRejectModal(reg)}
+                    onRemove={() => removeFromCompetition(reg)}
+                    onClear={() => void clearWithdrawnRegistration(reg)}
+                  />
+                ))}
+              </div>
+            )}
 
-              return (
-                <div key={reg.id} className="flex flex-col gap-3 py-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex min-w-0 gap-3">
-                    <UserAvatar
-                      name={displayName}
-                      avatarUrl={reg.profile?.avatar_url}
-                      size="sm"
-                    />
-                    <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <span className="font-medium text-foreground">{displayName}</span>
-                      <span className="text-sm capitalize text-muted">({reg.role})</span>
-                      <StatusBadge status={reg.status} className="sm:hidden" />
-                    </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                      {requiresPayment && reg.status === "approved" && (
-                        <span className="text-xs text-muted">
-                          {hasPaid ? "Paid" : "Awaiting payment"}
-                        </span>
-                      )}
-                      {isConfirmed && (
-                        <span className="text-xs font-medium text-emerald-400">Confirmed</span>
-                      )}
-                    </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
-                    <StatusBadge status={reg.status} className="hidden sm:inline-flex" />
-                    {!readOnly && reg.status === "pending" && (
-                      <>
-                        <Button
-                          size="sm"
-                          className="flex-1 sm:flex-none"
-                          onClick={() => void updateStatus(reg.id, "approved")}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          className="flex-1 sm:flex-none"
-                          onClick={() => openRejectModal(reg)}
-                        >
-                          Reject
-                        </Button>
-                      </>
-                    )}
-                    {!readOnly && reg.status === "approved" && (
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        className="flex-1 sm:flex-none"
-                        onClick={() => removeFromCompetition(reg)}
-                      >
-                        Remove
-                      </Button>
-                    )}
-                    {showAdminTools && reg.status === "withdrawn" && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="flex-1 sm:flex-none"
-                        loading={clearingId === reg.id}
-                        onClick={() => void clearWithdrawnRegistration(reg)}
-                      >
-                        Clear
-                      </Button>
-                    )}
-                  </div>
+            {approved.length > 0 && (
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-foreground">
+                  Approved participants
+                </h3>
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <ApprovedRoleColumn
+                    label="Leaders"
+                    registrations={approvedLeaders}
+                    requiresPayment={requiresPayment}
+                    paidUserIdSet={paidUserIdSet}
+                    readOnly={readOnly}
+                    onRemove={removeFromCompetition}
+                  />
+                  <ApprovedRoleColumn
+                    label="Followers"
+                    registrations={approvedFollowers}
+                    requiresPayment={requiresPayment}
+                    paidUserIdSet={paidUserIdSet}
+                    readOnly={readOnly}
+                    onRemove={removeFromCompetition}
+                  />
                 </div>
-              );
-            })}
+              </div>
+            )}
           </div>
         )}
       </Card>
@@ -341,5 +313,158 @@ export function RegistrationsPanel({
         </div>
       )}
     </>
+  );
+}
+
+function registrationDisplayName(reg: RegistrationWithProfile): string {
+  return reg.display_name ?? reg.profile?.full_name ?? "Unknown";
+}
+
+function RegistrationRow({
+  reg,
+  requiresPayment,
+  hasPaid,
+  readOnly,
+  showAdminTools,
+  clearingId,
+  onApprove,
+  onReject,
+  onRemove,
+  onClear,
+  compact = false,
+}: {
+  reg: RegistrationWithProfile;
+  requiresPayment: boolean;
+  hasPaid: boolean;
+  readOnly: boolean;
+  showAdminTools?: boolean;
+  clearingId?: string | null;
+  onApprove?: () => void;
+  onReject?: () => void;
+  onRemove?: () => void;
+  onClear?: () => void;
+  compact?: boolean;
+}) {
+  const isConfirmed = reg.status === "approved" && (!requiresPayment || hasPaid);
+  const displayName = registrationDisplayName(reg);
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-3 py-3 sm:flex-row sm:items-start sm:justify-between",
+        compact && "py-2"
+      )}
+    >
+      <div className="flex min-w-0 gap-3">
+        <UserAvatar name={displayName} avatarUrl={reg.profile?.avatar_url} size="sm" />
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-medium text-foreground">{displayName}</span>
+            {!compact && (
+              <span className="text-sm capitalize text-muted">({reg.role})</span>
+            )}
+            {reg.status !== "approved" && (
+              <StatusBadge status={reg.status} className="sm:hidden" />
+            )}
+          </div>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            {requiresPayment && reg.status === "approved" && (
+              <span className="text-xs text-muted">
+                {hasPaid ? "Paid" : "Awaiting payment"}
+              </span>
+            )}
+            {isConfirmed && (
+              <span className="text-xs font-medium text-emerald-400">Confirmed</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
+        {reg.status !== "approved" && (
+          <StatusBadge status={reg.status} className="hidden sm:inline-flex" />
+        )}
+        {!readOnly && reg.status === "pending" && (
+          <>
+            <Button size="sm" className="flex-1 sm:flex-none" onClick={onApprove}>
+              Approve
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              className="flex-1 sm:flex-none"
+              onClick={onReject}
+            >
+              Reject
+            </Button>
+          </>
+        )}
+        {!readOnly && reg.status === "approved" && (
+          <Button
+            size="sm"
+            variant="danger"
+            className="flex-1 sm:flex-none"
+            onClick={onRemove}
+          >
+            Remove
+          </Button>
+        )}
+        {showAdminTools && reg.status === "withdrawn" && (
+          <Button
+            size="sm"
+            variant="secondary"
+            className="flex-1 sm:flex-none"
+            loading={clearingId === reg.id}
+            onClick={onClear}
+          >
+            Clear
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ApprovedRoleColumn({
+  label,
+  registrations,
+  requiresPayment,
+  paidUserIdSet,
+  readOnly,
+  onRemove,
+}: {
+  label: string;
+  registrations: RegistrationWithProfile[];
+  requiresPayment: boolean;
+  paidUserIdSet: Set<string>;
+  readOnly: boolean;
+  onRemove: (reg: RegistrationWithProfile) => void;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface-raised/40 p-3">
+      <h4 className="mb-2 flex items-baseline justify-between gap-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+        <span>{label}</span>
+        <span className="rounded-full bg-surface-overlay px-2 py-0.5 text-xs font-semibold text-foreground ring-1 ring-border">
+          {registrations.length}
+        </span>
+      </h4>
+      {registrations.length === 0 ? (
+        <EmptyState title={`No ${label.toLowerCase()} yet`} compact className="py-2" />
+      ) : (
+        <div className="divide-y divide-border">
+          {registrations.map((reg) => (
+            <RegistrationRow
+              key={reg.id}
+              reg={reg}
+              requiresPayment={requiresPayment}
+              hasPaid={paidUserIdSet.has(reg.user_id)}
+              readOnly={readOnly}
+              compact
+              onRemove={() => onRemove(reg)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
